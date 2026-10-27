@@ -4,6 +4,7 @@ import { getDb } from "../db/client";
 import { documents } from "../db/schema";
 import { getPublishedContent } from "../content/siteContent";
 import { redactSensitiveData } from "../privacy/sensitiveData";
+import { outsideWork } from "../../data/siteData";
 
 /** Renders the published site content as plain text for the model. */
 export function contentToText(content) {
@@ -39,6 +40,8 @@ export function contentToText(content) {
     "",
     "Skills:",
     ...skillGroups.map((group) => `- ${group.name}: ${group.items.join(", ")}`),
+    "",
+    `Outside work: ${outsideWork.join(", ")}.`,
     "",
     `Problem solving: ${profile.problemSolving.solved} LeetCode problems (${profile.problemSolving.medium} medium, ${profile.problemSolving.hard} hard), mostly in ${profile.problemSolving.language}.`,
     "",

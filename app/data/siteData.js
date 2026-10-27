@@ -290,12 +290,22 @@ export const skillGroups = [
   },
 ];
 
+/** Photos from outside work. `position` keeps the subject in frame when the photo is cropped to a card. */
 export const beyondWork = [
-  { src: "/img/carousel/slider-img-1(1).jpg", alt: "Burhanuddin holding a football on the pitch", title: "Tournament Winners" },
-  { src: "/img/carousel/slider-img-2(1).jpg", alt: "Burhanuddin with a trophy and golden boot", title: "Tournament Champions" },
-  { src: "/img/carousel/slider-img-3(1).jpg", alt: "Burhanuddin with a trophy at a night match", title: "Best Player of the Tournament" },
-  { src: "/img/carousel/slider-img-4(1).jpeg", alt: "Burhanuddin performing on stage with a microphone", title: "Stand-Up Battle Winner" },
+  { src: "/img/life/pondicherry.jpg", alt: "Burhanuddin smiling outside a yellow heritage building in Pondicherry", position: "50% 55%" },
+  { src: "/img/life/surf-board.jpg", alt: "Burhanuddin standing beside a surfboard on the beach", position: "50% 45%" },
+  { src: "/img/life/kitten.jpg", alt: "Burhanuddin holding a fluffy kitten on the beach", position: "50% 40%" },
+  { src: "/img/life/home-cooking.jpg", alt: "A home-cooked platter of chicken in white sauce, corn, roasted vegetables and fries", position: "50% 45%" },
+  { src: "/img/life/kayak.jpg", alt: "Burhanuddin kayaking with family on a lake full of lily pads", position: "50% 62%" },
+  { src: "/img/life/gym.jpg", alt: "Burhanuddin taking a mirror selfie at the gym", position: "50% 45%" },
+  { src: "/img/life/beach-selfie.jpg", alt: "Burhanuddin grinning in sunglasses above the Pondicherry promenade", position: "47% 50%" },
+  { src: "/img/life/surf-sitting.jpg", alt: "Burhanuddin sitting on a surfboard at the water's edge, watching the waves", position: "50% 68%" },
+  { src: "/img/life/pier.jpg", alt: "Waves breaking beside an old pier under a clear sky", position: "55% 60%" },
+  { src: "/img/life/stand-up.jpg", alt: "Burhanuddin performing stand-up comedy on stage", position: "50% 40%" },
 ];
+
+/** What the chat can say about life outside work. */
+export const outsideWork = ["travelling", "food and cooking", "family time", "animals", "surfing and kayaking", "the gym", "stand-up comedy"];
 
 /** Slides for the "Quick intro" slideshow. */
 export const introSlides = [
