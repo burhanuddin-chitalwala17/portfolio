@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { validatePassword } from "../../../services/auth/validatePassword";
 import { ADMIN_COOKIE_NAME, createSessionToken } from "../../../services/auth/checkSession";
+import { isLockedOut, recordLoginAttempt } from "../../../services/auth/loginAttempts";
+import { clientIpHash } from "../../../services/request/clientIp";
 
 const COOKIE_NAME = ADMIN_COOKIE_NAME;
 const COOKIE_OPTIONS = {
@@ -30,7 +32,16 @@ export async function POST(request) {
       );
     }
 
+    const ipHash = clientIpHash(request);
+    if (await isLockedOut(ipHash)) {
+      return NextResponse.json(
+        { success: false, error: "Too many attempts. Please try again in 15 minutes." },
+        { status: 429 }
+      );
+    }
+
     const isValid = validatePassword(password);
+    await recordLoginAttempt(ipHash, isValid);
 
     if (!isValid) {
       return NextResponse.json(

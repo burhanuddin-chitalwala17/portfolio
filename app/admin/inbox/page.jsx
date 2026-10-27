@@ -18,13 +18,13 @@ export default async function InboxPage() {
     <div className="flex flex-col gap-6">
       <SetupNotice databaseReady={isDatabaseConfigured()} storageReady={isStorageConfigured()} />
       <div>
-        <h2 className="text-lg font-semibold text-slate-900">Visitor questions</h2>
-        <p className="text-sm text-slate-500">
+        <h2 className="text-lg font-semibold text-fg">Visitor questions</h2>
+        <p className="text-sm text-fg/60">
           Questions the portfolio chat couldn&apos;t answer from your documents land here.
         </p>
       </div>
       {loadError ? (
-        <p role="alert" className="rounded-2xl border border-rose-200 bg-rose-50 px-5 py-4 text-sm text-rose-800">
+        <p role="alert" className="rounded-2xl border border-danger/20 bg-danger/5 px-5 py-4 text-sm text-danger">
           {loadError}
         </p>
       ) : (

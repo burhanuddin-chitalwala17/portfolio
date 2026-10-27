@@ -15,6 +15,20 @@
       "when": 1793104840662,
       "tag": "0001_lock_down_tables",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1793105714807,
+      "tag": "0002_chat_content_security",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1793105716171,
+      "tag": "0003_lock_down_new_tables",
+      "breakpoints": true
     }
   ]
 }

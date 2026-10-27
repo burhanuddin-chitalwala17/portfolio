@@ -41,14 +41,14 @@ export default function AdminLockScreen() {
   };
 
   return (
-    <div className="flex min-h-screen w-full items-center justify-center bg-slate-50 px-4">
+    <div className="theme-light flex min-h-screen w-full items-center justify-center bg-canvas px-4">
       <div className="w-full max-w-md">
-        <div className="rounded-2xl border border-slate-200 bg-white p-8 shadow-sm">
+        <div className="rounded-2xl border border-fg/10 bg-surface p-8 shadow-sm">
           <div className="mb-6 text-center">
-            <h1 className="text-2xl font-semibold text-slate-900 md:text-3xl">
+            <h1 className="text-2xl font-semibold text-fg md:text-3xl">
               Admin Access
             </h1>
-            <p className="mt-2 text-sm text-slate-500">
+            <p className="mt-2 text-sm text-fg/60">
               Enter your password to access the admin dashboard
             </p>
           </div>
@@ -57,7 +57,7 @@ export default function AdminLockScreen() {
             <div>
               <label
                 htmlFor="password"
-                className="mb-2 block text-sm font-medium text-slate-700"
+                className="mb-2 block text-sm font-medium text-fg/80"
               >
                 Password
               </label>
@@ -67,7 +67,7 @@ export default function AdminLockScreen() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 disabled={isLoading}
-                className="w-full rounded-lg border border-slate-300 bg-white px-4 py-3 text-slate-900 placeholder-slate-400 transition focus:border-slate-900 focus:outline-none focus:ring-2 focus:ring-slate-900 focus:ring-offset-1 disabled:cursor-not-allowed disabled:bg-slate-50"
+                className="w-full rounded-lg border border-fg/20 bg-surface px-4 py-3 text-fg placeholder-fg/40 transition focus:border-fg focus:outline-none focus:ring-2 focus:ring-fg focus:ring-offset-1 ring-offset-surface disabled:cursor-not-allowed disabled:bg-canvas"
                 placeholder="Enter admin password"
                 autoFocus
                 required
@@ -75,7 +75,7 @@ export default function AdminLockScreen() {
             </div>
 
             {error && (
-              <div className="rounded-lg bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">
+              <div className="rounded-lg bg-danger/5 border border-danger/20 px-4 py-3 text-sm text-danger">
                 {error}
               </div>
             )}
@@ -83,7 +83,7 @@ export default function AdminLockScreen() {
             <button
               type="submit"
               disabled={isLoading || !password.trim()}
-              className="w-full rounded-lg bg-slate-900 px-4 py-3 text-sm font-semibold text-white transition hover:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-slate-900 focus:ring-offset-2 disabled:cursor-not-allowed disabled:bg-slate-400"
+              className="w-full rounded-lg bg-fg px-4 py-3 text-sm font-semibold text-surface transition hover:bg-fg/80 focus:outline-none focus:ring-2 focus:ring-fg focus:ring-offset-2 disabled:cursor-not-allowed disabled:bg-fg/40"
             >
               {isLoading ? "Authenticating..." : "Unlock Dashboard"}
             </button>

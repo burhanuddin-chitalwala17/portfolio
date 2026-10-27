@@ -6,7 +6,8 @@ import { UploadError, uploadDocument } from "../../../services/documents/manageD
 
 /**
  * POST /api/admin/documents
- * Uploads one or more files sent as multipart form data under the "files" field.
+ * Uploads files sent as multipart "files", with an "options" JSON array of per-file choices.
+ * A file only reaches the chat when its choice says so (and, if risky, the risk was confirmed).
  */
 export async function POST(request) {
   if (!(await isAdminRequest())) {
@@ -20,8 +21,12 @@ export async function POST(request) {
   }
 
   let files;
+  let options = [];
   try {
-    files = (await request.formData()).getAll("files").filter((item) => typeof item === "object");
+    const formData = await request.formData();
+    files = formData.getAll("files").filter((item) => typeof item === "object");
+    // Per-file choices, in the same order as the files: [{ useInChat, acknowledgedRisks }]
+    options = JSON.parse(formData.get("options") || "[]");
   } catch {
     return NextResponse.json({ success: false, error: "The upload couldn't be read." }, { status: 400 });
   }
@@ -31,9 +36,13 @@ export async function POST(request) {
 
   const uploaded = [];
   const errors = [];
-  for (const file of files) {
+  for (const [index, file] of files.entries()) {
     try {
-      const row = await uploadDocument(file);
+      const choice = options[index] ?? {};
+      const row = await uploadDocument(file, {
+        useInChat: choice.useInChat === true,
+        acknowledgedRisks: choice.acknowledgedRisks === true,
+      });
       uploaded.push({ id: row.id, name: row.name });
     } catch (error) {
       if (error instanceof UploadError) {

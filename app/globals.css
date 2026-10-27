@@ -2,6 +2,112 @@
 @tailwind components;
 @tailwind utilities;
 
+/*
+ * Design tokens
+ *
+ * Primitives hold raw values (colours as "R G B" channels so Tailwind can apply opacity).
+ * Semantic tokens say what a value is for; components only ever use semantic tokens through
+ * the Tailwind theme (bg-canvas, text-fg/70, border-danger/20, text-display-hero, px-gutter…).
+ * The public site uses the dark theme on :root; the admin panel opts into .theme-light.
+ */
+@layer base {
+  :root {
+    /* Primitives: colour */
+    --neutral-0: 255 255 255;
+    --neutral-50: 248 250 252;
+    --neutral-900: 20 20 20;
+    --neutral-950: 11 11 13;
+    --neutral-1000: 0 0 0;
+    --slate-900: 15 23 42;
+    --gold-400: 245 184 61;
+    --emerald-400: 52 211 153;
+    --emerald-700: 4 120 87;
+    --rose-400: 251 113 133;
+    --rose-700: 190 18 60;
+    --amber-300: 252 211 77;
+    --amber-700: 180 83 9;
+    --blue-400: 96 165 250;
+    --blue-700: 29 78 216;
+    --hue-amber: 245 158 11;
+    --hue-amber-deep: 234 88 12;
+    --hue-sky: 14 165 233;
+    --hue-sky-deep: 79 70 229;
+    --hue-fuchsia: 217 70 239;
+    --hue-emerald: 16 185 129;
+    --hue-emerald-deep: 15 118 110;
+    --hue-rose: 244 63 94;
+    --hue-teal: 20 184 166;
+
+    /* Semantic: colour (dark theme) */
+    --color-canvas: var(--neutral-950);
+    --color-surface: var(--neutral-900);
+    --color-fg: var(--neutral-0);
+    --color-inverse: var(--neutral-1000);
+    --color-scrim: var(--neutral-1000);
+    --color-accent: var(--gold-400);
+    --color-on-accent: var(--neutral-1000);
+    --color-success: var(--emerald-400);
+    --color-warning: var(--amber-300);
+    --color-danger: var(--rose-400);
+    --color-info: var(--blue-400);
+    --color-category-1: var(--hue-amber);
+    --color-category-1-deep: var(--hue-amber-deep);
+    --color-category-2: var(--hue-sky);
+    --color-category-2-deep: var(--hue-sky-deep);
+    --color-category-3: var(--hue-fuchsia);
+    --color-category-4: var(--hue-emerald);
+    --color-category-4-deep: var(--hue-emerald-deep);
+    --color-category-5: var(--hue-rose);
+    --color-category-6: var(--hue-teal);
+
+    /* Semantic: fluid type scale (min at ~360px wide, max at ~1440px) */
+    --text-2xs: clamp(0.625rem, 0.6rem + 0.1vw, 0.6875rem);
+    --text-xs: clamp(0.7rem, 0.68rem + 0.1vw, 0.75rem);
+    --text-sm: clamp(0.8125rem, 0.79rem + 0.12vw, 0.875rem);
+    --text-base: clamp(0.9375rem, 0.9rem + 0.18vw, 1rem);
+    --text-lg: clamp(1.0313rem, 0.98rem + 0.25vw, 1.125rem);
+    --text-xl: clamp(1.125rem, 1.05rem + 0.35vw, 1.25rem);
+    --text-2xl: clamp(1.3125rem, 1.2rem + 0.55vw, 1.5rem);
+    --text-3xl: clamp(1.625rem, 1.45rem + 0.8vw, 1.875rem);
+    --text-4xl: clamp(2rem, 1.75rem + 1.1vw, 2.25rem);
+    --text-5xl: clamp(2.5rem, 2.1rem + 1.75vw, 3rem);
+    --text-6xl: clamp(2.75rem, 2.2rem + 2.5vw, 3.75rem);
+    --text-7xl: clamp(3rem, 2.25rem + 3.4vw, 4.5rem);
+    --text-display-section: clamp(3.25rem, 1.6rem + 7.4vw, 8.25rem);
+    --text-display-hero: clamp(3.75rem, 1.9rem + 8.2vw, 8.5rem);
+    --text-display-intro: clamp(4.25rem, 2rem + 10vw, 11rem);
+    --text-display-numeral: clamp(8rem, 6.6rem + 6vw, 12rem);
+
+    /* Semantic: spacing */
+    --space-gutter: clamp(1rem, 0.25rem + 3.4vw, 3rem);
+    --space-section: clamp(3.5rem, 2.9rem + 2.6vw, 5rem);
+
+    /* Semantic: radius */
+    --radius-sm: 0.125rem;
+    --radius-default: 0.25rem;
+    --radius-md: 0.375rem;
+    --radius-lg: 0.5rem;
+    --radius-xl: 0.75rem;
+    --radius-2xl: 1rem;
+    --radius-3xl: 1.5rem;
+  }
+
+  /* Light theme for the admin panel: same token names, different values. */
+  .theme-light {
+    --color-canvas: var(--neutral-50);
+    --color-surface: var(--neutral-0);
+    --color-fg: var(--slate-900);
+    --color-inverse: var(--neutral-0);
+    --color-scrim: var(--slate-900);
+    --color-success: var(--emerald-700);
+    --color-warning: var(--amber-700);
+    --color-danger: var(--rose-700);
+    --color-info: var(--blue-700);
+    color: rgb(var(--color-fg));
+  }
+}
+
+
 @layer utilities {
   .scrollbar-hide {
     -ms-overflow-style: none; /* IE/Edge */
@@ -19,13 +125,13 @@
 
 body {
   font-family: var(--font-sans), system-ui, sans-serif;
-  background-color: #0b0b0d;
+  background-color: rgb(var(--color-canvas));
   -webkit-font-smoothing: antialiased;
 }
 
 ::selection {
-  background: #f5b83d;
-  color: #000;
+  background: rgb(var(--color-accent));
+  color: rgb(var(--color-on-accent));
 }
 
 /* Lenis smooth scroll */

@@ -1,49 +1,54 @@
 # Burhanuddin Chitalwala — Portfolio
 
-A cinematic, streaming-inspired portfolio: an animated intro, a "What brings you here?" screen that reorders sections, a hero banner, experience, project cards, a ranked impact row, skills, photos from outside work and a contact section.
+A cinematic, streaming-inspired portfolio with an AI version of me that visitors can chat with, and a small CMS that rewrites the site from a new resume once I approve it.
 
-Built with Next.js (App Router), Tailwind CSS, Framer Motion and Lenis.
+Built with Next.js 16 (App Router), React 19, Tailwind CSS, Framer Motion, Lenis, the Claude API, Drizzle (Postgres) and S3-compatible storage.
 
 ## Run it locally
 
 ```bash
 npm install
+cp .env.example .env.local   # fill in what you need; only ADMIN_PASSWORD is required
 npm run dev
 ```
 
-Open http://localhost:3000. The admin dashboard is at `/admin`; see [`app/admin/README.md`](app/admin/README.md) for its settings and database setup, and `.env.example` for every environment variable.
+Open http://localhost:3000. The admin panel is at `/admin`; see [`app/admin/README.md`](app/admin/README.md).
 
-## Updating content
+Without a database the site runs on the built-in content in `app/data/siteData.js`, and the chat stays hidden.
 
-All homepage content lives in **`app/data/siteData.js`**, taken from `public/docs/resume.pdf`.
+## How it fits together
 
-| To change… | Edit |
-| --- | --- |
-| Name, logline, summary, email, social links | `profile` |
-| Education | `education` |
-| Jobs and their highlights | `experience` |
-| Projects (cards and the detail overlay) | `projects` |
-| Ranked impact numbers | `impactNumbers` |
-| Skills | `skillGroups` |
-| Photos | `beyondWork` |
-| Quick Intro slides | `introSlides` |
-| Visitor types and the section order for each | `visitorTypes` |
+- **Homepage** (`app/page.js`) renders the latest *published* content version, falling back to `defaultContent` in `app/data/siteData.js`. Publishing a version rebuilds the page.
+- **Chat** (`app/api/chat/route.js`) streams answers from Claude, speaking as me, grounded in the published content plus the documents I allow. When it can't answer, it calls a `raise_query` tool that files the question in the admin inbox.
+- **CMS** (`app/admin/content`): upload a resume → Claude returns updated content as schema-validated JSON → I review a diff, preview it, edit it if needed, and publish. Every version is kept for rollback.
+- **Privacy**: uploads are scanned for ID numbers, bank/card details, secrets, phone numbers, addresses, dates of birth and salary. Risky files stay out of the chat unless I confirm, and detected values are always redacted before any text reaches the model. Chat is rate-limited per visitor and per day, transcripts are kept, and admin logins lock after repeated failures.
 
-**Resume:** replace `public/docs/resume.pdf`. **Portrait:** replace `public/img/burhanuddin-portrait.jpg`.
+## Design tokens
+
+All colours, font sizes, radii and layout spacing are CSS variables in `app/globals.css`, exposed through `tailwind.config.js`:
+
+- **Primitives** (raw values) → **semantic tokens** (`canvas`, `surface`, `fg`, `inverse`, `scrim`, `accent`, `on-accent`, `success`, `warning`, `danger`, `info`, `category-*`).
+- The site uses the dark theme on `:root`; the admin panel opts into `.theme-light`, which redefines the same names.
+- Type sizes are fluid (`clamp()`), from `text-2xs` to `text-7xl`, plus display sizes (`text-display-hero`, `-intro`, `-section`, `-numeral`). `text-input` keeps form fields at 16px so iOS doesn't zoom.
+- `px-gutter` and `py-section` scale page padding with the viewport.
+
+Components use only these tokens (for example `bg-canvas text-fg/70 border-danger/20`), never raw palette classes or hex values.
 
 ## Code layout
 
 ```
 app/
-  page.js                  ← renders the portfolio
-  _portfolio/
-    Portfolio.jsx          ← stages (intro → welcome → home) and overlays
-    smoothScroll.jsx       ← Lenis smooth scroll and scroll locking
-    fx.jsx                 ← reveals, magnetic buttons, 3D tilt, particles, cursor ring
-    components/            ← one file per section or overlay
-  admin/                   ← password-protected dashboard: documents and visitor inbox
-  services/                ← auth, database (Drizzle + Postgres), S3 storage, documents, inbox
-drizzle/                   ← SQL migrations
+  page.js                    ← homepage (published content + chat switch)
+  preview/[id]/              ← admin-only preview of any content version
+  _portfolio/                ← public site: sections, chat panel, motion helpers, content context
+  admin/                     ← dashboard: documents, content, inbox, chats
+  api/                       ← chat, resume link, admin APIs, keep-alive cron
+  services/
+    auth/                    ← signed sessions, login lockout
+    chat/                    ← config, persona, knowledge, history
+    content/                 ← schema (zod), versions, resume → draft, diff
+    documents/               ← upload, text extraction, listing
+    privacy/                 ← sensitive-data scan and redaction
+    db/, storage/            ← Drizzle schema + client, S3 client
+drizzle/                     ← SQL migrations
 ```
-
-The intro plays once per browser session; use "Replay intro" in the footer to see it again. Animations are reduced for visitors who turn on reduced motion.

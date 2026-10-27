@@ -1,12 +1,13 @@
 "use client";
 
-import { impactNumbers } from "../../data/siteData";
+import { useContent } from "../content";
 import { Reveal } from "../fx";
 import { Rail, SectionHeading } from "./Rail";
 
 export default function Impact() {
+  const { impactNumbers } = useContent();
   return (
-    <section id="impact" className="py-14 md:py-20" aria-labelledby="impact-title">
+    <section id="impact" className="py-section" aria-labelledby="impact-title">
       <SectionHeading eyebrow="Impact" title={<span id="impact-title">By the Numbers</span>}>
         A few results I&apos;m proud of.
       </SectionHeading>
@@ -16,16 +17,16 @@ export default function Impact() {
             <Reveal delay={index * 0.05} className="flex items-end">
               <span
                 aria-hidden
-                className="font-display text-[9rem] leading-[0.75] text-transparent md:text-[12rem]"
-                style={{ WebkitTextStroke: "2px rgba(255,255,255,0.35)" }}
+                className="font-display text-display-numeral text-transparent"
+                style={{ WebkitTextStroke: "2px rgb(var(--color-fg) / 0.35)" }}
               >
                 {index + 1}
               </span>
-              <div className="-ml-3 flex h-44 w-40 flex-col justify-between rounded-md border border-white/10 bg-gradient-to-br from-white/[0.08] to-white/[0.02] p-4 backdrop-blur md:-ml-4 md:h-56 md:w-48">
+              <div className="-ml-3 flex h-44 w-40 flex-col justify-between rounded-md border border-fg/10 bg-gradient-to-br from-fg/[0.08] to-fg/[0.02] p-4 backdrop-blur md:-ml-4 md:h-56 md:w-48">
                 <span className="sr-only">Number {index + 1}:</span>
                 <span className="font-display text-5xl leading-none text-accent md:text-6xl">{item.value}</span>
-                <span className="text-sm leading-snug text-white/80">{item.label}</span>
-                <span className="text-[11px] uppercase tracking-[0.2em] text-white/40">{item.source}</span>
+                <span className="text-sm leading-snug text-fg/80">{item.label}</span>
+                <span className="text-2xs uppercase tracking-[0.2em] text-fg/40">{item.source}</span>
               </div>
             </Reveal>
           </li>

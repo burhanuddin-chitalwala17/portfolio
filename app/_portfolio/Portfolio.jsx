@@ -5,6 +5,7 @@ import { AnimatePresence, MotionConfig, motion } from "framer-motion";
 import { visitorTypes } from "../data/siteData";
 import { SmoothScrollProvider, useScrollLock, useSmoothScroll } from "./smoothScroll";
 import { CursorRing } from "./fx";
+import { ContentProvider } from "./content";
 import Opening from "./components/Opening";
 import VisitorSelect from "./components/VisitorSelect";
 import Navbar from "./components/Navbar";
@@ -17,6 +18,7 @@ import Skills from "./components/Skills";
 import BeyondWork from "./components/BeyondWork";
 import Contact from "./components/Contact";
 import QuickIntro from "./components/QuickIntro";
+import Chat from "./components/Chat";
 import ProjectModal from "./components/ProjectModal";
 import ResumeModal from "./components/ResumeModal";
 
@@ -64,17 +66,19 @@ function useStoredVisitor() {
   return useSyncExternalStore(subscribeToVisitor, readStoredVisitor, () => null);
 }
 
-export default function Portfolio() {
+export default function Portfolio({ content, chatEnabled = false }) {
   return (
-    <MotionConfig reducedMotion="user">
-      <SmoothScrollProvider>
-        <Home />
-      </SmoothScrollProvider>
-    </MotionConfig>
+    <ContentProvider content={content}>
+      <MotionConfig reducedMotion="user">
+        <SmoothScrollProvider>
+          <Home chatEnabled={chatEnabled} />
+        </SmoothScrollProvider>
+      </MotionConfig>
+    </ContentProvider>
   );
 }
 
-function Home() {
+function Home({ chatEnabled }) {
   const storedVisitor = useStoredVisitor();
   const visitorId = storedVisitor ?? visitorTypes[0].id;
   // "auto" plays the intro for first-time visitors and skips them for returning ones.
@@ -84,6 +88,7 @@ function Home() {
   const [resumeOpen, setResumeOpen] = useState(false);
   const [project, setProject] = useState(null);
   const [toast, setToast] = useState(null);
+  const [chatOpen, setChatOpen] = useState(false);
   const { scrollTo } = useSmoothScroll();
 
   useEffect(() => {
@@ -125,7 +130,7 @@ function Home() {
     <>
       <CursorRing />
 
-      <div className="relative min-h-screen overflow-x-clip bg-ink text-white" inert={overlayOpen}>
+      <div className="relative min-h-screen overflow-x-clip bg-canvas text-fg" inert={overlayOpen}>
         <Navbar visitorId={visitorId} onSwitchVisitor={switchVisitor} onOpenResume={openResume} />
         <main>
           <Hero onPlayIntro={() => setIntroOpen(true)} onMoreInfo={() => scrollTo("about")} />
@@ -135,7 +140,11 @@ function Home() {
               return <Section key={id} onOpen={setProject} />;
             })}
           </div>
-          <Contact onOpenResume={openResume} onReplay={replayOpening} />
+          <Contact
+            onOpenResume={openResume}
+            onReplay={replayOpening}
+            onOpenChat={chatEnabled ? () => setChatOpen(true) : undefined}
+          />
         </main>
       </div>
 
@@ -145,11 +154,15 @@ function Home() {
       <AnimatePresence>{project && <ProjectModal key={project.id} project={project} onClose={closeProject} />}</AnimatePresence>
       <AnimatePresence>{resumeOpen && <ResumeModal key="resume" onClose={closeResume} />}</AnimatePresence>
 
+      {chatEnabled && (
+        <Chat open={chatOpen} onOpenChange={setChatOpen} hidden={overlayOpen} />
+      )}
+
       <AnimatePresence>
         {toast && (
           <motion.div
             role="status"
-            className="fixed bottom-6 left-1/2 z-[160] -translate-x-1/2 rounded-md bg-white px-5 py-3 text-sm font-medium text-black shadow-2xl"
+            className="fixed bottom-6 left-1/2 z-[160] -translate-x-1/2 rounded-md bg-fg px-5 py-3 text-sm font-medium text-inverse shadow-2xl"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 20 }}

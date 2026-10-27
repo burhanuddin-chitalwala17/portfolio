@@ -114,6 +114,8 @@ export function Particles({ className = "", count = 60 }) {
     const canvas = ref.current;
     const context = canvas.getContext("2d");
     const ratio = Math.min(window.devicePixelRatio || 1, 2);
+    // Drawn in the accent colour token, so the dust follows the theme.
+    const accent = getComputedStyle(canvas).getPropertyValue("--color-accent").trim() || "245 184 61";
     let width = 0;
     let height = 0;
     let frame;
@@ -147,7 +149,7 @@ export function Particles({ className = "", count = 60 }) {
         }
         context.beginPath();
         context.arc(dot.x, dot.y, dot.radius, 0, Math.PI * 2);
-        context.fillStyle = `rgba(245, 184, 61, ${dot.alpha})`;
+        context.fillStyle = `rgb(${accent} / ${dot.alpha})`;
         context.fill();
       }
       if (!reduced) frame = requestAnimationFrame(draw);

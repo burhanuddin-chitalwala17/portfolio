@@ -7,7 +7,7 @@ import { Rail, SectionHeading } from "./Rail";
 
 export default function BeyondWork() {
   return (
-    <section id="beyond" className="py-14 md:py-20" aria-labelledby="beyond-title">
+    <section id="beyond" className="py-section" aria-labelledby="beyond-title">
       <SectionHeading eyebrow="Off the clock" title={<span id="beyond-title">Beyond Work</span>}>
         Football pitches, trophies and the odd stand-up stage.
       </SectionHeading>
@@ -23,8 +23,8 @@ export default function BeyondWork() {
                   sizes="(min-width: 1024px) 21vw, (min-width: 768px) 26vw, 70vw"
                   className="object-cover transition duration-700 group-hover:scale-105"
                 />
-                <figcaption className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/90 to-transparent p-4 pt-12">
-                  <span className="font-display text-2xl leading-none text-white">{photo.title}</span>
+                <figcaption className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-scrim/90 to-transparent p-4 pt-12">
+                  <span className="font-display text-2xl leading-none text-fg">{photo.title}</span>
                 </figcaption>
               </figure>
             </Reveal>

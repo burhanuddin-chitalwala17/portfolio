@@ -1,26 +1,26 @@
 const TYPE_STYLES = {
   pdf: {
     label: "PDF",
-    className: "bg-rose-100 text-rose-700 ring-rose-200",
+    className: "bg-danger/10 text-danger ring-danger/20",
   },
   word: {
     label: "Word",
-    className: "bg-blue-100 text-blue-700 ring-blue-200",
+    className: "bg-info/10 text-info ring-info/20",
   },
   image: {
     label: "Image",
-    className: "bg-emerald-100 text-emerald-700 ring-emerald-200",
+    className: "bg-success/10 text-success ring-success/20",
   },
   text: {
     label: "Text",
-    className: "bg-amber-100 text-amber-700 ring-amber-200",
+    className: "bg-warning/10 text-warning ring-warning/20",
   },
 };
 
 export default function DocumentTypeBadge({ type }) {
   const fallback = {
     label: type?.toUpperCase() ?? "FILE",
-    className: "bg-slate-100 text-slate-700 ring-slate-200",
+    className: "bg-fg/5 text-fg/80 ring-fg/10",
   };
 
   const { label, className } = TYPE_STYLES[type] ?? fallback;

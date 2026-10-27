@@ -30,12 +30,12 @@ export default function Navbar({ visitorId, onSwitchVisitor, onOpenResume }) {
   return (
     <motion.header
       className={`fixed inset-x-0 top-0 z-50 transition-colors duration-500 ${
-        solid ? "bg-ink/90 backdrop-blur-md" : "bg-gradient-to-b from-black/80 to-transparent"
+        solid ? "bg-canvas/90 backdrop-blur-md" : "bg-gradient-to-b from-scrim/80 to-transparent"
       }`}
       animate={{ y: hidden ? "-100%" : 0 }}
       transition={{ duration: 0.35, ease: EASE }}
     >
-      <nav className="mx-auto flex h-16 max-w-[1600px] items-center gap-6 px-4 md:h-[72px] md:px-12" aria-label="Main">
+      <nav className="mx-auto flex h-16 max-w-[1600px] items-center gap-6 px-gutter md:h-[72px]" aria-label="Main">
         <button
           type="button"
           onClick={() => scrollTo(0)}
@@ -45,10 +45,10 @@ export default function Navbar({ visitorId, onSwitchVisitor, onOpenResume }) {
           BURHANUDDIN
         </button>
 
-        <ul className="hidden items-center gap-5 text-sm text-white/75 md:flex">
+        <ul className="hidden items-center gap-5 text-sm text-fg/75 md:flex">
           {navSections.map((section) => (
             <li key={section.id}>
-              <button type="button" onClick={() => go(section.id)} className="px-1 py-2 transition hover:text-white">
+              <button type="button" onClick={() => go(section.id)} className="px-1 py-2 transition hover:text-fg">
                 {section.label}
               </button>
             </li>
@@ -59,7 +59,7 @@ export default function Navbar({ visitorId, onSwitchVisitor, onOpenResume }) {
           <button
             type="button"
             onClick={onOpenResume}
-            className="rounded border border-white/25 px-3 py-1.5 text-sm text-white/90 transition hover:border-accent hover:text-accent"
+            className="rounded border border-fg/25 px-3 py-1.5 text-sm text-fg/90 transition hover:border-accent hover:text-accent"
           >
             Resume
           </button>
@@ -74,7 +74,7 @@ export default function Navbar({ visitorId, onSwitchVisitor, onOpenResume }) {
               className="flex items-center gap-1"
             >
               <VisitorAvatar visitor={visitor} className="h-8 w-8 rounded" />
-              <svg viewBox="0 0 24 24" className={`h-4 w-4 text-white transition ${viewsOpen ? "rotate-180" : ""}`} aria-hidden>
+              <svg viewBox="0 0 24 24" className={`h-4 w-4 text-fg transition ${viewsOpen ? "rotate-180" : ""}`} aria-hidden>
                 <path d="m6 9 6 6 6-6" stroke="currentColor" strokeWidth="2" fill="none" />
               </svg>
             </button>
@@ -82,7 +82,7 @@ export default function Navbar({ visitorId, onSwitchVisitor, onOpenResume }) {
               {viewsOpen && (
                 <motion.ul
                   role="menu"
-                  className="absolute right-0 mt-3 w-56 overflow-hidden rounded-md border border-white/10 bg-black/95 py-2 shadow-2xl"
+                  className="absolute right-0 mt-3 w-56 overflow-hidden rounded-md border border-fg/10 bg-scrim/95 py-2 shadow-2xl"
                   initial={{ opacity: 0, y: -8 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -8 }}
@@ -97,7 +97,7 @@ export default function Navbar({ visitorId, onSwitchVisitor, onOpenResume }) {
                           setViewsOpen(false);
                           onSwitchVisitor(item.id);
                         }}
-                        className="flex w-full items-center gap-3 px-4 py-2 text-left text-sm text-white/80 transition hover:bg-white/10 hover:text-white"
+                        className="flex w-full items-center gap-3 px-4 py-2 text-left text-sm text-fg/80 transition hover:bg-fg/10 hover:text-fg"
                       >
                         <VisitorAvatar visitor={item} className="h-7 w-7 rounded" />
                         <span className="flex-1">{item.name}</span>
@@ -118,7 +118,7 @@ export default function Navbar({ visitorId, onSwitchVisitor, onOpenResume }) {
             aria-label="Menu"
             className="flex h-9 w-9 items-center justify-center md:hidden"
           >
-            <svg viewBox="0 0 24 24" className="h-6 w-6 text-white" aria-hidden>
+            <svg viewBox="0 0 24 24" className="h-6 w-6 text-fg" aria-hidden>
               <path
                 d={menuOpen ? "M6 6l12 12M18 6 6 18" : "M4 7h16M4 12h16M4 17h16"}
                 stroke="currentColor"
@@ -134,7 +134,7 @@ export default function Navbar({ visitorId, onSwitchVisitor, onOpenResume }) {
         {menuOpen && (
           <motion.ul
             id="mobile-menu"
-            className="overflow-hidden border-t border-white/10 bg-ink/95 px-4 md:hidden"
+            className="overflow-hidden border-t border-fg/10 bg-canvas/95 px-gutter md:hidden"
             initial={{ height: 0 }}
             animate={{ height: "auto" }}
             exit={{ height: 0 }}
@@ -145,7 +145,7 @@ export default function Navbar({ visitorId, onSwitchVisitor, onOpenResume }) {
                 <button
                   type="button"
                   onClick={() => go(section.id)}
-                  className="block w-full py-3 text-left text-lg text-white/80"
+                  className="block w-full py-3 text-left text-lg text-fg/80"
                 >
                   {section.label}
                 </button>

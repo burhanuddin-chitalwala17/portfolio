@@ -24,11 +24,11 @@ export default async function AdminLayout({ children }) {
   ).length;
 
   return (
-    <div className="min-h-screen w-full bg-slate-50 text-slate-900">
+    <div className="theme-light min-h-screen w-full bg-canvas text-fg">
       <div className="mx-auto flex min-h-screen w-full max-w-6xl flex-col gap-8 px-4 pb-12 pt-8 md:px-8">
         <header className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
           <div>
-            <p className="text-sm uppercase tracking-widest text-slate-500">
+            <p className="text-sm uppercase tracking-widest text-fg/60">
               Admin
             </p>
             <h1 className="text-3xl font-semibold md:text-4xl">
@@ -36,7 +36,7 @@ export default async function AdminLayout({ children }) {
             </h1>
           </div>
           <div className="flex flex-col items-start gap-3 md:items-end">
-            <p className="text-sm text-slate-500 md:text-base">
+            <p className="text-sm text-fg/60 md:text-base">
               Manage documents, assets, and upcoming portfolio updates from this
               panel.
             </p>

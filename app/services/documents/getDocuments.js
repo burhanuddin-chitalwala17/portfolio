@@ -21,6 +21,9 @@ const bundledDocuments = [
     previewUrl: "/docs/resume.pdf",
     downloadUrl: "/docs/resume.pdf",
     source: "bundled",
+    useInChat: false,
+    hasText: false,
+    sensitiveFindings: [],
   },
 ];
 
@@ -41,6 +44,10 @@ export async function getDocuments() {
     previewUrl: `/api/admin/documents/${row.id}/file`,
     downloadUrl: `/api/admin/documents/${row.id}/file?download=1`,
     source: "upload",
+    useInChat: row.useInChat,
+    hasText: Boolean(row.extractedText),
+    characters: row.extractedText?.length ?? 0,
+    sensitiveFindings: row.sensitiveFindings,
   }));
   return [...uploaded, ...bundledDocuments];
 }

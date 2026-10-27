@@ -16,6 +16,7 @@ export const metadata = {
 };
 
 export const viewport = {
+  // Matches the --color-canvas token in app/globals.css (metadata needs a literal colour).
   themeColor: "#0b0b0d",
 };
 

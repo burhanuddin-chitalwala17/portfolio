@@ -28,7 +28,8 @@ export const profile = {
   },
   location: "Bengaluru, India",
   email: "burhanuddinchital25151@gmail.com",
-  resumePdf: "/docs/resume.pdf",
+  // Serves the resume from the latest published version, or the bundled /docs/resume.pdf.
+  resumePdf: "/api/resume",
   portrait: {
     src: "/img/burhanuddin-portrait.jpg",
     alt: "Portrait of Burhanuddin Chitalwala",
@@ -121,6 +122,23 @@ export const experience = [
 
 /** Projects, shown as cards. `art` sets each card's gradient. */
 export const projects = [
+  {
+    id: "this-portfolio",
+    title: "This Portfolio",
+    subtitle: "AI chat + headless CMS",
+    kind: "Live · Personal",
+    art: { from: "#0b0b0d", via: "#a16207", to: "#f5b83d" },
+    logline: "The site you're on: an AI version of me that answers from my own documents, and a CMS that rewrites the site from a new resume once I approve it.",
+    points: [
+      "Chat grounded in my resume and uploaded notes, built on Claude with streaming replies, prompt caching and a tool that files unanswered questions into my admin inbox.",
+      "Upload a new resume and Claude drafts the updated site as validated, versioned content; nothing goes live until I review the diff and publish, with one-click rollback.",
+      "Privacy by design: every upload is scanned for IDs, bank details, secrets and contact info, risky files stay out of the chat, and detected values are redacted before the model sees them.",
+      "Portable backend (Drizzle on any Postgres, any S3-compatible storage), signed admin sessions with login lockout, and per-visitor rate limits on the chat.",
+      "Design-token system with fluid typography, Framer Motion and Lenis, tested on phones, tablets and desktop.",
+    ],
+    tech: ["Next.js 16", "React 19", "Claude API", "Drizzle", "Postgres", "S3", "Framer Motion", "Tailwind"],
+    links: [{ label: "View code", href: "https://github.com/burhanuddin-chitalwala17/portfolio" }],
+  },
   {
     id: "creddev",
     title: "CredDev",
@@ -283,21 +301,21 @@ export const visitorTypes = [
     id: "recruiter",
     name: "Recruiter",
     blurb: "Experience and impact first",
-    color: "from-amber-400 to-orange-600",
+    color: "from-category-1 to-category-1-deep",
     order: ["experience", "impact", "projects", "skills", "about", "beyond"],
   },
   {
     id: "engineer",
     name: "Engineer",
     blurb: "Projects and stack first",
-    color: "from-sky-400 to-indigo-600",
+    color: "from-category-2 to-category-2-deep",
     order: ["projects", "skills", "experience", "impact", "about", "beyond"],
   },
   {
     id: "browsing",
     name: "Just browsing",
     blurb: "The person first",
-    color: "from-emerald-400 to-teal-700",
+    color: "from-category-4 to-category-4-deep",
     order: ["about", "experience", "projects", "beyond", "impact", "skills"],
   },
 ];
@@ -309,3 +327,9 @@ export const navSections = [
   { id: "about", label: "About" },
   { id: "contact", label: "Contact" },
 ];
+
+/**
+ * The editable part of the homepage. The admin panel publishes new versions of this shape;
+ * these values are what the site shows until the first version is published.
+ */
+export const defaultContent = { profile, education, experience, projects, impactNumbers, skillGroups, introSlides };
