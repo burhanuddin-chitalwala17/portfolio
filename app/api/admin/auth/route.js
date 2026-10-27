@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
 import { validatePassword } from "../../../services/auth/validatePassword";
-import { createSessionToken } from "../../../services/auth/checkSession";
+import { ADMIN_COOKIE_NAME, createSessionToken } from "../../../services/auth/checkSession";
 
-const COOKIE_NAME = "admin-auth";
+const COOKIE_NAME = ADMIN_COOKIE_NAME;
 const COOKIE_OPTIONS = {
   name: COOKIE_NAME,
   httpOnly: true,

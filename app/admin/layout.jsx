@@ -1,9 +1,14 @@
 import { cookies } from "next/headers";
-import { checkSession } from "../services/auth/checkSession";
+import { ADMIN_COOKIE_NAME, checkSession } from "../services/auth/checkSession";
 import AdminLockScreen from "./_components/AdminLockScreen";
 import LogoutButton from "./_components/LogoutButton";
+import AdminNav from "./_components/AdminNav";
+import { listVisitorQueries, QUERY_STATUSES } from "../services/queries/visitorQueries";
 
-const COOKIE_NAME = "admin-auth";
+const COOKIE_NAME = ADMIN_COOKIE_NAME;
+
+// Admin pages read the session and the database on every request; never pre-render them at build time.
+export const dynamic = "force-dynamic";
 
 export default async function AdminLayout({ children }) {
   const cookieStore = await cookies();
@@ -13,6 +18,10 @@ export default async function AdminLayout({ children }) {
   if (!isAuthenticated) {
     return <AdminLockScreen />;
   }
+
+  const openQueries = (await listVisitorQueries().catch(() => [])).filter(
+    (query) => query.status === QUERY_STATUSES.OPEN
+  ).length;
 
   return (
     <div className="min-h-screen w-full bg-slate-50 text-slate-900">
@@ -34,6 +43,8 @@ export default async function AdminLayout({ children }) {
             <LogoutButton />
           </div>
         </header>
+
+        <AdminNav openQueries={openQueries} />
 
         <main className="flex flex-1 flex-col gap-6">{children}</main>
       </div>

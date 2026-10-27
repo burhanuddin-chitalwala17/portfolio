@@ -1,31 +1,77 @@
 "use client";
 
 import { useCallback, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
+
+const MAX_UPLOAD_BYTES = 4 * 1024 * 1024;
 
 export default function FileUploadPanel({
+  enabled = false,
   acceptedTypes = [
     "application/pdf",
     "application/msword",
     "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
     "image/*",
     "text/plain",
+    "text/markdown",
   ],
 }) {
   const fileInputRef = useRef(null);
   const [isDragging, setIsDragging] = useState(false);
   const [selectedFiles, setSelectedFiles] = useState([]);
+  const [status, setStatus] = useState({ state: "idle", messages: [] });
+  const router = useRouter();
 
-  const handleFilesSelected = useCallback((filesList) => {
-    const files = Array.from(filesList ?? []);
-    if (!files.length) return;
+  const uploadFiles = useCallback(
+    async (files) => {
+      const tooLarge = files.filter((file) => file.size > MAX_UPLOAD_BYTES);
+      const toSend = files.filter((file) => file.size <= MAX_UPLOAD_BYTES);
+      const skipped = tooLarge.map((file) => `${file.name}: files must be 4 MB or smaller.`);
+      if (!toSend.length) {
+        setStatus({ state: "error", messages: skipped });
+        return;
+      }
 
-    setSelectedFiles(files);
-    // TODO: Send the files to storage once it's connected.
-  }, []);
+      setStatus({ state: "uploading", messages: [] });
+      const formData = new FormData();
+      toSend.forEach((file) => formData.append("files", file));
+      try {
+        const response = await fetch("/api/admin/documents", { method: "POST", body: formData });
+        const data = await response.json().catch(() => ({}));
+        const errors = [...skipped, ...(data.errors ?? []), ...(data.error ? [data.error] : [])];
+        const uploadedCount = data.uploaded?.length ?? 0;
+        if (uploadedCount) router.refresh();
+        setStatus({
+          state: errors.length ? "error" : "done",
+          messages: uploadedCount
+            ? [`Uploaded ${uploadedCount} file${uploadedCount === 1 ? "" : "s"}.`, ...errors]
+            : errors.length
+              ? errors
+              : ["Upload failed. Please try again."],
+        });
+        if (!errors.length) setSelectedFiles([]);
+      } catch {
+        setStatus({ state: "error", messages: ["Network error. Check your connection and try again."] });
+      }
+    },
+    [router]
+  );
+
+  const handleFilesSelected = useCallback(
+    (filesList) => {
+      const files = Array.from(filesList ?? []);
+      if (!files.length) return;
+
+      setSelectedFiles(files);
+      if (enabled) uploadFiles(files);
+    },
+    [enabled, uploadFiles]
+  );
 
   const handleChange = useCallback(
     (event) => {
       handleFilesSelected(event.target.files);
+      event.target.value = "";
     },
     [handleFilesSelected]
   );
@@ -91,7 +137,9 @@ export default function FileUploadPanel({
         aria-label="Select a file or drop it here to upload"
       >
         <p className="px-6 text-sm text-slate-600">
-          Select a file or drag &amp; drop it here to stage for upload.
+          {status.state === "uploading"
+            ? "Uploading…"
+            : "Tap to choose files, or drag & drop them here. Up to 4 MB each."}
         </p>
       </div>
 
@@ -104,15 +152,30 @@ export default function FileUploadPanel({
         onChange={handleChange}
       />
 
+      {status.messages.length > 0 && (
+        <ul
+          role="status"
+          className={`mt-4 space-y-1 rounded-xl px-4 py-3 text-sm ${
+            status.state === "error" ? "bg-rose-50 text-rose-800" : "bg-emerald-50 text-emerald-800"
+          }`}
+        >
+          {status.messages.map((message) => (
+            <li key={message}>{message}</li>
+          ))}
+        </ul>
+      )}
+
       {selectedFiles.length ? (
         <div className="mt-4 rounded-xl border border-slate-100 bg-slate-100/60 p-4">
           <h3 className="text-xs uppercase tracking-wide text-slate-500">
             Selected
           </h3>
-          <p className="mt-1 text-xs text-amber-700">
-            Uploading isn&apos;t switched on yet: it needs file storage to be
-            connected. These files stay on your device for now.
-          </p>
+          {!enabled && (
+            <p className="mt-1 text-xs text-amber-700">
+              Uploading switches on once storage is connected. These files stay
+              on your device for now.
+            </p>
+          )}
           <ul className="mt-2 space-y-1 text-sm text-slate-600">
             {selectedFiles.map((file) => (
               <li

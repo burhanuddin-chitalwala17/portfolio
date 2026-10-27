@@ -11,7 +11,7 @@ npm install
 npm run dev
 ```
 
-Open http://localhost:3000. The admin dashboard is still at `/admin`.
+Open http://localhost:3000. The admin dashboard is at `/admin`; see [`app/admin/README.md`](app/admin/README.md) for its settings and database setup, and `.env.example` for every environment variable.
 
 ## Updating content
 
@@ -41,7 +41,9 @@ app/
     smoothScroll.jsx       ← Lenis smooth scroll and scroll locking
     fx.jsx                 ← reveals, magnetic buttons, 3D tilt, particles, cursor ring
     components/            ← one file per section or overlay
-  admin/                   ← password-protected document dashboard
+  admin/                   ← password-protected dashboard: documents and visitor inbox
+  services/                ← auth, database (Drizzle + Postgres), S3 storage, documents, inbox
+drizzle/                   ← SQL migrations
 ```
 
 The intro plays once per browser session; use "Replay intro" in the footer to see it again. Animations are reduced for visitors who turn on reduced motion.

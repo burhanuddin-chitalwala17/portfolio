@@ -1,5 +1,6 @@
 import { createHmac, timingSafeEqual } from "crypto";
 
+export const ADMIN_COOKIE_NAME = "admin-auth";
 const ONE_HOUR_IN_MS = 60 * 60 * 1000;
 
 /**
