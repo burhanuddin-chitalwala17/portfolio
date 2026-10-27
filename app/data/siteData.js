@@ -75,7 +75,7 @@ export const experience = [
     highlights: [
       {
         title: "AI voice assistant",
-        text: "Built an AI-powered in-car voice assistant integrating GPT-4o, Gemini, DeepSeek and Realtime AI across a 14-feature suite, now live in the Citroën Basalt X. Its subscription model is projected to generate $786M+ in revenue.",
+        text: "Built an AI-powered in-car voice assistant integrating GPT-4o, Gemini, DeepSeek and Realtime AI across a 14-feature suite, now live in the Citroën Basalt X as CARA. Its subscription model is projected to generate $786M+ in revenue.",
       },
       {
         title: "Alexa Skills for 14 brands",
@@ -207,17 +207,25 @@ export const projects = [
   },
   {
     id: "basalt-assistant",
-    title: "Basalt X Assistant",
-    subtitle: "In-car AI assistant",
+    title: "CARA",
+    subtitle: "Citroën's in-car AI companion",
     kind: "Stellantis",
     art: { from: "#0c4a6e", via: "#0891b2", to: "#a7f3d0" },
-    logline: "A hands-free, LLM-powered voice assistant with 14 features, live in the Citroën Basalt X.",
+    logline:
+      "A hands-free, LLM-powered voice assistant built at Stellantis' Bengaluru tech hub, launched by Citroën in the Basalt X as CARA, \"India's first intelligent in-car companion\".",
     points: [
       "Integrated GPT-4o, Gemini, DeepSeek and Realtime AI to enable hands-free operations.",
       "Shipped a 14-feature suite that is now live in the Citroën Basalt X.",
       "Its subscription model is projected to generate $786M+ in revenue.",
+      "At launch in September 2025, Citroën highlighted support for 52 languages, vehicle insights like tyre pressure and fuel, remote controls, and voice-triggered SOS and crash response.",
     ],
     tech: ["GPT-4o", "Gemini", "DeepSeek", "Realtime AI"],
+    links: [
+      {
+        label: "Citroën's announcement",
+        href: "https://www.citroen.in/about-citroen/news/citroen-basalt-intelligent-in-car-assistant.html",
+      },
+    ],
   },
   {
     id: "media-planner",
@@ -239,7 +247,7 @@ export const projects = [
     subtitle: "14 automotive brands",
     kind: "Stellantis",
     art: { from: "#450a0a", via: "#b91c1c", to: "#fb923c" },
-    logline: "Voice-controlled vehicle operations for Jeep, Maserati, Alfa Romeo and 11 more brands.",
+    logline: "Voice-controlled vehicle operations for 14 brands, including Jeep, Maserati and Alfa Romeo.",
     points: [
       "Developed Alexa Skills for voice-controlled vehicle operations across 14 brands.",
       "Built responsive multimodal UIs for Echo Show devices, increasing engagement by 27%.",
@@ -290,7 +298,7 @@ export const beyondWork = [
 export const introSlides = [
   { eyebrow: "Hello, I'm", title: "BURHANUDDIN", text: "A full-stack engineer from VIT who ships AI-powered products." },
   { eyebrow: "2023", title: "2,000+ DAILY USERS", text: "An internship at ITR Consulting: a high-traffic Laravel + Vue.js app." },
-  { eyebrow: "2024", title: "AI ON THE ROAD", text: "An LLM voice assistant live in the Citroën Basalt X, plus Alexa Skills for 14 car brands." },
+  { eyebrow: "2024", title: "AI ON THE ROAD", text: "CARA, an LLM voice assistant live in the Citroën Basalt X, plus Alexa Skills for 14 car brands." },
   { eyebrow: "Today", title: "AI FOR ADVERTISERS", text: "At InMobi, building a platform where an AI chat layer plans media and budgets." },
   { eyebrow: "What's next", title: "YOUR TEAM?", text: "Open to new roles and collaborations, with a move to Dubai on the horizon." },
 ];
