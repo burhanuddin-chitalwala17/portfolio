@@ -75,16 +75,23 @@ export default function ProjectModal({ project, onClose }) {
             ))}
           </ul>
 
-          {project.link && (
-            <a
-              href={project.link.href}
-              target="_blank"
-              rel="noreferrer"
-              className="mt-8 inline-flex items-center gap-2 rounded-md bg-white px-5 py-2.5 font-semibold text-black transition hover:bg-accent"
-            >
-              {project.link.label}
-              <span aria-hidden>↗</span>
-            </a>
+          {project.links?.length > 0 && (
+            <div className="mt-8 flex flex-wrap gap-3">
+              {project.links.map((link, index) => (
+                <a
+                  key={link.href}
+                  href={link.href}
+                  target="_blank"
+                  rel="noreferrer"
+                  className={`inline-flex items-center gap-2 rounded-md px-5 py-2.5 font-semibold transition ${
+                    index === 0 ? "bg-white text-black hover:bg-accent" : "border border-white/25 text-white hover:border-white"
+                  }`}
+                >
+                  {link.label}
+                  <span aria-hidden>↗</span>
+                </a>
+              ))}
+            </div>
           )}
         </motion.div>
 

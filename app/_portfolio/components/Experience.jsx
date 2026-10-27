@@ -78,16 +78,16 @@ export default function Experience() {
               {job.highlights.map((highlight, index) => (
                 <motion.li
                   key={highlight.title}
-                  className="group grid grid-cols-[2.5rem_1fr] items-start gap-4 py-5 transition hover:bg-white/[0.03] md:grid-cols-[4rem_12rem_1fr] md:gap-6 md:px-4"
+                  className="group grid grid-cols-[2.5rem_1fr] items-start gap-4 py-5 transition hover:bg-white/[0.03] md:grid-cols-[12rem_1fr] md:gap-6 md:px-4"
                   initial={{ opacity: 0, x: -16 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ duration: 0.5, ease: EASE, delay: 0.1 + index * 0.07 }}
                 >
-                  <span className="font-display text-4xl leading-none text-white/30 transition group-hover:text-accent md:text-5xl">
+                  <span className="font-display text-4xl leading-none text-white/30 transition group-hover:text-accent md:hidden">
                     {index + 1}
                   </span>
-                  <HighlightThumb jobIndex={selected} company={job.company} number={index + 1} />
-                  <div className="col-start-2 md:col-start-3">
+                  <HighlightNumber jobIndex={selected} company={job.company} number={index + 1} />
+                  <div className="col-start-2">
                     <h4 className="font-semibold text-white">{highlight.title}</h4>
                     <p className="mt-1 leading-relaxed text-white/65">{highlight.text}</p>
                   </div>
@@ -103,22 +103,16 @@ export default function Experience() {
 
 const THUMB_TINTS = ["from-amber-500/60", "from-sky-500/60", "from-fuchsia-500/60"];
 
-function HighlightThumb({ jobIndex, company, number }) {
+function HighlightNumber({ jobIndex, company, number }) {
   return (
     <div
       aria-hidden
-      className={`relative hidden aspect-video overflow-hidden rounded bg-gradient-to-br ${THUMB_TINTS[jobIndex % THUMB_TINTS.length]} to-black md:block`}
+      className={`relative hidden aspect-video items-center justify-center overflow-hidden rounded bg-gradient-to-br ${THUMB_TINTS[jobIndex % THUMB_TINTS.length]} to-black md:flex`}
     >
-      <span className="absolute bottom-1 left-2 font-display text-sm tracking-wider text-white/80">
-        {company} · {String(number).padStart(2, "0")}
+      <span className="font-display text-6xl leading-none text-white/80 transition group-hover:scale-110 group-hover:text-white">
+        {String(number).padStart(2, "0")}
       </span>
-      <span className="absolute inset-0 flex items-center justify-center opacity-0 transition group-hover:opacity-100">
-        <span className="flex h-9 w-9 items-center justify-center rounded-full border border-white bg-black/40">
-          <svg viewBox="0 0 24 24" className="ml-0.5 h-4 w-4 text-white" fill="currentColor">
-            <path d="M7 4.5v15a1 1 0 0 0 1.5.86l12.5-7.5a1 1 0 0 0 0-1.72L8.5 3.64A1 1 0 0 0 7 4.5Z" />
-          </svg>
-        </span>
-      </span>
+      <span className="absolute bottom-1 left-2 text-[10px] uppercase tracking-[0.2em] text-white/60">{company}</span>
     </div>
   );
 }

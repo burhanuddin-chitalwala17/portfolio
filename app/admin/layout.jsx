@@ -1,6 +1,7 @@
 import { cookies } from "next/headers";
 import { checkSession } from "../services/auth/checkSession";
 import AdminLockScreen from "./_components/AdminLockScreen";
+import LogoutButton from "./_components/LogoutButton";
 
 const COOKIE_NAME = "admin-auth";
 
@@ -25,10 +26,13 @@ export default async function AdminLayout({ children }) {
               Dashboard Control Center
             </h1>
           </div>
-          <p className="text-sm text-slate-500 md:text-base">
-            Manage documents, assets, and upcoming portfolio updates from this
-            panel.
-          </p>
+          <div className="flex flex-col items-start gap-3 md:items-end">
+            <p className="text-sm text-slate-500 md:text-base">
+              Manage documents, assets, and upcoming portfolio updates from this
+              panel.
+            </p>
+            <LogoutButton />
+          </div>
         </header>
 
         <main className="flex flex-1 flex-col gap-6">{children}</main>

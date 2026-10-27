@@ -1,3 +1,5 @@
+import { timingSafeEqual } from "crypto";
+
 /**
  * Validates the provided password against the admin password from environment variables.
  * @param {string} inputPassword - The password to validate
@@ -16,6 +18,8 @@ export function validatePassword(inputPassword) {
     return false;
   }
 
-  return inputPassword.trim() === adminPassword.trim();
+  const expected = Buffer.from(adminPassword.trim());
+  const received = Buffer.from(inputPassword.trim());
+  return expected.length === received.length && timingSafeEqual(expected, received);
 }
 

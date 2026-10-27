@@ -78,7 +78,7 @@ export default function Hero({ onPlayIntro, onMoreInfo }) {
           <span>Since 2023</span>
           <span className="rounded border border-white/40 px-1.5 text-xs">{experience.length} roles</span>
           <span className="rounded border border-white/40 px-1.5 text-xs">{projects.length} projects</span>
-          <span className="rounded border border-white/40 px-1.5 text-xs">1.5+ yrs</span>
+          <span className="rounded border border-white/40 px-1.5 text-xs">{profile.yearsExperience} yrs</span>
         </motion.div>
 
         <motion.p
@@ -140,9 +140,9 @@ export default function Hero({ onPlayIntro, onMoreInfo }) {
       {/* floating chips, desktop only */}
       <div className="pointer-events-none absolute inset-0 z-10 hidden lg:block" aria-hidden>
         {[
-          { text: "5M+ users", className: "right-[12%] top-[24%]", delay: 0 },
+          { text: "$786M+ projected", className: "right-[12%] top-[24%]", delay: 0 },
           { text: "LLM-powered", className: "right-[30%] top-[58%]", delay: 1.2 },
-          { text: "Next.js · Kotlin", className: "right-[8%] top-[70%]", delay: 2.4 },
+          { text: "Next.js · Java · Python", className: "right-[8%] top-[70%]", delay: 2.4 },
         ].map((chip) => (
           <motion.span
             key={chip.text}

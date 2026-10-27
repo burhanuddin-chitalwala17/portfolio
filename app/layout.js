@@ -7,10 +7,10 @@ const sans = Inter({ subsets: ["latin"], variable: "--font-sans" });
 export const metadata = {
   title: "Burhanuddin Chitalwala — Full-Stack Developer",
   description:
-    "Burhanuddin Chitalwala, full-stack software developer. Experience at InMobi, Stellantis and ITR Consulting, plus projects across web, mobile and AI.",
+    "Burhanuddin Chitalwala, full-stack engineer building AI-powered products. Experience at InMobi, Stellantis and ITR Consulting, plus live AI projects.",
   openGraph: {
     title: "Burhanuddin Chitalwala — Full-Stack Developer",
-    description: "Full-stack software developer building AI-powered web and mobile products.",
+    description: "Full-stack engineer with 3+ years shipping AI-powered products at InMobi and Stellantis.",
     images: ["/img/burhanuddin-main.jpg"],
   },
 };

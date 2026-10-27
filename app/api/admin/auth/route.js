@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { validatePassword } from "../../../services/auth/validatePassword";
+import { createSessionToken } from "../../../services/auth/checkSession";
 
 const COOKIE_NAME = "admin-auth";
 const COOKIE_OPTIONS = {
@@ -38,11 +39,10 @@ export async function POST(request) {
       );
     }
 
-    // Set session cookie with current timestamp
-    const timestamp = Date.now().toString();
+    // Set a signed session cookie
     const response = NextResponse.json({ success: true });
 
-    response.cookies.set(COOKIE_NAME, timestamp, COOKIE_OPTIONS);
+    response.cookies.set(COOKIE_NAME, createSessionToken(), COOKIE_OPTIONS);
 
     return response;
   } catch (error) {
@@ -63,3 +63,13 @@ export async function POST(request) {
   }
 }
 
+
+/**
+ * DELETE /api/admin/auth
+ * Logs the admin out by clearing the session cookie.
+ */
+export async function DELETE() {
+  const response = NextResponse.json({ success: true });
+  response.cookies.set(COOKIE_NAME, "", { ...COOKIE_OPTIONS, maxAge: 0 });
+  return response;
+}

@@ -2,6 +2,8 @@
 
 import Image from "next/image";
 import { education, profile } from "../../data/siteData";
+
+const { problemSolving } = profile;
 import { Reveal, Tilt } from "../fx";
 import { SectionHeading } from "./Rail";
 
@@ -41,12 +43,24 @@ export default function About() {
                 <dd className="mt-2 text-white">{education.degree}</dd>
                 <dd className="mt-1 text-sm text-white/60">{education.school}</dd>
                 <dd className="mt-3 inline-block rounded bg-accent/15 px-2 py-0.5 text-sm text-accent">{education.score}</dd>
+                <dt className="mt-5 text-xs uppercase tracking-[0.25em] text-white/50">Problem solving</dt>
+                <dd className="mt-2 text-white">
+                  <a href={profile.links.leetcode} target="_blank" rel="noreferrer" className="underline decoration-white/30 underline-offset-4 transition hover:text-accent">
+                    {problemSolving.solved} LeetCode problems
+                  </a>{" "}
+                  in {problemSolving.language}
+                </dd>
+                <dd className="mt-1 text-sm text-white/60">
+                  {problemSolving.medium} medium · {problemSolving.hard} hard · strongest in {problemSolving.strengths.join(", ").toLowerCase()}
+                </dd>
               </div>
               <div className="rounded-lg border border-white/10 bg-white/[0.03] p-5">
                 <dt className="text-xs uppercase tracking-[0.25em] text-white/50">Based in</dt>
                 <dd className="mt-2 text-white">{profile.location}</dd>
                 <dt className="mt-4 text-xs uppercase tracking-[0.25em] text-white/50">Focus areas</dt>
                 <dd className="mt-2 text-white">{profile.focusAreas.join(" · ")}</dd>
+                <dt className="mt-4 text-xs uppercase tracking-[0.25em] text-white/50">Open to</dt>
+                <dd className="mt-2 text-white">{profile.openTo}</dd>
               </div>
             </dl>
           </Reveal>

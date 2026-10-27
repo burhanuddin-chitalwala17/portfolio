@@ -7,14 +7,25 @@ export const profile = {
   firstName: "BURHANUDDIN",
   lastName: "CHITALWALA",
   introCard: "A PORTFOLIO BY",
-  role: "Full-Stack Software Developer",
-  focusAreas: ["Next.js", "Android · Kotlin", "LLM systems"],
+  role: "Full-Stack Engineer",
+  yearsExperience: "3+",
+  focusAreas: ["Next.js", "Java · Python", "AI / LLM systems"],
   logline:
-    "A full-stack developer with 1.5+ years of shipping AI-powered web and mobile products, from voice assistants in cars to ad platforms used across the globe.",
+    "A full-stack engineer with 3+ years shipping AI-powered products at InMobi and Stellantis, from an LLM voice assistant live in a car to an AI layer that plans ad campaigns.",
   summary: [
-    "Results-driven full-stack software developer with 1.5+ years of experience building scalable, AI-powered web and mobile applications.",
-    "I've shipped production features across Next.js, Android (Kotlin) and LLM-integrated systems. I care about modular frontends, clean backend communication and solutions that move real numbers for users and the business.",
+    "Full-stack engineer with 3+ years building and shipping AI-powered products at global companies. I own features end to end, across Java and Python backends and Next.js and React frontends.",
+    "I've shipped production LLM systems in a live vehicle, and I'm strongest in AI integration, scalable server-rendered web platforms and design systems, always with an eye on measurable business impact.",
   ],
+  openTo: "SDE 2 roles at product companies · relocation to Dubai, UAE",
+  /** From the public LeetCode profile. Update when the numbers change. */
+  problemSolving: {
+    solved: 555,
+    medium: 296,
+    hard: 54,
+    language: "Java",
+    strengths: ["Dynamic programming", "Graphs", "Trees", "Hash tables"],
+    badges: "100 Days Badge 2025 and 50 Days Badges in 2023, 2024 and 2025",
+  },
   location: "Bengaluru, India",
   email: "burhanuddinchital25151@gmail.com",
   resumePdf: "/docs/resume.pdf",
@@ -24,7 +35,8 @@ export const profile = {
   },
   links: {
     linkedin: "https://www.linkedin.com/in/cburhanuddin/",
-    github: "https://github.com/SatanSanta17",
+    github: "https://github.com/burhanuddin-chitalwala17",
+    leetcode: "https://leetcode.com/u/burhanuddinchital25151/",
     twitter: "https://twitter.com/BChital",
     instagram: "https://www.instagram.com/burhanuddin.chitalwala/",
   },
@@ -42,17 +54,13 @@ export const experience = [
     years: "2023",
     company: "ITR Consulting",
     role: "Software Developer Intern",
-    place: "Illinois, US",
+    place: "Illinois, US (Remote)",
     period: "Jul 2023 – Jan 2024",
     logline: "A consulting firm specializing in IT solutions and software development.",
     highlights: [
       {
         title: "High-traffic web app",
-        text: "Engineered a high-traffic web application serving 2,000+ daily users with a Laravel + Vue.js stack.",
-      },
-      {
-        title: "MVC architecture",
-        text: "Improved cross-platform UI responsiveness and implemented an MVC architecture for scalable backend logic and REST APIs.",
+        text: "Built a high-traffic web application with Laravel and Vue.js serving 2,000+ daily users, using an MVC architecture and REST APIs to improve cross-platform UI responsiveness.",
       },
     ],
   },
@@ -62,27 +70,23 @@ export const experience = [
     role: "Software Developer",
     place: "Bengaluru, India",
     period: "Feb 2024 – Jul 2025",
-    logline: "An automotive manufacturer that designs and produces vehicles.",
+    logline: "A global automotive manufacturer.",
     highlights: [
       {
+        title: "AI voice assistant",
+        text: "Built an AI-powered in-car voice assistant integrating GPT-4o, Gemini, DeepSeek and Realtime AI across a 14-feature suite, now live in the Citroën Basalt X. Its subscription model is projected to generate $786M+ in revenue.",
+      },
+      {
         title: "Alexa Skills for 14 brands",
-        text: "Built Alexa Skills for 14 iconic automotive brands (Jeep, Maserati, Alfa Romeo and more), enabling voice-controlled vehicle operations for over 5 million users.",
+        text: "Developed Alexa Skills for voice-controlled vehicle operations across 14 brands, including Jeep, Maserati and Alfa Romeo.",
       },
       {
         title: "Echo Show interfaces",
-        text: "Developed responsive multimodal interfaces for Echo Show devices, boosting user engagement by 27%.",
-      },
-      {
-        title: "AI voice assistant",
-        text: "Developed an AI-powered voice assistant integrating LLMs (GPT-4o, Gemini, DeepSeek, Realtime AI) with a 14-feature suite, now live in the Citroën Basalt X. Its subscription model is projected to generate at least $786M in revenue.",
+        text: "Built responsive multimodal interfaces for Echo Show devices, increasing user engagement by 27%.",
       },
       {
         title: "Refactoring for scale",
-        text: "Refactored code for scalability, reusability and MVVM compliance, saving 20 man-hours per sprint and speeding up future iterations.",
-      },
-      {
-        title: "Hiring",
-        text: "Conducted technical interviews for tech lead roles, helping hire high-caliber engineers for critical projects.",
+        text: "Refactored core systems for MVVM compliance and reusability, saving 20 engineering hours per sprint.",
       },
     ],
   },
@@ -93,24 +97,23 @@ export const experience = [
     place: "Bengaluru, India",
     period: "Jul 2025 – Present",
     current: true,
-    logline:
-      "A global AdTech leader empowering brands with intelligent, data-driven advertising across web, app and connected devices.",
+    logline: "A global AdTech leader for intelligent, data-driven advertising.",
     highlights: [
       {
-        title: "Ad publishing platform",
-        text: "Frontend development for an Omnichannel Ad Publishing Platform with Next.js, TypeScript and Tailwind CSS, making campaign management more efficient.",
+        title: "AI media planning",
+        text: "Building an omnichannel performance-marketing platform where an AI chat layer generates media plans, market research and optimised campaign and budget strategies. I own features end to end across Java and Python services and the Next.js frontend.",
       },
       {
-        title: "Reusable Datatable",
-        text: "Designed a reusable Datatable with server-side sorting, pagination and dynamic data binding, now used across multiple modules and boosting development velocity by 40%.",
+        title: "Design system & UI revamp",
+        text: "Building the go-to-market UI revamp on a layered design system (primitive and semantic tokens, shadcn and Radix primitives, composite components, layouts), modernising the product under tight deadlines without disrupting the live product.",
       },
       {
-        title: "Landing pages & performance",
-        text: "Built the landing and business pages and optimized rendering performance for large asset files.",
+        title: "Server-rendered ad publishing",
+        text: "Led frontend development of the server-side-rendered ad publishing platform (Next.js, TypeScript, Tailwind), improving SEO and campaign management efficiency.",
       },
       {
-        title: "Frontend architecture",
-        text: "Contributed to frontend architecture and design decisions for scalability, clean state management and seamless backend integration.",
+        title: "Internal AI tool with Claude",
+        text: "Built an internal tool using Claude that turns client-meeting minutes into structured signals and action items, replacing hours of cross-team discussion with reusable product insights.",
       },
     ],
   },
@@ -119,20 +122,39 @@ export const experience = [
 /** Projects, shown as cards. `art` sets each card's gradient. */
 export const projects = [
   {
-    id: "pickme",
-    title: "pickMe",
-    subtitle: "AI job portal",
-    kind: "Personal project",
-    art: { from: "#3b0764", via: "#7c3aed", to: "#f5b83d" },
-    logline: "A MERN job portal where an LLM writes the screening tasks, turning hours of work into seconds.",
+    id: "creddev",
+    title: "CredDev",
+    subtitle: "AI credibility reports",
+    kind: "Live · Personal",
+    art: { from: "#0f172a", via: "#2563eb", to: "#5eead4" },
+    logline: "An AI platform that pulls a developer's data from GitHub, LeetCode, LinkedIn and 15+ other platforms and turns it into credibility reports.",
     points: [
-      "Built a full-stack job portal using MongoDB, Express.js, React.js and Node.js.",
-      "Integrated Google LLM models for AI-driven task generation, reducing bias and employer workload: a process that took tens of hours now takes seconds.",
-      "Used prompt engineering to generate relevant tasks from job descriptions.",
-      "Developed and tested RESTful APIs and integrated MongoDB for its ease of integration and community support.",
+      "Full-stack AI platform built with Next.js 16, FastAPI and PostgreSQL.",
+      "Aggregates developer data from GitHub, LeetCode, LinkedIn and 15+ platforms to generate credibility reports with OpenAI GPT.",
+      "Backed by a 7-point anti-hallucination guardrail system.",
+      "Real-time 12-state chat agent, progressive OAuth authentication and graceful degradation across multi-platform data fetchers, following SOLID principles.",
     ],
-    tech: ["MongoDB", "Express.js", "React.js", "Node.js", "Google LLMs"],
-    link: { label: "View on GitHub", href: "https://github.com/SatanSanta17/pickMe" },
+    tech: ["Next.js 16", "FastAPI", "PostgreSQL", "OpenAI GPT", "OAuth"],
+    links: [
+      { label: "Visit site", href: "https://cred-dev17.vercel.app" },
+      { label: "View code", href: "https://github.com/burhanuddin-chitalwala17/cred-dev" },
+    ],
+  },
+  {
+    id: "bhendi-bazaar",
+    title: "Bhendi Bazaar",
+    subtitle: "Multi-tenant commerce",
+    kind: "Live · Personal",
+    art: { from: "#431407", via: "#ea580c", to: "#fde68a" },
+    logline: "An e-commerce platform that gives small businesses their own branded storefront, live in production with a real seller.",
+    points: [
+      "Full-stack platform built with Next.js, TypeScript, Prisma, Supabase/PostgreSQL and Vercel.",
+      "Each business gets a branded storefront and landing page, with inventory management and an org portal for order tracking.",
+      "Complete buyer flow (catalogue, cart and checkout) with orders routed to each seller's dashboard.",
+      "Designing AI-assisted marketplace listings that store a seller's business context once and reuse it to generate listings for Amazon, Flipkart and Meesho.",
+    ],
+    tech: ["Next.js", "TypeScript", "Prisma", "Supabase", "PostgreSQL", "Vercel"],
+    links: [{ label: "Visit site", href: "https://bhendi-bazaar.com" }],
   },
   {
     id: "basalt-assistant",
@@ -144,9 +166,23 @@ export const projects = [
     points: [
       "Integrated GPT-4o, Gemini, DeepSeek and Realtime AI to enable hands-free operations.",
       "Shipped a 14-feature suite that is now live in the Citroën Basalt X.",
-      "Its subscription model is projected to generate at least $786M in revenue.",
+      "Its subscription model is projected to generate $786M+ in revenue.",
     ],
     tech: ["GPT-4o", "Gemini", "DeepSeek", "Realtime AI"],
+  },
+  {
+    id: "media-planner",
+    title: "AI Media Planner",
+    subtitle: "Performance marketing",
+    kind: "InMobi",
+    art: { from: "#111827", via: "#4338ca", to: "#f472b6" },
+    logline: "An omnichannel marketing platform where an AI chat layer plans media, researches markets and optimises budgets for advertisers.",
+    points: [
+      "AI chat layer that generates media plans, market research and optimised campaign and budget strategies.",
+      "Features owned end to end across Java and Python services and the Next.js frontend.",
+      "UI revamp on a layered design system built from tokens, shadcn and Radix primitives.",
+    ],
+    tech: ["Next.js", "Java", "Python", "LLMs", "shadcn/ui"],
   },
   {
     id: "alexa-skills",
@@ -156,72 +192,41 @@ export const projects = [
     art: { from: "#450a0a", via: "#b91c1c", to: "#fb923c" },
     logline: "Voice-controlled vehicle operations for Jeep, Maserati, Alfa Romeo and 11 more brands.",
     points: [
-      "Developed Alexa Skills for 14 automotive brands, reaching over 5 million users.",
-      "Built responsive multimodal UIs for Echo Show devices, boosting engagement by 27%.",
-      "Refactored for MVVM compliance and reuse, saving 20 man-hours per sprint.",
+      "Developed Alexa Skills for voice-controlled vehicle operations across 14 brands.",
+      "Built responsive multimodal UIs for Echo Show devices, increasing engagement by 27%.",
+      "Refactored for MVVM compliance and reuse, saving 20 engineering hours per sprint.",
     ],
     tech: ["Alexa Skills", "Echo Show", "Voice UX", "MVVM"],
-  },
-  {
-    id: "ad-platform",
-    title: "Ad Publisher",
-    subtitle: "Omnichannel ad platform",
-    kind: "InMobi",
-    art: { from: "#111827", via: "#4338ca", to: "#f472b6" },
-    logline: "The frontend of an ad publishing platform, built around a Datatable the whole team now reuses.",
-    points: [
-      "Frontend development with Next.js, TypeScript and Tailwind CSS for campaign management.",
-      "Reusable Datatable with server-side sorting, pagination and dynamic data binding, boosting development velocity by 40%.",
-      "Landing and business pages, with rendering optimized for large asset files.",
-    ],
-    tech: ["Next.js", "TypeScript", "Tailwind CSS"],
-  },
-  {
-    id: "weather",
-    title: "Weather App",
-    subtitle: "Flask + Tomorrow.io",
-    kind: "Personal project",
-    art: { from: "#082f49", via: "#0284c7", to: "#fde68a" },
-    logline: "A Flask weather forecasting app powered by real-time data from the Tomorrow.io APIs.",
-    points: ["Built a weather forecasting app using Flask with Tomorrow.io APIs for real-time weather data."],
-    tech: ["Flask", "Python", "Tomorrow.io API"],
-  },
-  {
-    id: "task-scheduler",
-    title: "Task Scheduler",
-    subtitle: "Flask + MongoDB",
-    kind: "Personal project",
-    art: { from: "#052e16", via: "#15803d", to: "#bef264" },
-    logline: "A Flask and MongoDB task scheduler with a responsive Bootstrap UI.",
-    points: [
-      "Developed a Flask-based task scheduler with MongoDB.",
-      "Responsive Bootstrap UI with CRUD operations and task sorting in JavaScript.",
-    ],
-    tech: ["Flask", "MongoDB", "Bootstrap", "JavaScript"],
   },
 ];
 
 /** Headline numbers from the resume, biggest first. */
 export const impactNumbers = [
-  { value: "5M+", label: "users reached by voice-controlled vehicle skills", source: "Stellantis" },
-  { value: "$786M", label: "projected subscription revenue for the AI assistant", source: "Stellantis" },
-  { value: "40%", label: "faster development with a shared Datatable", source: "InMobi" },
+  { value: "$786M+", label: "projected subscription revenue for the in-car AI assistant", source: "Stellantis" },
+  { value: "14", label: "car brands with voice-controlled Alexa Skills", source: "Stellantis" },
   { value: "27%", label: "more engagement on Echo Show interfaces", source: "Stellantis" },
-  { value: "14", label: "automotive brands given a voice", source: "Stellantis" },
-  { value: "20h", label: "saved every sprint through refactoring", source: "Stellantis" },
+  { value: "20h", label: "of engineering time saved every sprint", source: "Stellantis" },
+  { value: "15+", label: "developer platforms aggregated into AI reports", source: "CredDev" },
   { value: "2,000+", label: "daily users on a high-traffic web app", source: "ITR Consulting" },
+  { value: "555", label: "LeetCode problems solved, including 296 medium and 54 hard", source: "LeetCode" },
+  { value: "3+", label: "years shipping AI-powered products", source: "Career" },
 ];
 
 export const skillGroups = [
-  { name: "Languages", items: ["Java", "Python", "JavaScript", "Kotlin", "SQL", "PHP"] },
+  { name: "Languages", items: ["Java", "Python", "TypeScript", "JavaScript", "Kotlin", "SQL", "PHP"] },
   {
-    name: "Frameworks & Libraries",
-    items: ["Next.js", "React.js", "Node.js", "Flask", "Laravel", "Vue.js", "Bootstrap"],
+    name: "Frontend",
+    items: ["Next.js", "React", "Tailwind CSS", "shadcn/ui", "Radix UI", "Design systems", "SSR / SEO"],
   },
-  { name: "Databases", items: ["MongoDB", "MySQL"] },
+  { name: "Backend", items: ["Node.js", "FastAPI", "REST APIs", "Prisma", "OAuth"] },
   {
-    name: "Tools & Foundations",
-    items: ["Cursor", "Android Studio", "Git", "VS Code", "Postman", "DS & Algo", "OOP"],
+    name: "AI / LLM",
+    items: ["OpenAI API", "GPT-4o", "Gemini", "DeepSeek", "Claude", "Realtime AI", "RAG", "AI agents", "Prompt engineering", "Hallucination guardrails"],
+  },
+  { name: "Data & Cloud", items: ["PostgreSQL", "Supabase", "MySQL", "MongoDB", "Vercel"] },
+  {
+    name: "Practices",
+    items: ["System design", "DS & Algo", "SOLID", "OOP", "MVVM", "Git", "AI-assisted development"],
   },
 ];
 
@@ -234,11 +239,11 @@ export const beyondWork = [
 
 /** Slides for the "Quick intro" slideshow. */
 export const introSlides = [
-  { eyebrow: "Hello, I'm", title: "BURHANUDDIN", text: "A computer science graduate from VIT starts writing code for real users." },
+  { eyebrow: "Hello, I'm", title: "BURHANUDDIN", text: "A full-stack engineer from VIT who ships AI-powered products." },
   { eyebrow: "2023", title: "2,000+ DAILY USERS", text: "An internship at ITR Consulting: a high-traffic Laravel + Vue.js app." },
-  { eyebrow: "2024", title: "5 MILLION VOICES", text: "Alexa Skills for 14 car brands, and an LLM assistant live in the Citroën Basalt X." },
-  { eyebrow: "Today", title: "AD TECH AT SCALE", text: "Building an omnichannel ad publishing platform at InMobi with Next.js." },
-  { eyebrow: "What's next", title: "YOUR TEAM?", text: "Open to conversations about full-stack, mobile and AI products." },
+  { eyebrow: "2024", title: "AI ON THE ROAD", text: "An LLM voice assistant live in the Citroën Basalt X, plus Alexa Skills for 14 car brands." },
+  { eyebrow: "Today", title: "AI FOR ADVERTISERS", text: "At InMobi, building a platform where an AI chat layer plans media and budgets." },
+  { eyebrow: "What's next", title: "YOUR TEAM?", text: "Open to SDE 2 roles at product companies, including in Dubai." },
 ];
 
 /** Visitor types for the welcome screen. Each one only changes the order of sections. */

@@ -115,18 +115,21 @@ export default function DocumentList({
                   </td>
                   <td className="px-3 py-3">
                     <div className="flex flex-wrap items-center gap-2">
-                      <button
-                        type="button"
+                      <a
+                        href={document.url}
+                        target="_blank"
+                        rel="noreferrer"
                         className="rounded-full border border-slate-200 px-3 py-1 text-xs font-semibold text-slate-600 transition hover:border-slate-300 hover:text-slate-700"
                       >
                         Preview
-                      </button>
-                      <button
-                        type="button"
+                      </a>
+                      <a
+                        href={document.url}
+                        download
                         className="rounded-full bg-slate-900 px-3 py-1 text-xs font-semibold text-white transition hover:bg-slate-700"
                       >
                         Download
-                      </button>
+                      </a>
                     </div>
                   </td>
                 </tr>

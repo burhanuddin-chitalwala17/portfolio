@@ -20,7 +20,7 @@ export default function FileUploadPanel({
     if (!files.length) return;
 
     setSelectedFiles(files);
-    // TODO: Invoke upload service once API endpoint is available.
+    // TODO: Send the files to storage once it's connected.
   }, []);
 
   const handleChange = useCallback(
@@ -107,8 +107,12 @@ export default function FileUploadPanel({
       {selectedFiles.length ? (
         <div className="mt-4 rounded-xl border border-slate-100 bg-slate-100/60 p-4">
           <h3 className="text-xs uppercase tracking-wide text-slate-500">
-            Ready to upload
+            Selected
           </h3>
+          <p className="mt-1 text-xs text-amber-700">
+            Uploading isn&apos;t switched on yet: it needs file storage to be
+            connected. These files stay on your device for now.
+          </p>
           <ul className="mt-2 space-y-1 text-sm text-slate-600">
             {selectedFiles.map((file) => (
               <li

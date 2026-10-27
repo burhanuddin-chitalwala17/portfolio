@@ -7,6 +7,7 @@ import { EASE, Magnetic, Particles, Reveal } from "../fx";
 const LINKS = [
   { label: "LinkedIn", href: profile.links.linkedin },
   { label: "GitHub", href: profile.links.github },
+  { label: "LeetCode", href: profile.links.leetcode },
   { label: "Twitter", href: profile.links.twitter },
   { label: "Instagram", href: profile.links.instagram },
 ];

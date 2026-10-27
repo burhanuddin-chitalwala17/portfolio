@@ -9,13 +9,15 @@ const GROUP_TINTS = [
   "from-sky-500/25",
   "from-emerald-500/25",
   "from-fuchsia-500/25",
+  "from-rose-500/25",
+  "from-teal-500/25",
 ];
 
 export default function Skills() {
   return (
     <section id="skills" className="py-14 md:py-20" aria-labelledby="skills-title">
       <SectionHeading eyebrow="Toolkit" title={<span id="skills-title">Skills</span>} />
-      <div className="grid gap-4 px-4 sm:grid-cols-2 md:px-12 xl:grid-cols-4">
+      <div className="grid gap-4 px-4 sm:grid-cols-2 md:px-12 lg:grid-cols-3">
         {skillGroups.map((group, index) => (
           <Reveal key={group.name} delay={index * 0.08}>
             <Tilt max={6} className="h-full">
