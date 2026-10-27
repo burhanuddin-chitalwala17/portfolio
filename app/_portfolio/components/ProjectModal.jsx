@@ -3,7 +3,7 @@
 import { useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import { EASE } from "../fx";
-import { PosterArt } from "./Originals";
+import { PosterArt } from "./Projects";
 
 export default function ProjectModal({ project, onClose }) {
   const closeRef = useRef(null);
@@ -38,7 +38,7 @@ export default function ProjectModal({ project, onClose }) {
           <PosterArt project={project} className="aspect-[16/9] md:aspect-[21/9]">
             <div className="absolute inset-0 bg-gradient-to-t from-[#141414] via-transparent to-transparent" />
             <div className="absolute bottom-0 left-0 p-5 md:p-8">
-              <p className="text-xs font-semibold uppercase tracking-[0.3em] text-accent">B Original · {project.kind}</p>
+              <p className="text-xs font-semibold uppercase tracking-[0.3em] text-accent">{project.kind}</p>
               <h2 id="project-title" className="mt-1 font-display text-5xl leading-none text-white md:text-7xl">
                 {project.title}
               </h2>
@@ -56,7 +56,7 @@ export default function ProjectModal({ project, onClose }) {
         >
           <p className="text-lg leading-relaxed text-white">{project.logline}</p>
 
-          <h3 className="mt-6 text-xs font-semibold uppercase tracking-[0.25em] text-white/50">Episode guide</h3>
+          <h3 className="mt-6 text-xs font-semibold uppercase tracking-[0.25em] text-white/50">What I did</h3>
           <ul className="mt-3 space-y-3">
             {project.points.map((point) => (
               <li key={point} className="flex gap-3 leading-relaxed text-white/75">
@@ -66,7 +66,7 @@ export default function ProjectModal({ project, onClose }) {
             ))}
           </ul>
 
-          <h3 className="mt-6 text-xs font-semibold uppercase tracking-[0.25em] text-white/50">Cast</h3>
+          <h3 className="mt-6 text-xs font-semibold uppercase tracking-[0.25em] text-white/50">Tech stack</h3>
           <ul className="mt-3 flex flex-wrap gap-2">
             {project.tech.map((tech) => (
               <li key={tech} className="rounded-full border border-white/15 px-3 py-1 text-sm text-white/85">

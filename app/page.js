@@ -1,5 +1,5 @@
-import Series from "./_series/Series";
+import Portfolio from "./_portfolio/Portfolio";
 
 export default function Home() {
-  return <Series />;
+  return <Portfolio />;
 }

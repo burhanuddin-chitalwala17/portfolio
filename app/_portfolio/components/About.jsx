@@ -5,10 +5,10 @@ import { education, profile } from "../../data/siteData";
 import { Reveal, Tilt } from "../fx";
 import { SectionHeading } from "./Rail";
 
-export default function Pilot() {
+export default function About() {
   return (
-    <section id="pilot" className="py-14 md:py-20" aria-labelledby="pilot-title">
-      <SectionHeading eyebrow="Episode 0" title={<span id="pilot-title">The Pilot</span>} />
+    <section id="about" className="py-14 md:py-20" aria-labelledby="about-title">
+      <SectionHeading eyebrow="About" title={<span id="about-title">A Bit About Me</span>} />
       <div className="grid gap-10 px-4 md:grid-cols-[minmax(0,1fr)_minmax(0,1.4fr)] md:px-12 lg:gap-16">
         <Reveal>
           <Tilt className="relative mx-auto aspect-[4/5] w-full max-w-sm overflow-hidden rounded-lg shadow-2xl shadow-black/60">
@@ -22,7 +22,7 @@ export default function Pilot() {
             <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
             <div className="absolute bottom-0 p-5">
               <p className="font-display text-3xl text-white">{profile.firstName}</p>
-              <p className="text-sm text-white/70">as {profile.role}</p>
+              <p className="text-sm text-white/70">{profile.role}</p>
             </div>
           </Tilt>
         </Reveal>
@@ -37,16 +37,16 @@ export default function Pilot() {
           <Reveal delay={0.2}>
             <dl className="grid gap-4 sm:grid-cols-2">
               <div className="rounded-lg border border-white/10 bg-white/[0.03] p-5">
-                <dt className="text-xs uppercase tracking-[0.25em] text-white/50">Origin story</dt>
+                <dt className="text-xs uppercase tracking-[0.25em] text-white/50">Education</dt>
                 <dd className="mt-2 text-white">{education.degree}</dd>
                 <dd className="mt-1 text-sm text-white/60">{education.school}</dd>
                 <dd className="mt-3 inline-block rounded bg-accent/15 px-2 py-0.5 text-sm text-accent">{education.score}</dd>
               </div>
               <div className="rounded-lg border border-white/10 bg-white/[0.03] p-5">
-                <dt className="text-xs uppercase tracking-[0.25em] text-white/50">Filming in</dt>
+                <dt className="text-xs uppercase tracking-[0.25em] text-white/50">Based in</dt>
                 <dd className="mt-2 text-white">{profile.location}</dd>
-                <dt className="mt-4 text-xs uppercase tracking-[0.25em] text-white/50">Starring in</dt>
-                <dd className="mt-2 text-white">{profile.genres.join(" · ")}</dd>
+                <dt className="mt-4 text-xs uppercase tracking-[0.25em] text-white/50">Focus areas</dt>
+                <dd className="mt-2 text-white">{profile.focusAreas.join(" · ")}</dd>
               </div>
             </dl>
           </Reveal>

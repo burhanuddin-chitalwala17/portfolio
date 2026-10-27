@@ -1,17 +1,17 @@
 "use client";
 
-import { topNumbers } from "../../data/siteData";
+import { impactNumbers } from "../../data/siteData";
 import { Reveal } from "../fx";
 import { Rail, SectionHeading } from "./Rail";
 
-export default function TopNumbers() {
+export default function Impact() {
   return (
-    <section id="numbers" className="py-14 md:py-20" aria-labelledby="numbers-title">
-      <SectionHeading eyebrow="Ratings" title={<span id="numbers-title">Top {topNumbers.length} in Impact</span>}>
-        The numbers behind the work, straight from the resume.
+    <section id="impact" className="py-14 md:py-20" aria-labelledby="impact-title">
+      <SectionHeading eyebrow="Impact" title={<span id="impact-title">By the Numbers</span>}>
+        A few results I&apos;m proud of.
       </SectionHeading>
       <Rail label="Impact numbers">
-        {topNumbers.map((item, index) => (
+        {impactNumbers.map((item, index) => (
           <li key={item.label} className="flex shrink-0 snap-start items-end">
             <Reveal delay={index * 0.05} className="flex items-end">
               <span

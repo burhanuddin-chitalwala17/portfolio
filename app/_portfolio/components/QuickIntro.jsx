@@ -8,8 +8,8 @@ import { EASE } from "../fx";
 
 const SLIDE_MS = 4500;
 
-/** "Play Intro": a story-style highlight reel. Arrows step, Space pauses, Esc closes. */
-export default function IntroReel({ onClose }) {
+/** "Quick intro": a story-style slideshow. Arrows step, Space pauses, Esc closes. */
+export default function QuickIntro({ onClose }) {
   const [index, setIndex] = useState(0);
   const [paused, setPaused] = useState(false);
 
@@ -50,7 +50,7 @@ export default function IntroReel({ onClose }) {
       transition={{ duration: 0.5 }}
       role="dialog"
       aria-modal="true"
-      aria-label="Intro highlight reel"
+      aria-label="Quick intro"
     >
       <motion.div
         aria-hidden

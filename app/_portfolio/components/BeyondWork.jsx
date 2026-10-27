@@ -1,18 +1,18 @@
 "use client";
 
 import Image from "next/image";
-import { behindTheScenes } from "../../data/siteData";
+import { beyondWork } from "../../data/siteData";
 import { Reveal } from "../fx";
 import { Rail, SectionHeading } from "./Rail";
 
-export default function BehindTheScenes() {
+export default function BeyondWork() {
   return (
-    <section id="bts" className="py-14 md:py-20" aria-labelledby="bts-title">
-      <SectionHeading eyebrow="Off screen" title={<span id="bts-title">Behind the Scenes</span>}>
+    <section id="beyond" className="py-14 md:py-20" aria-labelledby="beyond-title">
+      <SectionHeading eyebrow="Off the clock" title={<span id="beyond-title">Beyond Work</span>}>
         Football pitches, trophies and the odd stand-up stage.
       </SectionHeading>
       <Rail label="Photos">
-        {behindTheScenes.map((photo, index) => (
+        {beyondWork.map((photo, index) => (
           <li key={photo.src} className="w-[70vw] shrink-0 snap-start sm:w-[40vw] md:w-[26vw] lg:w-[21vw]">
             <Reveal delay={index * 0.06}>
               <figure className="group relative aspect-[4/5] overflow-hidden rounded-md">

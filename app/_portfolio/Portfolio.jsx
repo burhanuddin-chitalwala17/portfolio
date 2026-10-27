@@ -2,84 +2,84 @@
 
 import { useCallback, useEffect, useState, useSyncExternalStore } from "react";
 import { AnimatePresence, MotionConfig, motion } from "framer-motion";
-import { viewerProfiles } from "../data/siteData";
+import { visitorTypes } from "../data/siteData";
 import { SmoothScrollProvider, useScrollLock, useSmoothScroll } from "./smoothScroll";
 import { CursorRing } from "./fx";
-import OpeningSequence from "./components/OpeningSequence";
-import ProfileSelect from "./components/ProfileSelect";
+import Opening from "./components/Opening";
+import VisitorSelect from "./components/VisitorSelect";
 import Navbar from "./components/Navbar";
 import Hero from "./components/Hero";
-import Pilot from "./components/Pilot";
-import Seasons from "./components/Seasons";
-import Originals from "./components/Originals";
-import TopNumbers from "./components/TopNumbers";
+import About from "./components/About";
+import Experience from "./components/Experience";
+import Projects from "./components/Projects";
+import Impact from "./components/Impact";
 import Skills from "./components/Skills";
-import BehindTheScenes from "./components/BehindTheScenes";
-import Finale from "./components/Finale";
-import IntroReel from "./components/IntroReel";
+import BeyondWork from "./components/BeyondWork";
+import Contact from "./components/Contact";
+import QuickIntro from "./components/QuickIntro";
 import ProjectModal from "./components/ProjectModal";
 import ResumeModal from "./components/ResumeModal";
 
-const STORAGE_KEY = "burhanuddin-series-profile";
+const STORAGE_KEY = "burhanuddin-portfolio-visitor";
 
 const SECTIONS = {
-  pilot: Pilot,
-  seasons: Seasons,
-  originals: Originals,
-  numbers: TopNumbers,
+  about: About,
+  experience: Experience,
+  projects: Projects,
+  impact: Impact,
   skills: Skills,
-  bts: BehindTheScenes,
+  beyond: BeyondWork,
 };
 
-// The chosen profile lives in sessionStorage (with an in-memory fallback) so a reload skips the opening titles.
-let memoryProfile = null;
-const profileListeners = new Set();
+// The chosen visitor type lives in sessionStorage (with an in-memory fallback) so a reload skips the intro.
+let memoryVisitor = null;
+const visitorListeners = new Set();
 
-function readStoredProfile() {
+function readStoredVisitor() {
   try {
     const stored = sessionStorage.getItem(STORAGE_KEY);
-    if (viewerProfiles.some((viewer) => viewer.id === stored)) return stored;
+    if (visitorTypes.some((viewer) => viewer.id === stored)) return stored;
   } catch {
     // Storage is unavailable; fall back to memory.
   }
-  return memoryProfile;
+  return memoryVisitor;
 }
 
-function storeProfile(id) {
-  memoryProfile = id;
+function storeVisitor(id) {
+  memoryVisitor = id;
   try {
     sessionStorage.setItem(STORAGE_KEY, id);
   } catch {
-    // Storage is unavailable, so the opening titles will simply play again next visit.
+    // Storage is unavailable, so the intro will simply play again next visit.
   }
-  profileListeners.forEach((listener) => listener());
+  visitorListeners.forEach((listener) => listener());
 }
 
-function subscribeToProfile(listener) {
-  profileListeners.add(listener);
-  return () => profileListeners.delete(listener);
+function subscribeToVisitor(listener) {
+  visitorListeners.add(listener);
+  return () => visitorListeners.delete(listener);
 }
 
-function useStoredProfile() {
-  return useSyncExternalStore(subscribeToProfile, readStoredProfile, () => null);
+function useStoredVisitor() {
+  return useSyncExternalStore(subscribeToVisitor, readStoredVisitor, () => null);
 }
 
-export default function Series() {
+export default function Portfolio() {
   return (
     <MotionConfig reducedMotion="user">
       <SmoothScrollProvider>
-        <Show />
+        <Home />
       </SmoothScrollProvider>
     </MotionConfig>
   );
 }
 
-function Show() {
-  const storedProfile = useStoredProfile();
-  const profileId = storedProfile ?? viewerProfiles[0].id;
-  // "auto" plays the opening titles for first-time visitors and skips them for returning ones.
+function Home() {
+  const storedVisitor = useStoredVisitor();
+  const visitorId = storedVisitor ?? visitorTypes[0].id;
+  // "auto" plays the intro for first-time visitors and skips them for returning ones.
   const [stageChoice, setStage] = useState("auto");
-  const stage = stageChoice === "auto" ? (storedProfile ? "home" : "opening") : stageChoice;
+  const stage = stageChoice === "auto" ? (storedVisitor ? "home" : "opening") : stageChoice;
   const [introOpen, setIntroOpen] = useState(false);
   const [resumeOpen, setResumeOpen] = useState(false);
   const [project, setProject] = useState(null);
@@ -95,22 +95,22 @@ function Show() {
   const overlayOpen = stage !== "home" || introOpen || resumeOpen || Boolean(project);
   useScrollLock(overlayOpen);
 
-  const finishOpening = useCallback(() => setStage("profiles"), []);
+  const finishOpening = useCallback(() => setStage("welcome"), []);
   const closeIntro = useCallback(() => setIntroOpen(false), []);
   const closeResume = useCallback(() => setResumeOpen(false), []);
   const closeProject = useCallback(() => setProject(null), []);
   const openResume = useCallback(() => setResumeOpen(true), []);
 
-  const pickProfile = (id) => {
-    storeProfile(id);
+  const pickVisitor = (id) => {
+    storeVisitor(id);
     window.scrollTo(0, 0);
     setStage("home");
   };
 
-  const switchProfile = (id) => {
-    storeProfile(id);
-    const viewer = viewerProfiles.find((item) => item.id === id);
-    setToast(`Now watching as ${viewer.name}: ${viewer.blurb.toLowerCase()}`);
+  const switchVisitor = (id) => {
+    storeVisitor(id);
+    const visitor = visitorTypes.find((item) => item.id === id);
+    setToast(`Showing the ${visitor.name.toLowerCase()} view: ${visitor.blurb.toLowerCase()}`);
     scrollTo(0);
   };
 
@@ -119,29 +119,29 @@ function Show() {
     setStage("opening");
   };
 
-  const order = viewerProfiles.find((viewer) => viewer.id === profileId).order;
+  const order = visitorTypes.find((visitor) => visitor.id === visitorId).order;
 
   return (
     <>
       <CursorRing />
 
       <div className="relative min-h-screen overflow-x-clip bg-ink text-white" inert={overlayOpen}>
-        <Navbar profileId={profileId} onSwitchProfile={switchProfile} onOpenResume={openResume} />
+        <Navbar visitorId={visitorId} onSwitchVisitor={switchVisitor} onOpenResume={openResume} />
         <main>
-          <Hero onPlayIntro={() => setIntroOpen(true)} onMoreInfo={() => scrollTo("pilot")} />
+          <Hero onPlayIntro={() => setIntroOpen(true)} onMoreInfo={() => scrollTo("about")} />
           <div className="relative z-10 -mt-[8vh] mx-auto max-w-[1600px]">
             {order.map((id) => {
               const Section = SECTIONS[id];
               return <Section key={id} onOpen={setProject} />;
             })}
           </div>
-          <Finale onOpenResume={openResume} onReplay={replayOpening} />
+          <Contact onOpenResume={openResume} onReplay={replayOpening} />
         </main>
       </div>
 
-      <AnimatePresence>{stage === "opening" && <OpeningSequence key="opening" onDone={finishOpening} />}</AnimatePresence>
-      <AnimatePresence>{stage === "profiles" && <ProfileSelect key="profiles" onPick={pickProfile} />}</AnimatePresence>
-      <AnimatePresence>{introOpen && <IntroReel key="intro" onClose={closeIntro} />}</AnimatePresence>
+      <AnimatePresence>{stage === "opening" && <Opening key="opening" onDone={finishOpening} />}</AnimatePresence>
+      <AnimatePresence>{stage === "welcome" && <VisitorSelect key="welcome" onPick={pickVisitor} />}</AnimatePresence>
+      <AnimatePresence>{introOpen && <QuickIntro key="intro" onClose={closeIntro} />}</AnimatePresence>
       <AnimatePresence>{project && <ProjectModal key={project.id} project={project} onClose={closeProject} />}</AnimatePresence>
       <AnimatePresence>{resumeOpen && <ResumeModal key="resume" onClose={closeResume} />}</AnimatePresence>
 

@@ -3,11 +3,11 @@
 import { useRef } from "react";
 import Image from "next/image";
 import { motion, useScroll, useTransform } from "framer-motion";
-import { originals, profile, seasons } from "../../data/siteData";
+import { experience, profile, projects } from "../../data/siteData";
 import { EASE, Magnetic, Particles } from "../fx";
-import { PlayIcon } from "./OpeningSequence";
+import { PlayIcon } from "./Opening";
 
-const current = seasons.find((season) => season.current) ?? seasons[seasons.length - 1];
+const current = experience.find((job) => job.current) ?? experience[experience.length - 1];
 
 export default function Hero({ onPlayIntro, onMoreInfo }) {
   const ref = useRef(null);
@@ -55,7 +55,7 @@ export default function Hero({ onPlayIntro, onMoreInfo }) {
           transition={{ duration: 0.8, ease: EASE, delay: 0.2 }}
         >
           <span className="font-display text-3xl leading-none text-accent">B</span>
-          <span className="text-xs font-semibold uppercase tracking-[0.35em] text-white/80">Series</span>
+          <span className="text-xs font-semibold uppercase tracking-[0.35em] text-white/80">Portfolio</span>
         </motion.div>
 
         <motion.h1
@@ -74,11 +74,11 @@ export default function Hero({ onPlayIntro, onMoreInfo }) {
           animate={{ opacity: 1 }}
           transition={{ duration: 0.8, delay: 0.6 }}
         >
-          <span className="font-semibold text-emerald-400">Season {current.number} now streaming</span>
-          <span>2023 – Present</span>
-          <span className="rounded border border-white/40 px-1.5 text-xs">{seasons.length} Seasons</span>
-          <span className="rounded border border-white/40 px-1.5 text-xs">{originals.length} Originals</span>
-          <span className="rounded border border-white/40 px-1.5 text-xs">HD</span>
+          <span className="font-semibold text-emerald-400">Currently at {current.company}</span>
+          <span>Since 2023</span>
+          <span className="rounded border border-white/40 px-1.5 text-xs">{experience.length} roles</span>
+          <span className="rounded border border-white/40 px-1.5 text-xs">{projects.length} projects</span>
+          <span className="rounded border border-white/40 px-1.5 text-xs">1.5+ yrs</span>
         </motion.div>
 
         <motion.p
@@ -103,7 +103,7 @@ export default function Hero({ onPlayIntro, onMoreInfo }) {
               className="flex items-center gap-2 rounded-md bg-white px-6 py-3 text-base font-semibold text-black transition hover:bg-white/80 md:px-8 md:text-lg"
             >
               <PlayIcon className="h-5 w-5" />
-              Play Intro
+              Quick Intro
             </button>
           </Magnetic>
           <Magnetic strength={0.2}>
@@ -116,7 +116,7 @@ export default function Hero({ onPlayIntro, onMoreInfo }) {
                 <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="2" fill="none" />
                 <path d="M12 11v6M12 7.5v.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
               </svg>
-              More Info
+              About Me
             </button>
           </Magnetic>
         </motion.div>
@@ -126,12 +126,12 @@ export default function Hero({ onPlayIntro, onMoreInfo }) {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.8, delay: 1 }}
-          aria-label="Genres"
+          aria-label="Focus areas"
         >
-          {profile.genres.map((genre, index) => (
-            <li key={genre} className="flex items-center gap-2">
+          {profile.focusAreas.map((area, index) => (
+            <li key={area} className="flex items-center gap-2">
               {index > 0 && <span className="h-1 w-1 rounded-full bg-white/40" aria-hidden />}
-              {genre}
+              {area}
             </li>
           ))}
         </motion.ul>

@@ -5,11 +5,11 @@ const display = Bebas_Neue({ weight: "400", subsets: ["latin"], variable: "--fon
 const sans = Inter({ subsets: ["latin"], variable: "--font-sans" });
 
 export const metadata = {
-  title: "Burhanuddin Chitalwala — The Series",
+  title: "Burhanuddin Chitalwala — Full-Stack Developer",
   description:
-    "Burhanuddin Chitalwala, full-stack software developer. Experience at InMobi, Stellantis and ITR Consulting, told as a series.",
+    "Burhanuddin Chitalwala, full-stack software developer. Experience at InMobi, Stellantis and ITR Consulting, plus projects across web, mobile and AI.",
   openGraph: {
-    title: "Burhanuddin Chitalwala — The Series",
+    title: "Burhanuddin Chitalwala — Full-Stack Developer",
     description: "Full-stack software developer building AI-powered web and mobile products.",
     images: ["/img/burhanuddin-main.jpg"],
   },

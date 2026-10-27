@@ -1,18 +1,18 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { originals } from "../../data/siteData";
+import { projects } from "../../data/siteData";
 import { Reveal, Tilt } from "../fx";
 import { Rail, SectionHeading } from "./Rail";
 
-export default function Originals({ onOpen }) {
+export default function Projects({ onOpen }) {
   return (
-    <section id="originals" className="py-14 md:py-20" aria-labelledby="originals-title">
-      <SectionHeading eyebrow="Projects" title={<span id="originals-title">Originals</span>}>
-        Things I&apos;ve built at work and on my own. Pick a poster for the full story.
+    <section id="projects" className="py-14 md:py-20" aria-labelledby="projects-title">
+      <SectionHeading eyebrow="Work" title={<span id="projects-title">Projects</span>}>
+        Things I&apos;ve built at work and on my own. Open any card for the details.
       </SectionHeading>
       <Rail label="Projects">
-        {originals.map((project, index) => (
+        {projects.map((project, index) => (
           <li key={project.id} className="w-[46vw] shrink-0 snap-start sm:w-[30vw] md:w-[22vw] lg:w-[17vw]">
             <Reveal delay={index * 0.06}>
               <Tilt>

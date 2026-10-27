@@ -1,6 +1,6 @@
-# Burhanuddin Chitalwala — The Series
+# Burhanuddin Chitalwala — Portfolio
 
-A portfolio styled like a streaming series: opening titles, a "Who's watching?" screen, a hero banner, jobs as **Seasons**, projects as **Originals**, a ranked impact row, skills by genre, behind-the-scenes photos and a "To be continued…" finale.
+A cinematic, streaming-inspired portfolio: an animated intro, a "What brings you here?" screen that reorders sections, a hero banner, experience, project cards, a ranked impact row, skills, photos from outside work and a contact section.
 
 Built with Next.js (App Router), Tailwind CSS, Framer Motion and Lenis.
 
@@ -21,13 +21,13 @@ All homepage content lives in **`app/data/siteData.js`**, taken from `public/doc
 | --- | --- |
 | Name, logline, summary, email, social links | `profile` |
 | Education | `education` |
-| Jobs (each job is a season; each point an episode) | `seasons` |
-| Projects (posters and the detail overlay) | `originals` |
-| Ranked impact numbers | `topNumbers` |
-| Skills | `skillGenres` |
-| Photos | `behindTheScenes` |
-| ▶ Play Intro slides | `introSlides` |
-| "Who's watching?" profiles and the section order for each | `viewerProfiles` |
+| Jobs and their highlights | `experience` |
+| Projects (cards and the detail overlay) | `projects` |
+| Ranked impact numbers | `impactNumbers` |
+| Skills | `skillGroups` |
+| Photos | `beyondWork` |
+| Quick Intro slides | `introSlides` |
+| Visitor types and the section order for each | `visitorTypes` |
 
 **Resume:** replace `public/docs/resume.pdf`. **Portrait:** replace `public/img/burhanuddin-portrait.jpg`.
 
@@ -35,13 +35,13 @@ All homepage content lives in **`app/data/siteData.js`**, taken from `public/doc
 
 ```
 app/
-  page.js                  ← renders the series
-  _series/
-    Series.jsx             ← stages (opening → profiles → home) and overlays
+  page.js                  ← renders the portfolio
+  _portfolio/
+    Portfolio.jsx          ← stages (intro → welcome → home) and overlays
     smoothScroll.jsx       ← Lenis smooth scroll and scroll locking
     fx.jsx                 ← reveals, magnetic buttons, 3D tilt, particles, cursor ring
     components/            ← one file per section or overlay
   admin/                   ← password-protected document dashboard
 ```
 
-The opening titles play once per browser session; use "Replay opening titles" in the footer to see them again. Animations are reduced for visitors who turn on reduced motion.
+The intro plays once per browser session; use "Replay intro" in the footer to see it again. Animations are reduced for visitors who turn on reduced motion.

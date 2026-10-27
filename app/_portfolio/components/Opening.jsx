@@ -6,7 +6,7 @@ import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { profile } from "../../data/siteData";
 import { EASE, LetterReveal, Magnetic } from "../fx";
 
-// black → studio card → name → THE SERIES → portrait → role → ▶ PLAY
+// black → intro card → first name → last name → portrait → role → ENTER
 const TIMELINE = [
   { at: 300, beat: 1 },
   { at: 2000, beat: 2 },
@@ -16,7 +16,7 @@ const TIMELINE = [
   { at: 5200, beat: 6 },
 ];
 
-export default function OpeningSequence({ onDone }) {
+export default function Opening({ onDone }) {
   const reduced = useReducedMotion();
   const [beat, setBeat] = useState(0);
   const shown = reduced ? 6 : beat;
@@ -42,7 +42,7 @@ export default function OpeningSequence({ onDone }) {
       transition={{ duration: 0.9, ease: EASE }}
       role="dialog"
       aria-modal="true"
-      aria-label="Opening titles"
+      aria-label="Intro"
     >
       {/* letterbox bars that slide away once the titles finish */}
       <motion.div
@@ -85,11 +85,11 @@ export default function OpeningSequence({ onDone }) {
         <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-black/70" />
       </motion.div>
 
-      {/* studio card */}
+      {/* intro card */}
       <AnimatePresence>
         {shown === 1 && (
           <motion.div
-            key="studio"
+            key="intro-card"
             className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-4"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -102,7 +102,7 @@ export default function OpeningSequence({ onDone }) {
               animate={{ width: 220 }}
               transition={{ duration: 1.2, ease: EASE }}
             />
-            <span className="text-xs font-medium tracking-[0.6em] text-white/80 md:text-sm">{profile.studioCard}</span>
+            <span className="text-xs font-medium tracking-[0.6em] text-white/80 md:text-sm">{profile.introCard}</span>
           </motion.div>
         )}
       </AnimatePresence>
@@ -120,7 +120,7 @@ export default function OpeningSequence({ onDone }) {
           animate={shown >= 3 ? { opacity: 1, letterSpacing: "0.5em" } : {}}
           transition={{ duration: 1.1, ease: EASE }}
         >
-          {profile.seriesTag}
+          {profile.lastName}
         </motion.p>
         <motion.p
           className="mt-6 text-sm uppercase tracking-[0.3em] text-white/70 md:text-base"
@@ -144,7 +144,7 @@ export default function OpeningSequence({ onDone }) {
               className="group flex items-center gap-3 rounded-full bg-white px-8 py-4 text-lg font-semibold text-black transition hover:bg-accent focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent"
             >
               <PlayIcon className="h-5 w-5 transition group-hover:scale-110" />
-              PLAY
+              ENTER
             </button>
           </Magnetic>
         </motion.div>
@@ -155,7 +155,7 @@ export default function OpeningSequence({ onDone }) {
         onClick={onDone}
         className="absolute bottom-[10vh] right-6 z-40 rounded border border-white/30 bg-black/40 px-4 py-2 text-sm text-white/80 backdrop-blur transition hover:border-white hover:text-white"
       >
-        Skip intro
+        Skip
       </button>
     </motion.div>
   );
