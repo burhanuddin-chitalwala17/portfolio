@@ -27,7 +27,7 @@ export function Rail({ children, label }) {
       <ul
         ref={ref}
         aria-label={label}
-        className="scrollbar-hide flex snap-x snap-mandatory gap-3 overflow-x-auto scroll-smooth px-4 pb-6 pt-2 md:gap-4 md:px-12"
+        className="scrollbar-hide flex snap-x snap-mandatory scroll-px-4 gap-3 overflow-x-auto scroll-smooth px-4 pb-6 pt-2 md:scroll-px-12 md:gap-4 md:px-12"
       >
         {children}
       </ul>

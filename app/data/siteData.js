@@ -16,7 +16,7 @@ export const profile = {
     "Full-stack engineer with 3+ years building and shipping AI-powered products at global companies. I own features end to end, across Java and Python backends and Next.js and React frontends.",
     "I've shipped production LLM systems in a live vehicle, and I'm strongest in AI integration, scalable server-rendered web platforms and design systems, always with an eye on measurable business impact.",
   ],
-  openTo: "SDE 2 roles at product companies · relocation to Dubai, UAE",
+  openTo: "Relocating to Dubai, UAE",
   /** From the public LeetCode profile. Update when the numbers change. */
   problemSolving: {
     solved: 555,
@@ -157,6 +157,37 @@ export const projects = [
     links: [{ label: "Visit site", href: "https://bhendi-bazaar.com" }],
   },
   {
+    id: "synthesiser",
+    title: "Synthesiser",
+    subtitle: "Client feedback AI",
+    kind: "Personal",
+    art: { from: "#1e1b4b", via: "#7c3aed", to: "#f5b83d" },
+    logline: "Paste raw client-meeting notes and AI extracts the signals, building a live cross-client analysis your team can chat with.",
+    points: [
+      "AI extracts structured signals from session notes and files (TXT, PDF, CSV, DOCX, JSON): pain points, must-haves, blockers, urgency and sentiment.",
+      "RAG chat over every captured session with citations, using pgvector semantic search plus a database query tool, with up to 5 chat streams running in parallel.",
+      "Live insights dashboard, embedding-based theme de-duplication, real-time notifications and team workspaces with role-based access.",
+      "Provider-agnostic AI layer that switches between Anthropic, OpenAI and Google through configuration.",
+    ],
+    tech: ["Next.js", "Vercel AI SDK", "Supabase", "pgvector", "Claude", "OpenAI"],
+    links: [{ label: "View code", href: "https://github.com/burhanuddin-chitalwala17/client-feedback-synthesis" }],
+  },
+  {
+    id: "textbook-rag",
+    title: "Textbook Q&A",
+    subtitle: "RAG over PDFs",
+    kind: "Personal",
+    art: { from: "#022c22", via: "#059669", to: "#fef08a" },
+    logline: "Upload a textbook PDF and ask it questions, with answers grounded only in the book.",
+    points: [
+      "Retrieval-augmented generation pipeline: PDF extraction, chunking, embeddings and vector search in Pinecone.",
+      "FastAPI backend with a Streamlit chat interface.",
+      "System prompt enforces grounded answers only, with tests for the chunker.",
+    ],
+    tech: ["Python", "FastAPI", "OpenAI", "Pinecone", "Streamlit"],
+    links: [{ label: "View code", href: "https://github.com/burhanuddin-chitalwala17/book-bitch" }],
+  },
+  {
     id: "basalt-assistant",
     title: "Basalt X Assistant",
     subtitle: "In-car AI assistant",
@@ -243,7 +274,7 @@ export const introSlides = [
   { eyebrow: "2023", title: "2,000+ DAILY USERS", text: "An internship at ITR Consulting: a high-traffic Laravel + Vue.js app." },
   { eyebrow: "2024", title: "AI ON THE ROAD", text: "An LLM voice assistant live in the Citroën Basalt X, plus Alexa Skills for 14 car brands." },
   { eyebrow: "Today", title: "AI FOR ADVERTISERS", text: "At InMobi, building a platform where an AI chat layer plans media and budgets." },
-  { eyebrow: "What's next", title: "YOUR TEAM?", text: "Open to SDE 2 roles at product companies, including in Dubai." },
+  { eyebrow: "What's next", title: "YOUR TEAM?", text: "Open to new roles and collaborations, with a move to Dubai on the horizon." },
 ];
 
 /** Visitor types for the welcome screen. Each one only changes the order of sections. */
