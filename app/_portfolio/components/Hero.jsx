@@ -138,7 +138,7 @@ export default function Hero({ onPlayIntro, onMoreInfo }) {
       </motion.div>
 
       {/* floating chips, desktop only */}
-      <div className="pointer-events-none absolute inset-0 z-10 hidden lg:block" aria-hidden>
+      <div className="pointer-events-none absolute inset-0 z-10 hidden xl:block" aria-hidden>
         {[
           { text: "$786M+ projected", className: "right-[12%] top-[24%]", delay: 0 },
           { text: "LLM-powered", className: "right-[30%] top-[58%]", delay: 1.2 },

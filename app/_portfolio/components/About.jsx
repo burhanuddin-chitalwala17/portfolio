@@ -11,7 +11,7 @@ export default function About() {
   return (
     <section id="about" className="py-14 md:py-20" aria-labelledby="about-title">
       <SectionHeading eyebrow="About" title={<span id="about-title">A Bit About Me</span>} />
-      <div className="grid gap-10 px-4 md:grid-cols-[minmax(0,1fr)_minmax(0,1.4fr)] md:px-12 lg:gap-16">
+      <div className="grid gap-10 px-4 md:px-12 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.4fr)] lg:gap-16">
         <Reveal>
           <Tilt className="relative mx-auto aspect-[4/5] w-full max-w-sm overflow-hidden rounded-lg shadow-2xl shadow-black/60">
             <Image

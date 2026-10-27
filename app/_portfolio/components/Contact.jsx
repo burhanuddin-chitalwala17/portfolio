@@ -68,7 +68,7 @@ export default function Contact({ onOpenResume, onReplay }) {
           <ul className="mt-10 flex flex-wrap justify-center gap-x-6 gap-y-2 text-white/60">
             {LINKS.map((link) => (
               <li key={link.label}>
-                <a href={link.href} target="_blank" rel="noreferrer" className="transition hover:text-accent">
+                <a href={link.href} target="_blank" rel="noreferrer" className="inline-block px-1 py-2 transition hover:text-accent">
                   {link.label}
                 </a>
               </li>
@@ -79,7 +79,7 @@ export default function Contact({ onOpenResume, onReplay }) {
 
       <footer className="relative mt-20 flex flex-col items-center justify-between gap-3 border-t border-white/10 px-4 pt-6 text-xs text-white/40 md:flex-row md:px-12">
         <p>© {new Date().getFullYear()} Burhanuddin Chitalwala · {profile.location}</p>
-        <button type="button" onClick={onReplay} className="transition hover:text-white">
+        <button type="button" onClick={onReplay} className="py-2 transition hover:text-white">
           ↺ Replay intro
         </button>
       </footer>

@@ -48,7 +48,7 @@ export default function Navbar({ visitorId, onSwitchVisitor, onOpenResume }) {
         <ul className="hidden items-center gap-5 text-sm text-white/75 md:flex">
           {navSections.map((section) => (
             <li key={section.id}>
-              <button type="button" onClick={() => go(section.id)} className="transition hover:text-white">
+              <button type="button" onClick={() => go(section.id)} className="px-1 py-2 transition hover:text-white">
                 {section.label}
               </button>
             </li>

@@ -29,7 +29,7 @@ export default function VisitorSelect({ onPick }) {
         Pick one and I&apos;ll show you the most relevant parts first.
       </p>
 
-      <ul className="mt-10 flex flex-wrap justify-center gap-6 md:mt-14 md:gap-10">
+      <ul className="mt-10 flex flex-wrap justify-center gap-3 sm:gap-6 md:mt-14 md:gap-10">
         {visitorTypes.map((visitor, index) => (
           <motion.li
             key={visitor.id}
@@ -40,11 +40,11 @@ export default function VisitorSelect({ onPick }) {
             <button
               type="button"
               onClick={() => onPick(visitor.id)}
-              className="group flex w-28 flex-col items-center gap-3 focus:outline-none md:w-40"
+              className="group flex w-24 flex-col items-center gap-3 focus:outline-none sm:w-28 md:w-40"
             >
               <VisitorAvatar
                 visitor={visitor}
-                className="h-28 w-28 rounded-md ring-accent ring-offset-4 ring-offset-ink transition duration-300 group-hover:scale-105 group-hover:ring-4 group-focus-visible:ring-4 md:h-40 md:w-40"
+                className="h-24 w-24 rounded-md ring-accent ring-offset-4 ring-offset-ink transition duration-300 group-hover:scale-105 group-hover:ring-4 group-focus-visible:ring-4 sm:h-28 sm:w-28 md:h-40 md:w-40"
               />
               <span className="text-base text-white/60 transition group-hover:text-white md:text-lg">{visitor.name}</span>
               <span className="-mt-2 text-center text-xs text-white/40">{visitor.blurb}</span>
