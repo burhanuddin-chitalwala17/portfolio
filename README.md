@@ -1,36 +1,47 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Burhanuddin Chitalwala — The Series
 
-## Getting Started
+A portfolio styled like a streaming series: opening titles, a "Who's watching?" screen, a hero banner, jobs as **Seasons**, projects as **Originals**, a ranked impact row, skills by genre, behind-the-scenes photos and a "To be continued…" finale.
 
-First, run the development server:
+Built with Next.js (App Router), Tailwind CSS, Framer Motion and Lenis.
+
+## Run it locally
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open http://localhost:3000. The admin dashboard is still at `/admin`.
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+## Updating content
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+All homepage content lives in **`app/data/siteData.js`**, taken from `public/docs/resume.pdf`.
 
-## Learn More
+| To change… | Edit |
+| --- | --- |
+| Name, logline, summary, email, social links | `profile` |
+| Education | `education` |
+| Jobs (each job is a season; each point an episode) | `seasons` |
+| Projects (posters and the detail overlay) | `originals` |
+| Ranked impact numbers | `topNumbers` |
+| Skills | `skillGenres` |
+| Photos | `behindTheScenes` |
+| ▶ Play Intro slides | `introSlides` |
+| "Who's watching?" profiles and the section order for each | `viewerProfiles` |
 
-To learn more about Next.js, take a look at the following resources:
+**Resume:** replace `public/docs/resume.pdf`. **Portrait:** replace `public/img/burhanuddin-portrait.jpg`.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Code layout
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```
+app/
+  page.js                  ← renders the series
+  _series/
+    Series.jsx             ← stages (opening → profiles → home) and overlays
+    smoothScroll.jsx       ← Lenis smooth scroll and scroll locking
+    fx.jsx                 ← reveals, magnetic buttons, 3D tilt, particles, cursor ring
+    components/            ← one file per section or overlay
+  admin/                   ← password-protected document dashboard
+```
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+The opening titles play once per browser session; use "Replay opening titles" in the footer to see them again. Animations are reduced for visitors who turn on reduced motion.

@@ -1,0 +1,36 @@
+"use client";
+
+import Image from "next/image";
+import { behindTheScenes } from "../../data/siteData";
+import { Reveal } from "../fx";
+import { Rail, SectionHeading } from "./Rail";
+
+export default function BehindTheScenes() {
+  return (
+    <section id="bts" className="py-14 md:py-20" aria-labelledby="bts-title">
+      <SectionHeading eyebrow="Off screen" title={<span id="bts-title">Behind the Scenes</span>}>
+        Football pitches, trophies and the odd stand-up stage.
+      </SectionHeading>
+      <Rail label="Photos">
+        {behindTheScenes.map((photo, index) => (
+          <li key={photo.src} className="w-[70vw] shrink-0 snap-start sm:w-[40vw] md:w-[26vw] lg:w-[21vw]">
+            <Reveal delay={index * 0.06}>
+              <figure className="group relative aspect-[4/5] overflow-hidden rounded-md">
+                <Image
+                  src={photo.src}
+                  alt={photo.alt}
+                  fill
+                  sizes="(min-width: 1024px) 21vw, (min-width: 768px) 26vw, 70vw"
+                  className="object-cover transition duration-700 group-hover:scale-105"
+                />
+                <figcaption className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/90 to-transparent p-4 pt-12">
+                  <span className="font-display text-2xl leading-none text-white">{photo.title}</span>
+                </figcaption>
+              </figure>
+            </Reveal>
+          </li>
+        ))}
+      </Rail>
+    </section>
+  );
+}

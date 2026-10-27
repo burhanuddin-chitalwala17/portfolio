@@ -1,4 +1,5 @@
-import Main from "./layout/main";
+import Series from "./_series/Series";
+
 export default function Home() {
-  return <Main />;
+  return <Series />;
 }
