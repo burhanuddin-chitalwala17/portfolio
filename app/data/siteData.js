@@ -33,6 +33,8 @@ export const profile = {
   portrait: {
     src: "/img/burhanuddin-portrait.jpg",
     alt: "Portrait of Burhanuddin Chitalwala",
+    // Background-removed version for the hero.
+    cutout: "/img/burhanuddin-cutout.webp",
   },
   links: {
     linkedin: "https://www.linkedin.com/in/cburhanuddin/",

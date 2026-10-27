@@ -12,29 +12,44 @@ export default function Hero({ onPlayIntro, onMoreInfo }) {
   const current = experience.find((job) => job.current) ?? experience[experience.length - 1];
   const ref = useRef(null);
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
-  const portraitY = useTransform(scrollYProgress, [0, 1], ["0%", "18%"]);
-  const portraitScale = useTransform(scrollYProgress, [0, 1], [1.05, 1.15]);
+  const portraitY = useTransform(scrollYProgress, [0, 1], ["0%", "12%"]);
   const copyY = useTransform(scrollYProgress, [0, 1], ["0%", "30%"]);
   const fade = useTransform(scrollYProgress, [0, 0.8], [1, 0]);
 
   return (
     <section ref={ref} id="top" className="relative h-[100svh] min-h-[620px] w-full overflow-hidden" aria-label="Featured">
-      <motion.div className="absolute inset-0 md:left-[30%]" style={{ y: portraitY, scale: portraitScale }}>
-        <Image
-          src={profile.portrait.src}
-          alt={profile.portrait.alt}
-          fill
-          priority
-          sizes="(min-width: 768px) 70vw, 100vw"
-          className="object-cover object-[50%_25%]"
-        />
-      </motion.div>
-
-      {/* fade the portrait into the page on the left and bottom */}
-      <div className="absolute inset-0 bg-gradient-to-r from-canvas via-canvas/70 to-transparent md:via-canvas/40" />
-      <div className="absolute inset-0 bg-gradient-to-t from-canvas via-canvas/30 to-scrim/40" />
+      {/* gold glow behind the portrait: centred on phones, to the right on wider screens */}
+      <div
+        aria-hidden
+        className="absolute inset-0 lg:hidden"
+        style={{ background: "radial-gradient(70% 40% at 50% 28%, rgb(var(--color-accent) / 0.2), transparent 70%)" }}
+      />
+      <div
+        aria-hidden
+        className="absolute inset-0 hidden lg:block"
+        style={{ background: "radial-gradient(42% 60% at 74% 60%, rgb(var(--color-accent) / 0.22), transparent 70%)" }}
+      />
 
       <Particles className="pointer-events-none absolute inset-0 h-full w-full" />
+
+      {/* Background-removed portrait. On phones and tablets it sits above the copy and fades out
+          downwards; on laptops and up it stands on the bottom edge to the right of the copy. */}
+      <div className="absolute left-1/2 top-[8%] aspect-[947/921] h-[44%] -translate-x-1/2 [-webkit-mask-image:linear-gradient(to_bottom,black_55%,transparent)] [mask-image:linear-gradient(to_bottom,black_55%,transparent)] lg:bottom-0 lg:left-auto lg:right-[3%] lg:top-auto lg:h-[66%] lg:translate-x-0 lg:[-webkit-mask-image:none] lg:[mask-image:none] xl:h-[86%]">
+        <motion.div className="relative h-full w-full" style={{ y: portraitY }}>
+          <Image
+            src={profile.portrait.cutout ?? profile.portrait.src}
+            alt={profile.portrait.alt}
+            fill
+            priority
+            sizes="(min-width: 768px) 55vw, 100vw"
+            className="object-contain object-bottom drop-shadow-[0_24px_60px_rgb(var(--color-scrim)/0.6)]"
+          />
+        </motion.div>
+      </div>
+
+      {/* blend the waist-level crop into the page, and keep the copy readable on phones */}
+      <div className="absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-canvas via-canvas/70 to-transparent lg:h-1/3 lg:via-canvas/40" />
+      <div className="absolute inset-0 hidden bg-gradient-to-r from-canvas/80 via-transparent to-transparent lg:block" />
 
       {/* light streaks */}
       <motion.div
@@ -45,7 +60,7 @@ export default function Hero({ onPlayIntro, onMoreInfo }) {
       />
 
       <motion.div
-        className="relative z-10 mx-auto flex h-full max-w-[1600px] flex-col justify-end px-gutter pb-[14vh] md:justify-center md:pb-0"
+        className="relative z-10 mx-auto flex h-full max-w-[1600px] flex-col justify-end px-gutter pb-[12vh] lg:justify-center lg:pb-0"
         style={{ y: copyY, opacity: fade }}
       >
         <motion.div

@@ -34,13 +34,15 @@ Without the database and storage variables the panel still works: it shows the r
 
 ## Database setup
 
-The schema lives in `app/services/db/schema.js` and the SQL migrations in `drizzle/`. To create or update the tables:
+The schema lives in `app/services/db/schema.js` and the SQL migrations in `drizzle/`.
+
+On a new Supabase project, paste `supabase/setup.sql` into the SQL Editor and run it once. It creates every table, turns on row-level security, and records the migrations as applied. Alternatively, from a terminal:
 
 ```bash
 DATABASE_URL="postgres://…" npm run db:migrate
 ```
 
-After changing the schema, run `npm run db:generate` to write a new migration.
+After changing the schema, run `npm run db:generate` to write a new migration, then `npm run db:setup-sql` to refresh `supabase/setup.sql`.
 
 ## Switching providers
 

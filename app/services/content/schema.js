@@ -81,7 +81,7 @@ export const ContentSchema = z.object({
     lastName: text(30),
     introCard: text(40),
     resumePdf: text(200),
-    portrait: z.object({ src: text(200), alt: text(120) }),
+    portrait: z.object({ src: text(200), alt: text(120), cutout: text(200).optional() }),
   }),
   projects: z.array(z.object({ ...projectFields, art: artSchema.optional() })).min(1).max(12),
   ...sharedSections,

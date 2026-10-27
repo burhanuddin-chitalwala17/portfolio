@@ -9,7 +9,7 @@ export default function BeyondWork() {
   return (
     <section id="beyond" className="py-section" aria-labelledby="beyond-title">
       <SectionHeading eyebrow="Off the clock" title={<span id="beyond-title">Beyond Work</span>}>
-        Travel, good food, family, animals, the ocean, the gym and the odd stand-up stage.
+        Travelling, good food, family time, animals, surfing, the gym and stand-up comedy.
       </SectionHeading>
       <Rail label="Photos">
         {beyondWork.map((photo, index) => (
