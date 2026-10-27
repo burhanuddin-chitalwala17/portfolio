@@ -57,7 +57,7 @@ export const experience = [
     role: "Software Developer Intern",
     place: "Illinois, US (Remote)",
     period: "Jul 2023 – Jan 2024",
-    logline: "A consulting firm specializing in IT solutions and software development.",
+    logline: "An IT services company delivering software for clients.",
     highlights: [
       {
         title: "High-traffic web app",
@@ -101,8 +101,8 @@ export const experience = [
     logline: "A global AdTech leader for intelligent, data-driven advertising.",
     highlights: [
       {
-        title: "AI media planning",
-        text: "Building an omnichannel performance-marketing platform where an AI chat layer generates media plans, market research and optimised campaign and budget strategies. I own features end to end across Java and Python services and the Next.js frontend.",
+        title: "InMobi Accelerate",
+        text: "Building InMobi Accelerate, an omnichannel performance-marketing platform where an AI chat layer generates media plans, market research and optimised campaign and budget strategies. I own features end to end across Java and Python services and the Next.js frontend.",
       },
       {
         title: "Design system & UI revamp",
@@ -229,17 +229,20 @@ export const projects = [
   },
   {
     id: "media-planner",
-    title: "AI Media Planner",
-    subtitle: "Performance marketing",
+    title: "InMobi Accelerate",
+    subtitle: "Agentic AI ad platform",
     kind: "InMobi",
     art: { from: "#111827", via: "#4338ca", to: "#f472b6" },
-    logline: "An omnichannel marketing platform where an AI chat layer plans media, researches markets and optimises budgets for advertisers.",
+    logline:
+      "InMobi's AI-native omnichannel advertising platform: paste a website link and AI agents plan, create and launch cross-channel campaigns in minutes.",
     points: [
       "AI chat layer that generates media plans, market research and optimised campaign and budget strategies.",
       "Features owned end to end across Java and Python services and the Next.js frontend.",
       "UI revamp on a layered design system built from tokens, shadcn and Radix primitives.",
+      "Accelerate analyses an advertiser's website to build media plans, creatives, targeting and budgets across Google, Meta, Microsoft and more, with one-click launch and conversational analytics.",
     ],
     tech: ["Next.js", "Java", "Python", "LLMs", "shadcn/ui"],
+    links: [{ label: "Visit Accelerate", href: "https://accelerate.inmobi.com" }],
   },
   {
     id: "alexa-skills",
@@ -299,7 +302,7 @@ export const introSlides = [
   { eyebrow: "Hello, I'm", title: "BURHANUDDIN", text: "A full-stack engineer from VIT who ships AI-powered products." },
   { eyebrow: "2023", title: "2,000+ DAILY USERS", text: "An internship at ITR Consulting: a high-traffic Laravel + Vue.js app." },
   { eyebrow: "2024", title: "AI ON THE ROAD", text: "CARA, an LLM voice assistant live in the Citroën Basalt X, plus Alexa Skills for 14 car brands." },
-  { eyebrow: "Today", title: "AI FOR ADVERTISERS", text: "At InMobi, building a platform where an AI chat layer plans media and budgets." },
+  { eyebrow: "Today", title: "AI FOR ADVERTISERS", text: "At InMobi, building Accelerate, where AI agents plan, create and launch ad campaigns." },
   { eyebrow: "What's next", title: "YOUR TEAM?", text: "Open to new roles and collaborations, with a move to Dubai on the horizon." },
 ];
 
