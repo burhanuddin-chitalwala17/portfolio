@@ -1,18 +1,17 @@
 import { Bebas_Neue, Inter } from "next/font/google";
 import "./globals.css";
+import { getSiteUrl } from "./services/seo/siteUrl";
 
 const display = Bebas_Neue({ weight: "400", subsets: ["latin"], variable: "--font-display" });
 const sans = Inter({ subsets: ["latin"], variable: "--font-sans" });
 
+// Site-wide defaults. The homepage fills in its own title, description and preview from the
+// published content (see generateMetadata in app/page.js).
 export const metadata = {
-  title: "Burhanuddin Chitalwala — Full-Stack Developer",
-  description:
-    "Burhanuddin Chitalwala, full-stack engineer building AI-powered products. Experience at InMobi, Stellantis and ITR Consulting, plus live AI projects.",
-  openGraph: {
-    title: "Burhanuddin Chitalwala — Full-Stack Developer",
-    description: "Full-stack engineer with 3+ years shipping AI-powered products at InMobi and Stellantis.",
-    images: ["/img/burhanuddin-main.jpg"],
-  },
+  metadataBase: new URL(getSiteUrl()),
+  title: { default: "Burhanuddin Chitalwala", template: "%s · Burhanuddin Chitalwala" },
+  robots: { index: true, follow: true },
+  formatDetection: { telephone: false },
 };
 
 export const viewport = {

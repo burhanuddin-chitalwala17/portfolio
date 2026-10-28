@@ -11,6 +11,8 @@ const COOKIE_NAME = ADMIN_COOKIE_NAME;
 // Admin pages read the session and the database on every request; never pre-render them at build time.
 export const dynamic = "force-dynamic";
 
+export const metadata = { title: "Admin", robots: { index: false, follow: false } };
+
 export default async function AdminLayout({ children }) {
   const cookieStore = await cookies();
   const sessionCookie = cookieStore.get(COOKIE_NAME);

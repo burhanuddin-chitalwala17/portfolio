@@ -1,4 +1,5 @@
 import "server-only";
+import { cache } from "react";
 import { and, desc, eq, ne } from "drizzle-orm";
 import { getDb, readWithRetry } from "../db/client";
 import { siteContent } from "../db/schema";
@@ -47,9 +48,10 @@ export function validateContent(content) {
 
 /**
  * The content the homepage shows: the published version if there is one and it is valid,
- * otherwise the defaults in app/data/siteData.js.
+ * otherwise the defaults in app/data/siteData.js. Cached per request, so a page and its metadata
+ * share one database read.
  */
-export async function getPublishedContent() {
+export const getPublishedContent = cache(async function getPublishedContent() {
   if (!getDb()) return { content: fallbackContent, versionId: null };
   try {
     const [row] = await readWithRetry(
@@ -68,12 +70,17 @@ export async function getPublishedContent() {
       console.error("Published content is invalid, showing defaults:", validated.errors);
       return { content: fallbackContent, versionId: null };
     }
-    return { content: validated.content, versionId: row.id, sourceDocumentId: row.sourceDocumentId };
+    return {
+      content: validated.content,
+      versionId: row.id,
+      sourceDocumentId: row.sourceDocumentId,
+      publishedAt: row.publishedAt,
+    };
   } catch (error) {
     console.error("Loading published content failed, showing defaults:", error);
     return { content: fallbackContent, versionId: null };
   }
-}
+});
 
 export async function listContentVersions() {
   const db = getDb();
