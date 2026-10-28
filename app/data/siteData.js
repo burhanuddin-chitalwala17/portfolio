@@ -16,7 +16,6 @@ export const profile = {
     "Full-stack engineer with 3+ years building and shipping AI-powered products at global companies. I own features end to end, across Java and Python backends and Next.js and React frontends.",
     "I've shipped production LLM systems in a live vehicle, and I'm strongest in AI integration, scalable server-rendered web platforms and design systems, always with an eye on measurable business impact.",
   ],
-  openTo: "Relocating to Dubai, UAE",
   /** From the public LeetCode profile. Update when the numbers change. */
   problemSolving: {
     solved: 555,
@@ -317,7 +316,7 @@ export const introSlides = [
   { eyebrow: "2023", title: "2,000+ DAILY USERS", text: "An internship at ITR Consulting: a high-traffic Laravel + Vue.js app." },
   { eyebrow: "2024", title: "AI ON THE ROAD", text: "CARA, an LLM voice assistant live in the Citroën Basalt X, plus Alexa Skills for 14 car brands." },
   { eyebrow: "Today", title: "AI FOR ADVERTISERS", text: "At InMobi, building Accelerate, where AI agents plan, create and launch ad campaigns." },
-  { eyebrow: "What's next", title: "YOUR TEAM?", text: "Open to new roles and collaborations, with a move to Dubai on the horizon." },
+  { eyebrow: "What's next", title: "LET'S BUILD", text: "Always up for a conversation about ambitious products and hard problems." },
 ];
 
 /** Visitor types for the welcome screen. Each one only changes the order of sections. */
