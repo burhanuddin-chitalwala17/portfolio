@@ -10,42 +10,19 @@ import {
   getOrCreateConversation,
   loadHistory,
 } from "../../services/chat/history";
-import { createVisitorQuery } from "../../services/queries/visitorQueries";
+import { createChatTools } from "../../services/chat/tools";
+import { resolveGithubAccess } from "../../services/github/settings";
 import { clientIpHash } from "../../services/request/clientIp";
 
 export const maxDuration = 60;
 
-const MAX_TOOL_ROUNDS = 3;
-const MAX_QUERIES_PER_REPLY = 1;
+// Enough rounds to read a README, list a folder and open a couple of files before answering.
+const MAX_TOOL_ROUNDS = 6;
 
 const RequestSchema = z.object({
   conversationId: z.string().max(64).nullish(),
   message: z.string().trim().min(1).max(CHAT_LIMITS.maxMessageCharacters),
 });
-
-const RaiseQueryInput = z.object({
-  question: z.string().trim().min(3).max(500),
-  visitor_name: z.string().trim().max(80).nullish(),
-  visitor_email: z.string().trim().email().max(200).nullish().or(z.literal("")),
-});
-
-// Provider-neutral tool definitions; each adapter converts them to its API's format.
-const TOOLS = [
-  {
-    name: "raise_query",
-    description:
-      "Pass a visitor's question to the real Burhanuddin's inbox when it can't be answered from the knowledge provided, or when it needs his personal answer. Include the visitor's name and email only if they shared them.",
-    parameters: {
-      type: "object",
-      properties: {
-        question: { type: "string", description: "The visitor's question, rephrased to make sense on its own." },
-        visitor_name: { type: "string", description: "The visitor's name, if they gave it." },
-        visitor_email: { type: "string", description: "The visitor's email address, if they gave it." },
-      },
-      required: ["question"],
-    },
-  },
-];
 
 function jsonError(message, status) {
   return NextResponse.json({ error: message }, { status });
@@ -65,7 +42,8 @@ function friendlyError(error) {
  * POST /api/chat
  * Body: { conversationId?: string, message: string }
  * Streams newline-delimited JSON events: {type: "conversation", id}, {type: "text", text},
- * {type: "query_saved"}, {type: "error", message}, {type: "done"}.
+ * {type: "status", text} (e.g. while reading GitHub), {type: "query_saved"}, {type: "error", message},
+ * {type: "done"}.
  */
 export async function POST(request) {
   let provider;
@@ -100,11 +78,18 @@ export async function POST(request) {
   let conversation;
   let history;
   let knowledge;
+  let github;
   try {
     conversation = await getOrCreateConversation(parsed.data.conversationId, ipHash);
     history = await loadHistory(conversation.id, CHAT_LIMITS.maxHistoryMessages - 1);
     await appendMessage(conversation.id, "user", parsed.data.message);
-    knowledge = await buildKnowledge();
+    [knowledge, github] = await Promise.all([
+      buildKnowledge(),
+      resolveGithubAccess().catch((error) => {
+        console.error("Loading GitHub settings failed, chatting without it:", error);
+        return null;
+      }),
+    ]);
   } catch (error) {
     console.error("Chat setup failed:", error);
     return jsonError("The chat isn't available right now.", 503);
@@ -124,7 +109,12 @@ export async function POST(request) {
       send({ type: "conversation", id: conversation.id });
 
       let reply = "";
-      let queriesSaved = 0;
+      const tools = createChatTools({
+        github,
+        visitorMessage: parsed.data.message,
+        onStatus: (text) => send({ type: "status", text }),
+        onQuerySaved: () => send({ type: "query_saved" }),
+      });
       try {
         for (let round = 0; round < MAX_TOOL_ROUNDS; round += 1) {
           let turnText = "";
@@ -132,7 +122,7 @@ export async function POST(request) {
             instructions,
             knowledge: knowledgeText,
             messages,
-            tools: TOOLS,
+            tools: tools.definitions,
             onText: (delta) => {
               turnText += delta;
               reply += delta;
@@ -150,30 +140,7 @@ export async function POST(request) {
 
           messages.push({ role: "assistant", content: turnText, toolCalls: turn.toolCalls, raw: turn.raw });
           const results = [];
-          for (const toolCall of turn.toolCalls) {
-            const input = RaiseQueryInput.safeParse(toolCall.input);
-            if (toolCall.name !== "raise_query" || !input.success) {
-              results.push({
-                toolCallId: toolCall.id,
-                isError: true,
-                content: "Invalid input. A question of 3-500 characters is required, and the email must be valid.",
-              });
-              continue;
-            }
-            if (queriesSaved >= MAX_QUERIES_PER_REPLY) {
-              results.push({ toolCallId: toolCall.id, content: "Already passed on." });
-              continue;
-            }
-            await createVisitorQuery({
-              question: input.data.question,
-              visitorName: input.data.visitor_name || null,
-              visitorEmail: input.data.visitor_email || null,
-              context: `Visitor asked: ${parsed.data.message}`.slice(0, 1000),
-            });
-            queriesSaved += 1;
-            send({ type: "query_saved" });
-            results.push({ toolCallId: toolCall.id, content: "Saved to Burhanuddin's inbox." });
-          }
+          for (const toolCall of turn.toolCalls) results.push(await tools.run(toolCall));
           messages.push({ role: "tool", results });
           if (reply && !reply.endsWith("\n")) {
             reply += "\n\n";

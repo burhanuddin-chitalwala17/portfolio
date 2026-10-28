@@ -1,9 +1,9 @@
 "use client";
 
-import { useCallback, useRef, useState } from "react";
-import { useRouter } from "next/navigation";
-
-const MAX_UPLOAD_BYTES = 4 * 1024 * 1024;
+import { useRef, useState } from "react";
+import UploadMessages from "./UploadMessages";
+import UploadReview from "./UploadReview";
+import { useDocumentUpload } from "./useDocumentUpload";
 
 const ACCEPTED_TYPES = [
   "application/pdf",
@@ -17,136 +17,18 @@ const ACCEPTED_TYPES = [
 // Pasted text is saved as a .txt document, so it goes through the same scan and review as a file.
 const MAX_NOTE_CHARACTERS = 100_000;
 
-const SEVERITY_STYLES = {
-  high: "bg-danger/10 text-danger",
-  medium: "bg-warning/10 text-warning",
-};
-
-function formatSize(bytes) {
-  return bytes >= 1024 * 1024
-    ? `${(bytes / (1024 * 1024)).toFixed(1)} MB`
-    : `${Math.max(1, Math.round(bytes / 1024))} KB`;
-}
-
 export default function FileUploadPanel({ enabled = false }) {
   const fileInputRef = useRef(null);
-  const router = useRouter();
   const [isDragging, setIsDragging] = useState(false);
-  // idle → checking → review → uploading → idle
-  const [stage, setStage] = useState("idle");
-  const [review, setReview] = useState([]);
-  const [messages, setMessages] = useState({ tone: "success", items: [] });
+  const { stage, review, messages, checkFiles, updateItem, upload, reset, blocked } = useDocumentUpload();
   // "file" to upload files, "text" to write or paste a note
   const [mode, setMode] = useState("file");
   const [note, setNote] = useState({ title: "", text: "" });
 
-  const reset = () => {
-    setReview([]);
-    setStage("idle");
-  };
-
-  const checkFiles = useCallback(async (files) => {
-    const tooLarge = files.filter((file) => file.size > MAX_UPLOAD_BYTES);
-    const candidates = files.filter((file) => file.size <= MAX_UPLOAD_BYTES);
-    const sizeErrors = tooLarge.map(
-      (file) => `${file.name}: files must be 4 MB or smaller.`,
-    );
-    setMessages({ tone: "error", items: sizeErrors });
-    if (!candidates.length) return;
-
-    setStage("checking");
-    const formData = new FormData();
-    candidates.forEach((file) => formData.append("files", file));
-    try {
-      const response = await fetch("/api/admin/documents/scan", {
-        method: "POST",
-        body: formData,
-      });
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.error);
-      setReview(
-        candidates.map((file, index) => {
-          const result = data.results[index];
-          const risky = result.findings.length > 0;
-          return {
-            file,
-            ...result,
-            useInChat: result.ok && result.hasText && !risky,
-            acknowledgedRisks: false,
-          };
-        }),
-      );
-      setStage("review");
-    } catch (error) {
-      setMessages({
-        tone: "error",
-        items: [
-          ...sizeErrors,
-          error.message || "Couldn't check the files. Try again.",
-        ],
-      });
-      setStage("idle");
-    }
-  }, []);
-
-  const updateItem = (index, changes) => {
-    setReview((items) =>
-      items.map((item, i) => (i === index ? { ...item, ...changes } : item)),
-    );
-  };
-
-  const upload = async () => {
-    const items = review.filter((item) => item.ok);
-    if (!items.length) {
-      reset();
-      return;
-    }
-    setStage("uploading");
-    const formData = new FormData();
-    items.forEach((item) => formData.append("files", item.file));
-    formData.append(
-      "options",
-      JSON.stringify(
-        items.map((item) => ({
-          useInChat: item.useInChat,
-          acknowledgedRisks: item.acknowledgedRisks,
-        })),
-      ),
-    );
-    try {
-      const response = await fetch("/api/admin/documents", {
-        method: "POST",
-        body: formData,
-      });
-      const data = await response.json().catch(() => ({}));
-      const errors = [
-        ...(data.errors ?? []),
-        ...(data.error ? [data.error] : []),
-      ];
-      const uploadedCount = data.uploaded?.length ?? 0;
-      if (uploadedCount) router.refresh();
-      if (uploadedCount && mode === "text") setNote({ title: "", text: "" });
-      setMessages({
-        tone: errors.length ? "error" : "success",
-        items: uploadedCount
-          ? [
-              mode === "text"
-                ? "Saved. It's in the list below."
-                : `Uploaded ${uploadedCount} file${uploadedCount === 1 ? "" : "s"}.`,
-              ...errors,
-            ]
-          : errors.length
-            ? errors
-            : ["Upload failed. Please try again."],
-      });
-      reset();
-    } catch {
-      setMessages({
-        tone: "error",
-        items: ["Network error. Check your connection and try again."],
-      });
-      setStage("review");
-    }
+  const save = async () => {
+    if (mode !== "text") return upload();
+    const saved = await upload({ successMessage: () => "Saved. It's in the list below." });
+    if (saved) setNote({ title: "", text: "" });
   };
 
   const handleFilesSelected = (fileList) => {
@@ -161,14 +43,6 @@ export default function FileUploadPanel({ enabled = false }) {
     if (!title || !note.text.trim() || !enabled) return;
     checkFiles([new File([note.text.trim()], `${title}.txt`, { type: "text/plain" })]);
   };
-
-  const blocked = review.some(
-    (item) =>
-      item.ok &&
-      item.useInChat &&
-      item.findings.length &&
-      !item.acknowledgedRisks,
-  );
 
   return (
     <section className="rounded-2xl border border-fg/10 bg-surface px-5 py-4 shadow-sm">
@@ -199,130 +73,15 @@ export default function FileUploadPanel({ enabled = false }) {
       </div>
 
       {stage === "review" || stage === "uploading" ? (
-        <div className="mt-4 flex flex-col gap-3">
-          <h3 className="text-sm font-semibold text-fg">
-            Check before uploading
-          </h3>
-          <ul className="flex flex-col gap-3">
-            {review.map((item, index) => (
-              <li
-                key={`${item.file.name}-${index}`}
-                className="rounded-xl border border-fg/10 p-4"
-              >
-                <div className="flex flex-wrap items-baseline justify-between gap-2">
-                  <span className="break-all font-medium text-fg">
-                    {item.file.name}
-                  </span>
-                  <span className="text-xs text-fg/60">
-                    {formatSize(item.file.size)}
-                  </span>
-                </div>
-
-                {!item.ok ? (
-                  <p className="mt-2 text-sm text-danger">{item.error}</p>
-                ) : (
-                  <>
-                    {item.findings.length > 0 ? (
-                      <div className="mt-3 rounded-lg bg-danger/5 p-3">
-                        <p className="text-sm font-semibold text-danger">
-                          ⚠ This file looks like it contains sensitive
-                          information
-                        </p>
-                        <ul className="mt-2 flex flex-wrap gap-2">
-                          {item.findings.map((finding) => (
-                            <li
-                              key={finding.kind}
-                              className={`rounded-full px-2.5 py-1 text-xs font-medium ${SEVERITY_STYLES[finding.severity]}`}
-                            >
-                              {finding.label} ×{finding.count}{" "}
-                              <span className="font-mono">
-                                ({finding.example})
-                              </span>
-                            </li>
-                          ))}
-                        </ul>
-                        <p className="mt-2 text-xs text-danger">
-                          It will be stored privately and kept out of the chat
-                          unless you choose otherwise below. Consider removing
-                          these details and uploading a clean copy instead.
-                        </p>
-                      </div>
-                    ) : item.hasText ? (
-                      <p className="mt-2 text-sm text-success">
-                        No sensitive data detected.
-                      </p>
-                    ) : (
-                      <p className="mt-2 text-sm text-fg/60">
-                        No readable text, so the chat can&apos;t use this file.
-                      </p>
-                    )}
-
-                    {item.hasText && (
-                      <label className="mt-3 flex items-start gap-2 text-sm text-fg/80">
-                        <input
-                          type="checkbox"
-                          className="mt-0.5 h-4 w-4"
-                          checked={item.useInChat}
-                          disabled={stage === "uploading"}
-                          onChange={(event) =>
-                            updateItem(index, {
-                              useInChat: event.target.checked,
-                              acknowledgedRisks: false,
-                            })
-                          }
-                        />
-                        Let the portfolio chat use this file
-                      </label>
-                    )}
-
-                    {item.useInChat && item.findings.length > 0 && (
-                      <label className="mt-2 flex items-start gap-2 rounded-lg bg-danger/5 p-3 text-sm text-danger">
-                        <input
-                          type="checkbox"
-                          className="mt-0.5 h-4 w-4"
-                          checked={item.acknowledgedRisks}
-                          disabled={stage === "uploading"}
-                          onChange={(event) =>
-                            updateItem(index, {
-                              acknowledgedRisks: event.target.checked,
-                            })
-                          }
-                        />
-                        I understand visitors may be able to see what&apos;s in
-                        this file. The detected items above will still be hidden
-                        from the chat, but anything the scan missed won&apos;t
-                        be.
-                      </label>
-                    )}
-                  </>
-                )}
-              </li>
-            ))}
-          </ul>
-          <div className="flex flex-wrap gap-2">
-            <button
-              type="button"
-              onClick={upload}
-              disabled={stage === "uploading" || blocked}
-              className="rounded-full bg-fg px-5 py-2 text-sm font-semibold text-surface transition hover:bg-fg/80 disabled:cursor-not-allowed disabled:opacity-50"
-            >
-              {stage === "uploading" ? "Saving…" : mode === "text" ? "Save" : "Upload"}
-            </button>
-            <button
-              type="button"
-              onClick={reset}
-              disabled={stage === "uploading"}
-              className="rounded-full border border-fg/20 px-5 py-2 text-sm font-semibold text-fg/80 transition hover:border-fg disabled:opacity-50"
-            >
-              Cancel
-            </button>
-          </div>
-          {blocked && (
-            <p className="text-sm text-danger">
-              Confirm the warning for each sensitive file the chat will use.
-            </p>
-          )}
-        </div>
+        <UploadReview
+          stage={stage}
+          review={review}
+          updateItem={updateItem}
+          blocked={blocked}
+          onSave={save}
+          onCancel={reset}
+          saveLabel={mode === "text" ? "Save" : "Upload"}
+        />
       ) : (
         <>
           <div role="tablist" aria-label="How to add" className="mt-4 inline-flex rounded-full border border-fg/15 p-1 text-sm">
@@ -438,20 +197,7 @@ export default function FileUploadPanel({ enabled = false }) {
         }}
       />
 
-      {messages.items.length > 0 && (
-        <ul
-          role="status"
-          className={`mt-4 space-y-1 rounded-xl px-4 py-3 text-sm ${
-            messages.tone === "error"
-              ? "bg-danger/5 text-danger"
-              : "bg-success/5 text-success"
-          }`}
-        >
-          {messages.items.map((message) => (
-            <li key={message}>{message}</li>
-          ))}
-        </ul>
-      )}
+      <UploadMessages messages={messages} />
     </section>
   );
 }

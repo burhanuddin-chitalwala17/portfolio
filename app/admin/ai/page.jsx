@@ -5,7 +5,7 @@ import SetupNotice from "../_components/SetupNotice";
 import { isDatabaseConfigured, readWithRetry, describeDatabaseError } from "../../services/db/client";
 import { isStorageConfigured } from "../../services/storage/storage";
 import { getAiSettings, getKeyStatuses } from "../../services/ai/settings";
-import { canStoreSecrets } from "../../services/ai/secrets";
+import { canStoreSecrets } from "../../services/settings/secrets";
 
 export default async function AiSettingsPage() {
   const databaseReady = isDatabaseConfigured();

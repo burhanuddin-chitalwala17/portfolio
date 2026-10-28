@@ -89,6 +89,7 @@ export const appSettings = pgTable("app_settings", {
 /**
  * AI provider API keys added from the admin panel, encrypted with a key derived from
  * SETTINGS_ENCRYPTION_KEY (or ADMIN_SESSION_SECRET). Only the last four characters are kept in clear.
+ * Also holds other integration secrets, such as the GitHub token, keyed by integration id.
  */
 export const providerKeys = pgTable("provider_keys", {
   provider: text("provider").primaryKey(),

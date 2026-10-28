@@ -1,11 +1,12 @@
 # Admin Dashboard
 
-Password-protected panel at `/admin` with five tabs:
+Password-protected panel at `/admin` with six tabs:
 
 - **Documents**: upload, preview, download and delete files (PDF, Word, images, text; up to 4 MB each), and choose which ones the chat may use. Every upload is scanned for sensitive data first.
 - **Content**: generate a draft of the homepage from a new resume (or edit by hand), review the changes, preview, publish, and roll back.
 - **Inbox**: questions from visitors that the portfolio chat couldn't answer. Mark them resolved or reopen them.
 - **Chats**: transcripts of recent chat conversations.
+- **Sources**: what the chat can look at beyond the site and documents. **GitHub**: pick repositories (public, or private with a token) that the chat explores live with read-only tools (overview and README, file listing, reading files, code search). **LeetCode**: live public stats. **LinkedIn**: import your LinkedIn data export; it's read in the browser and only public profile sections are kept, then saved as a scanned document.
 - **AI**: choose the provider and model for the chat and for resume drafts (Anthropic, OpenAI, Google Gemini, OpenRouter, Groq, or any OpenAI-compatible URL), load the models a key can use, test them, and add, replace or remove API keys. Changes apply immediately.
 
 ## Privacy model
@@ -15,7 +16,9 @@ Password-protected panel at `/admin` with five tabs:
 - Even for confirmed files, every detected value is replaced with a placeholder before the text reaches the model. The scan is pattern-based, so review files yourself too.
 - Files are never public: storage is private, links expire after five minutes and require the admin session.
 - New resumes used for content drafts are kept out of the chat, and their personal details are removed before they're sent to the model.
-- API keys saved in Admin → AI are encrypted (AES-256-GCM) before they reach the database, are never sent back to the browser (only the last four characters are shown), and their table is closed to Supabase's public API.
+- The chat's GitHub tools only reach the repositories selected in Sources, are read-only, never open files that usually hold credentials (`.env`, private keys, `.npmrc`…), truncate long files and redact detected sensitive values. Selecting a private repository makes its code askable by visitors; the panel warns about this.
+- A LinkedIn export is processed in the browser. Messages, connections, contact details, address and birth date never leave your device; only public profile sections are uploaded, and they go through the usual scan and review.
+- API keys and the GitHub token saved in the admin panel are encrypted (AES-256-GCM) before they reach the database, are never sent back to the browser (only the last four characters are shown), and their table is closed to Supabase's public API.
 
 ## Environment variables
 
@@ -29,6 +32,7 @@ Set these in Vercel → Settings → Environment Variables (or `.env.local` for 
 | `S3_ENDPOINT`, `S3_REGION`, `S3_ACCESS_KEY_ID`, `S3_SECRET_ACCESS_KEY`, `S3_BUCKET` | File uploads. Any S3-compatible storage (Supabase Storage, Cloudflare R2, AWS S3) |
 | `ANTHROPIC_API_KEY`, `OPENAI_API_KEY`, `GEMINI_API_KEY`, `OPENROUTER_API_KEY`, `GROQ_API_KEY`, `CUSTOM_LLM_API_KEY` + `CUSTOM_LLM_BASE_URL` | Optional. Keys can be added in Admin → AI instead; a key saved there wins. Set a monthly spend limit on every key |
 | `ANTHROPIC_CHAT_MODEL`, `ANTHROPIC_CONTENT_MODEL` | Optional. Models used until a choice is saved in Admin → AI. Default `claude-opus-5-5` |
+| `GITHUB_TOKEN`, `GITHUB_USERNAME` | Optional. The GitHub token and username can be set in Admin → Sources instead; a token saved there wins |
 | `SETTINGS_ENCRYPTION_KEY` | Optional. Encrypts keys saved in Admin → AI; defaults to `ADMIN_SESSION_SECRET`. Changing either means re-entering the keys |
 | `CHAT_HOURLY_LIMIT_PER_VISITOR`, `CHAT_DAILY_LIMIT` | Optional. Default 20 per visitor per hour and 300 per day |
 | `CRON_SECRET` | Optional. Protects the daily keep-alive job |

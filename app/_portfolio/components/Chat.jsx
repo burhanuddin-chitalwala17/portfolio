@@ -129,7 +129,8 @@ export default function Chat({ open, onOpenChange, hidden }) {
       }
       for await (const event of readEvents(response)) {
         if (event.type === "conversation") update((current) => ({ ...current, conversationId: event.id }));
-        else if (event.type === "text") appendToReply((reply) => ({ ...reply, text: reply.text + event.text }));
+        else if (event.type === "text") appendToReply((reply) => ({ ...reply, text: reply.text + event.text, status: null }));
+        else if (event.type === "status") appendToReply((reply) => ({ ...reply, status: event.text }));
         else if (event.type === "query_saved") appendToReply((reply) => ({ ...reply, querySaved: true }));
         else if (event.type === "error") throw new Error(event.message);
       }
@@ -144,6 +145,11 @@ export default function Chat({ open, onOpenChange, hidden }) {
       });
     } finally {
       setPending(false);
+      // A status like "Reading page.js…" only makes sense while the reply is being written.
+      update((current) => {
+        const last = current.messages[current.messages.length - 1];
+        return last?.status ? { ...current, messages: [...current.messages.slice(0, -1), { ...last, status: null }] } : current;
+      });
     }
   };
 
@@ -155,7 +161,7 @@ export default function Chat({ open, onOpenChange, hidden }) {
 
   const firstName = `${profile.firstName.charAt(0)}${profile.firstName.slice(1).toLowerCase()}`;
   const lastReply = chat.messages[chat.messages.length - 1];
-  const waitingForFirstWord = pending && lastReply?.role === "assistant" && !lastReply.text;
+  const waitingForFirstWord = pending && lastReply?.role === "assistant" && !lastReply.text && !lastReply.status;
 
   return (
     <>
@@ -201,7 +207,7 @@ export default function Chat({ open, onOpenChange, hidden }) {
                 <p className="font-semibold text-fg">
                   {firstName} <span className="font-normal text-fg/50">· AI</span>
                 </p>
-                <p className="text-xs leading-snug text-fg/50">Answers from my resume and notes. It can get things wrong.</p>
+                <p className="text-xs leading-snug text-fg/50">Answers from my resume, notes and code. It can get things wrong.</p>
               </div>
               {chat.messages.length > 0 && (
                 <button
@@ -258,6 +264,17 @@ export default function Chat({ open, onOpenChange, hidden }) {
                           }`}
                         >
                           {message.text.trim()}
+                        </p>
+                      )}
+                      {pending && index === chat.messages.length - 1 && message.status && (
+                        <p className="flex items-center gap-2 px-2 text-xs text-fg/60">
+                          <motion.span
+                            className="h-1.5 w-1.5 rounded-full bg-accent"
+                            animate={{ opacity: [0.3, 1, 0.3] }}
+                            transition={{ duration: 1, repeat: Infinity }}
+                            aria-hidden
+                          />
+                          {message.status}
                         </p>
                       )}
                       {message.querySaved && (

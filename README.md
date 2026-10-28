@@ -20,6 +20,7 @@ Without a database the site runs on the built-in content in `app/data/siteData.j
 
 - **Homepage** (`app/page.js`) renders the latest *published* content version, falling back to `defaultContent` in `app/data/siteData.js`. Publishing a version rebuilds the page.
 - **Chat** (`app/api/chat/route.js`) streams answers speaking as me, grounded in the published content plus the documents I allow. When it can't answer, it calls a `raise_query` tool that files the question in the admin inbox.
+- **Sources** (`app/services/github`, `app/services/leetcode`, `app/admin/_lib/linkedinExport.js`): the chat explores selected GitHub repositories live through read-only tools (`app/services/chat/tools.js`), uses live public LeetCode stats, and can read an imported LinkedIn profile. All three are configured in Admin → Sources.
 - **Knowledge, not vectors**: the chat gets the whole knowledge base (site content plus allowed documents, redacted) in its prompt, cached by the provider, rather than retrieving chunks through embeddings. For a portfolio-sized corpus this is cheaper to run, has nothing to keep in sync, and answers from full context. Retrieval with embeddings would only pay off once the documents outgrow the model's context window.
 - **AI providers** (`app/services/ai/`): one adapter for Claude (Anthropic SDK) and one for every OpenAI-compatible API. The provider, model and keys for the chat and the content drafts come from Admin → AI (keys encrypted in the database), falling back to environment variables.
 - **CMS** (`app/admin/content`): upload a resume → the model returns updated content as schema-validated JSON → I review a diff, preview it, edit it if needed, and publish. Every version is kept for rollback.
@@ -46,7 +47,9 @@ app/
   admin/                     ← dashboard: documents, content, inbox, chats
   api/                       ← chat, resume link, admin APIs, keep-alive cron
   services/
-    ai/                      ← provider catalog, adapters, settings, encrypted keys
+    ai/                      ← provider catalog, adapters, AI settings
+    github/, leetcode/       ← chat sources: read-only GitHub client, LeetCode stats
+    settings/                ← admin-editable settings and encrypted secrets
     auth/                    ← signed sessions, login lockout
     chat/                    ← config, persona, knowledge, history
     content/                 ← schema (zod), versions, resume → draft, diff
