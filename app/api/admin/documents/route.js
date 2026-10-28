@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { isAdminRequest } from "../../../services/auth/requireAdmin";
-import { isDatabaseConfigured } from "../../../services/db/client";
-import { isStorageConfigured } from "../../../services/storage/storage";
+import { describeDatabaseError, isDatabaseConfigured } from "../../../services/db/client";
+import { StorageError, isStorageConfigured } from "../../../services/storage/storage";
 import { UploadError, uploadDocument } from "../../../services/documents/manageDocuments";
 
 /**
@@ -47,9 +47,13 @@ export async function POST(request) {
     } catch (error) {
       if (error instanceof UploadError) {
         errors.push(error.message);
+      } else if (error instanceof StorageError) {
+        console.error("Upload failed in storage:", error.cause ?? error);
+        errors.push(`${file.name}: ${error.message}`);
       } else {
+        // Only the signed-in admin sees this, so say what failed rather than a generic message.
         console.error("Upload failed:", error);
-        errors.push(`${file.name}: upload failed. Please try again.`);
+        errors.push(`${file.name}: saving it failed (${describeDatabaseError(error)}). Please try again.`);
       }
     }
   }
