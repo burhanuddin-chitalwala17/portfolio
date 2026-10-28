@@ -29,6 +29,20 @@
       "when": 1793105716171,
       "tag": "0003_lock_down_new_tables",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1793164987638,
+      "tag": "0004_ai_settings",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1793164988650,
+      "tag": "0005_lock_down_ai_tables",
+      "breakpoints": true
     }
   ]
 }

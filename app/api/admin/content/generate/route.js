@@ -7,6 +7,7 @@ import { isStorageConfigured } from "../../../../services/storage/storage";
 import { UploadError, uploadDocument } from "../../../../services/documents/manageDocuments";
 import { createDraft, getPublishedContent } from "../../../../services/content/siteContent";
 import { GenerationError, generateContentFromResume } from "../../../../services/content/generate";
+import { AiProviderError, describeAiError } from "../../../../services/ai";
 
 // Reading a resume and rewriting every section takes a while with high effort.
 export const maxDuration = 300;
@@ -58,6 +59,9 @@ export async function POST(request) {
       return NextResponse.json({ success: false, error: error.message }, { status: 400 });
     }
     console.error("Content generation failed:", error);
+    if (error instanceof AiProviderError) {
+      return NextResponse.json({ success: false, error: describeAiError(error) }, { status: 502 });
+    }
     return NextResponse.json({ success: false, error: "Generating the draft failed. Please try again." }, { status: 500 });
   }
 }

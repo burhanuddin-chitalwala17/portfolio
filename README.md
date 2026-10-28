@@ -2,7 +2,7 @@
 
 A cinematic, streaming-inspired portfolio with an AI version of me that visitors can chat with, and a small CMS that rewrites the site from a new resume once I approve it.
 
-Built with Next.js 16 (App Router), React 19, Tailwind CSS, Framer Motion, Lenis, the Claude API, Drizzle (Postgres) and S3-compatible storage.
+Built with Next.js 16 (App Router), React 19, Tailwind CSS, Framer Motion, Lenis, Drizzle (Postgres), S3-compatible storage, and a pluggable LLM layer (Claude by default; OpenAI, Gemini, OpenRouter, Groq or any OpenAI-compatible API, chosen in the admin panel).
 
 ## Run it locally
 
@@ -19,8 +19,10 @@ Without a database the site runs on the built-in content in `app/data/siteData.j
 ## How it fits together
 
 - **Homepage** (`app/page.js`) renders the latest *published* content version, falling back to `defaultContent` in `app/data/siteData.js`. Publishing a version rebuilds the page.
-- **Chat** (`app/api/chat/route.js`) streams answers from Claude, speaking as me, grounded in the published content plus the documents I allow. When it can't answer, it calls a `raise_query` tool that files the question in the admin inbox.
-- **CMS** (`app/admin/content`): upload a resume → Claude returns updated content as schema-validated JSON → I review a diff, preview it, edit it if needed, and publish. Every version is kept for rollback.
+- **Chat** (`app/api/chat/route.js`) streams answers speaking as me, grounded in the published content plus the documents I allow. When it can't answer, it calls a `raise_query` tool that files the question in the admin inbox.
+- **Knowledge, not vectors**: the chat gets the whole knowledge base (site content plus allowed documents, redacted) in its prompt, cached by the provider, rather than retrieving chunks through embeddings. For a portfolio-sized corpus this is cheaper to run, has nothing to keep in sync, and answers from full context. Retrieval with embeddings would only pay off once the documents outgrow the model's context window.
+- **AI providers** (`app/services/ai/`): one adapter for Claude (Anthropic SDK) and one for every OpenAI-compatible API. The provider, model and keys for the chat and the content drafts come from Admin → AI (keys encrypted in the database), falling back to environment variables.
+- **CMS** (`app/admin/content`): upload a resume → the model returns updated content as schema-validated JSON → I review a diff, preview it, edit it if needed, and publish. Every version is kept for rollback.
 - **Privacy**: uploads are scanned for ID numbers, bank/card details, secrets, phone numbers, addresses, dates of birth and salary. Risky files stay out of the chat unless I confirm, and detected values are always redacted before any text reaches the model. Chat is rate-limited per visitor and per day, transcripts are kept, and admin logins lock after repeated failures.
 
 ## Design tokens
@@ -44,6 +46,7 @@ app/
   admin/                     ← dashboard: documents, content, inbox, chats
   api/                       ← chat, resume link, admin APIs, keep-alive cron
   services/
+    ai/                      ← provider catalog, adapters, settings, encrypted keys
     auth/                    ← signed sessions, login lockout
     chat/                    ← config, persona, knowledge, history
     content/                 ← schema (zod), versions, resume → draft, diff

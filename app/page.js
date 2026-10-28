@@ -8,5 +8,5 @@ export const revalidate = 86400;
 
 export default async function Home() {
   const { content } = await getPublishedContent();
-  return <Portfolio content={content} chatEnabled={isChatConfigured()} />;
+  return <Portfolio content={content} chatEnabled={await isChatConfigured()} />;
 }

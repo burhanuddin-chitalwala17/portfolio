@@ -1,7 +1,7 @@
-import Anthropic from "@anthropic-ai/sdk";
 import { NextResponse } from "next/server";
 import { z } from "zod";
-import { CHAT_LIMITS, CHAT_MODEL, isChatConfigured } from "../../services/chat/config";
+import { AiProviderError, getAdapter, resolveAiTask } from "../../services/ai";
+import { CHAT_LIMITS } from "../../services/chat/config";
 import { buildKnowledge } from "../../services/chat/knowledge";
 import { personaInstructions } from "../../services/chat/persona";
 import {
@@ -29,13 +29,13 @@ const RaiseQueryInput = z.object({
   visitor_email: z.string().trim().email().max(200).nullish().or(z.literal("")),
 });
 
+// Provider-neutral tool definitions; each adapter converts them to its API's format.
 const TOOLS = [
   {
     name: "raise_query",
     description:
       "Pass a visitor's question to the real Burhanuddin's inbox when it can't be answered from the knowledge provided, or when it needs his personal answer. Include the visitor's name and email only if they shared them.",
-    eager_input_streaming: true,
-    input_schema: {
+    parameters: {
       type: "object",
       properties: {
         question: { type: "string", description: "The visitor's question, rephrased to make sense on its own." },
@@ -47,21 +47,15 @@ const TOOLS = [
   },
 ];
 
-let anthropic;
-function getClient() {
-  anthropic ??= new Anthropic();
-  return anthropic;
-}
-
 function jsonError(message, status) {
   return NextResponse.json({ error: message }, { status });
 }
 
 function friendlyError(error) {
-  if (error instanceof Anthropic.RateLimitError || error instanceof Anthropic.InternalServerError) {
+  if (error instanceof AiProviderError && (error.kind === "rate_limit" || error.kind === "overloaded")) {
     return "I'm getting a lot of questions right now. Please try again in a minute.";
   }
-  if (error instanceof Anthropic.APIError) {
+  if (error instanceof AiProviderError) {
     return "Something went wrong on my side. Please try again.";
   }
   return "Something went wrong. Please try again.";
@@ -74,7 +68,13 @@ function friendlyError(error) {
  * {type: "query_saved"}, {type: "error", message}, {type: "done"}.
  */
 export async function POST(request) {
-  if (!isChatConfigured()) return jsonError("The chat isn't available right now.", 503);
+  let provider;
+  try {
+    provider = await resolveAiTask("chat");
+  } catch (error) {
+    console.error("Loading AI settings failed:", error);
+  }
+  if (!provider) return jsonError("The chat isn't available right now.", 503);
 
   const parsed = RequestSchema.safeParse(await request.json().catch(() => null));
   if (!parsed.success) return jsonError("Please send a message of up to 1,000 characters.", 400);
@@ -110,14 +110,11 @@ export async function POST(request) {
     return jsonError("The chat isn't available right now.", 503);
   }
 
-  const system = [
-    { type: "text", text: personaInstructions(knowledge.content) },
-    {
-      type: "text",
-      text: `Knowledge you may answer from:\n\n${knowledge.text}`,
-      cache_control: { type: "ephemeral" },
-    },
-  ];
+  const adapter = getAdapter(provider);
+  const instructions = personaInstructions(knowledge.content);
+  const knowledgeText = `Knowledge you may answer from:\n\n${knowledge.text}`;
+  // Provider-neutral conversation: {role: "user" | "assistant", content}, plus, within a reply,
+  // assistant turns with toolCalls and {role: "tool", results} turns. Adapters convert it.
   const messages = [...history, { role: "user", content: parsed.data.message }];
   const encoder = new TextEncoder();
 
@@ -130,46 +127,41 @@ export async function POST(request) {
       let queriesSaved = 0;
       try {
         for (let round = 0; round < MAX_TOOL_ROUNDS; round += 1) {
-          const stream = getClient().beta.messages.stream({
-            model: CHAT_MODEL,
-            max_tokens: 4000,
-            betas: ["server-side-fallback-2026-07-01"],
-            fallbacks: "default",
-            output_config: { effort: "low" },
-            system,
-            tools: TOOLS,
+          let turnText = "";
+          const turn = await adapter.streamChat({
+            instructions,
+            knowledge: knowledgeText,
             messages,
+            tools: TOOLS,
+            onText: (delta) => {
+              turnText += delta;
+              reply += delta;
+              send({ type: "text", text: delta });
+            },
           });
-          stream.on("text", (delta) => {
-            reply += delta;
-            send({ type: "text", text: delta });
-          });
-          const message = await stream.finalMessage();
 
-          if (message.stop_reason === "refusal") {
+          if (turn.stopReason === "refusal") {
             const note = "I can't help with that one. Feel free to ask me about my work, projects or experience.";
             reply += reply ? `\n\n${note}` : note;
             send({ type: "text", text: reply === note ? note : `\n\n${note}` });
             break;
           }
-          const toolUses = message.content.filter((block) => block.type === "tool_use");
-          if (message.stop_reason !== "tool_use" || !toolUses.length) break;
+          if (turn.stopReason !== "tool_calls" || !turn.toolCalls.length) break;
 
-          messages.push({ role: "assistant", content: message.content });
+          messages.push({ role: "assistant", content: turnText, toolCalls: turn.toolCalls, raw: turn.raw });
           const results = [];
-          for (const toolUse of toolUses) {
-            const input = RaiseQueryInput.safeParse(toolUse.input);
-            if (toolUse.name !== "raise_query" || !input.success) {
+          for (const toolCall of turn.toolCalls) {
+            const input = RaiseQueryInput.safeParse(toolCall.input);
+            if (toolCall.name !== "raise_query" || !input.success) {
               results.push({
-                type: "tool_result",
-                tool_use_id: toolUse.id,
-                is_error: true,
+                toolCallId: toolCall.id,
+                isError: true,
                 content: "Invalid input. A question of 3-500 characters is required, and the email must be valid.",
               });
               continue;
             }
             if (queriesSaved >= MAX_QUERIES_PER_REPLY) {
-              results.push({ type: "tool_result", tool_use_id: toolUse.id, content: "Already passed on." });
+              results.push({ toolCallId: toolCall.id, content: "Already passed on." });
               continue;
             }
             await createVisitorQuery({
@@ -180,9 +172,9 @@ export async function POST(request) {
             });
             queriesSaved += 1;
             send({ type: "query_saved" });
-            results.push({ type: "tool_result", tool_use_id: toolUse.id, content: "Saved to Burhanuddin's inbox." });
+            results.push({ toolCallId: toolCall.id, content: "Saved to Burhanuddin's inbox." });
           }
-          messages.push({ role: "user", content: results });
+          messages.push({ role: "tool", results });
           if (reply && !reply.endsWith("\n")) {
             reply += "\n\n";
             send({ type: "text", text: "\n\n" });

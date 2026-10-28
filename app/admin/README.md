@@ -1,11 +1,12 @@
 # Admin Dashboard
 
-Password-protected panel at `/admin` with four tabs:
+Password-protected panel at `/admin` with five tabs:
 
 - **Documents**: upload, preview, download and delete files (PDF, Word, images, text; up to 4 MB each), and choose which ones the chat may use. Every upload is scanned for sensitive data first.
 - **Content**: generate a draft of the homepage from a new resume (or edit by hand), review the changes, preview, publish, and roll back.
 - **Inbox**: questions from visitors that the portfolio chat couldn't answer. Mark them resolved or reopen them.
 - **Chats**: transcripts of recent chat conversations.
+- **AI**: choose the provider and model for the chat and for resume drafts (Anthropic, OpenAI, Google Gemini, OpenRouter, Groq, or any OpenAI-compatible URL), load the models a key can use, test them, and add, replace or remove API keys. Changes apply immediately.
 
 ## Privacy model
 
@@ -14,6 +15,7 @@ Password-protected panel at `/admin` with four tabs:
 - Even for confirmed files, every detected value is replaced with a placeholder before the text reaches the model. The scan is pattern-based, so review files yourself too.
 - Files are never public: storage is private, links expire after five minutes and require the admin session.
 - New resumes used for content drafts are kept out of the chat, and their personal details are removed before they're sent to the model.
+- API keys saved in Admin → AI are encrypted (AES-256-GCM) before they reach the database, are never sent back to the browser (only the last four characters are shown), and their table is closed to Supabase's public API.
 
 ## Environment variables
 
@@ -25,8 +27,9 @@ Set these in Vercel → Settings → Environment Variables (or `.env.local` for 
 | `ADMIN_SESSION_SECRET` | Signing the session cookie (any long random string) |
 | `DATABASE_URL` | Document library and inbox. Any Postgres; for Supabase use the transaction pooler URL (port 6543) |
 | `S3_ENDPOINT`, `S3_REGION`, `S3_ACCESS_KEY_ID`, `S3_SECRET_ACCESS_KEY`, `S3_BUCKET` | File uploads. Any S3-compatible storage (Supabase Storage, Cloudflare R2, AWS S3) |
-| `ANTHROPIC_API_KEY` | The chat and resume → content drafts (set a monthly spend limit on the key) |
-| `ANTHROPIC_CHAT_MODEL`, `ANTHROPIC_CONTENT_MODEL` | Optional. Default `claude-opus-5-5`; `claude-haiku-5-5` makes the chat much cheaper |
+| `ANTHROPIC_API_KEY`, `OPENAI_API_KEY`, `GEMINI_API_KEY`, `OPENROUTER_API_KEY`, `GROQ_API_KEY`, `CUSTOM_LLM_API_KEY` + `CUSTOM_LLM_BASE_URL` | Optional. Keys can be added in Admin → AI instead; a key saved there wins. Set a monthly spend limit on every key |
+| `ANTHROPIC_CHAT_MODEL`, `ANTHROPIC_CONTENT_MODEL` | Optional. Models used until a choice is saved in Admin → AI. Default `claude-opus-5-5` |
+| `SETTINGS_ENCRYPTION_KEY` | Optional. Encrypts keys saved in Admin → AI; defaults to `ADMIN_SESSION_SECRET`. Changing either means re-entering the keys |
 | `CHAT_HOURLY_LIMIT_PER_VISITOR`, `CHAT_DAILY_LIMIT` | Optional. Default 20 per visitor per hour and 300 per day |
 | `CRON_SECRET` | Optional. Protects the daily keep-alive job |
 
@@ -36,7 +39,9 @@ Without the database and storage variables the panel still works: it shows the r
 
 The schema lives in `app/services/db/schema.js` and the SQL migrations in `drizzle/`.
 
-On a new Supabase project, paste `supabase/setup.sql` into the SQL Editor and run it once. It creates every table, turns on row-level security, and records the migrations as applied. Alternatively, from a terminal:
+On a new Supabase project, paste `supabase/setup.sql` into the SQL Editor and run it once. It creates every table, turns on row-level security, and records the migrations as applied.
+
+When a later version adds migrations, run only the new files from `supabase/migrations/`, in number order, the same way. Alternatively, from a terminal:
 
 ```bash
 DATABASE_URL="postgres://…" npm run db:migrate

@@ -1,13 +1,20 @@
 import "server-only";
-import { isDatabaseConfigured } from "../db/client";
+import { isDatabaseConfigured, withTimeout } from "../db/client";
+import { resolveAiTask } from "../ai/settings";
 
-/** The chat needs an Anthropic key, and a database for rate limits and transcripts. */
-export function isChatConfigured() {
-  return Boolean(process.env.ANTHROPIC_API_KEY) && isDatabaseConfigured();
+/**
+ * The chat needs a database (rate limits, transcripts, settings) and a provider with a key and
+ * a model, chosen in Admin → AI or taken from the environment.
+ */
+export async function isChatConfigured() {
+  if (!isDatabaseConfigured()) return false;
+  try {
+    return Boolean(await withTimeout(resolveAiTask("chat"), 5000, "Loading AI settings"));
+  } catch (error) {
+    console.error("Checking the chat configuration failed:", error);
+    return false;
+  }
 }
-
-export const CHAT_MODEL = process.env.ANTHROPIC_CHAT_MODEL || "claude-opus-5-5";
-export const CONTENT_MODEL = process.env.ANTHROPIC_CONTENT_MODEL || "claude-opus-5-5";
 
 function positiveInteger(value, fallback) {
   const parsed = Number.parseInt(value ?? "", 10);

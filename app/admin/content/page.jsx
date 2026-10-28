@@ -1,3 +1,4 @@
+import Link from "next/link";
 import ContentGenerator from "../_components/ContentGenerator";
 import DraftReview from "../_components/DraftReview";
 import VersionHistory from "../_components/VersionHistory";
@@ -7,11 +8,12 @@ import { CONTENT_STATUSES, getPublishedContent, listContentVersions } from "../.
 import { getDocuments } from "../../services/documents/getDocuments";
 import { isDatabaseConfigured, withTimeout } from "../../services/db/client";
 import { isStorageConfigured } from "../../services/storage/storage";
+import { resolveAiTask } from "../../services/ai";
 
 export default async function ContentPage() {
   const databaseReady = isDatabaseConfigured();
   const storageReady = isStorageConfigured();
-  const aiReady = Boolean(process.env.ANTHROPIC_API_KEY);
+  const aiReady = Boolean(await resolveAiTask("content").catch(() => null));
 
   let versions = [];
   let resumeOptions = [];
@@ -35,8 +37,11 @@ export default async function ContentPage() {
       <SetupNotice databaseReady={databaseReady} storageReady={storageReady} />
       {databaseReady && !aiReady && (
         <p role="status" className="rounded-2xl border border-warning/20 bg-warning/5 px-5 py-4 text-sm text-warning">
-          Add <span className="font-mono text-xs">ANTHROPIC_API_KEY</span> in Vercel to generate drafts from a resume.
-          Editing by hand works without it.
+          Choose a provider, model and API key for resume drafts in{" "}
+          <Link href="/admin/ai" className="font-semibold underline">
+            AI settings
+          </Link>{" "}
+          to generate drafts from a resume. Editing by hand works without it.
         </p>
       )}
 

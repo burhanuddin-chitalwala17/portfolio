@@ -78,3 +78,21 @@ export const adminLoginAttempts = pgTable(
   },
   (table) => [index("admin_login_attempts_ip_idx").on(table.ipHash, table.attemptedAt)]
 );
+
+/** Small key/value settings edited from the admin panel, e.g. which AI provider and model to use. */
+export const appSettings = pgTable("app_settings", {
+  key: text("key").primaryKey(),
+  value: jsonb("value").notNull(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+});
+
+/**
+ * AI provider API keys added from the admin panel, encrypted with a key derived from
+ * SETTINGS_ENCRYPTION_KEY (or ADMIN_SESSION_SECRET). Only the last four characters are kept in clear.
+ */
+export const providerKeys = pgTable("provider_keys", {
+  provider: text("provider").primaryKey(),
+  encryptedKey: text("encrypted_key").notNull(),
+  keyHint: text("key_hint").notNull(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+});

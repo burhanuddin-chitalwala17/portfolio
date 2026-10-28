@@ -8,6 +8,7 @@ const TABS = [
   { href: "/admin/content", label: "Content" },
   { href: "/admin/inbox", label: "Inbox" },
   { href: "/admin/chats", label: "Chats" },
+  { href: "/admin/ai", label: "AI" },
 ];
 
 export default function AdminNav({ openQueries = 0 }) {
