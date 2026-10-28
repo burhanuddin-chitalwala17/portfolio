@@ -1,8 +1,6 @@
-"use client";
-
-import { useContent } from "../content";
-import { Reveal, Tilt } from "../fx";
-import { SectionHeading } from "./Rail";
+import { Tilt } from "../fx";
+import Reveal from "./Reveal";
+import SectionHeading from "./SectionHeading";
 
 const GROUP_TINTS = [
   "from-category-1/25",
@@ -13,13 +11,12 @@ const GROUP_TINTS = [
   "from-category-6/25",
 ];
 
-export default function Skills() {
-  const { skillGroups } = useContent();
+export default function Skills({ content }) {
   return (
     <section id="skills" className="py-section" aria-labelledby="skills-title">
-      <SectionHeading eyebrow="Toolkit" title={<span id="skills-title">Skills</span>} />
+      <SectionHeading id="skills-title" eyebrow="Toolkit" title="Skills" />
       <div className="grid gap-4 px-gutter sm:grid-cols-2 lg:grid-cols-3">
-        {skillGroups.map((group, index) => (
+        {content.skillGroups.map((group, index) => (
           <Reveal key={group.name} delay={index * 0.08}>
             <Tilt max={6} className="h-full">
               <div

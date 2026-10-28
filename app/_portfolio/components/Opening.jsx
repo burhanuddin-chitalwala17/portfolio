@@ -2,9 +2,10 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
-import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { AnimatePresence, m, useReducedMotion } from "framer-motion";
 import { useContent } from "../content";
-import { EASE, LetterReveal, Magnetic } from "../fx";
+import { EASE } from "../motion";
+import { LetterReveal, Magnetic } from "../fx";
 
 // black → intro card → first name → last name → portrait → role → ENTER
 const TIMELINE = [
@@ -37,7 +38,7 @@ export default function Opening({ onDone }) {
   }, [onDone]);
 
   return (
-    <motion.div
+    <m.div
       className="fixed inset-0 z-[150] overflow-hidden bg-scrim"
       exit={{ opacity: 0, scale: 1.05, filter: "blur(14px)" }}
       transition={{ duration: 0.9, ease: EASE }}
@@ -46,19 +47,19 @@ export default function Opening({ onDone }) {
       aria-label="Intro"
     >
       {/* letterbox bars that slide away once the titles finish */}
-      <motion.div
+      <m.div
         className="absolute inset-x-0 top-0 z-30 h-[8vh] bg-scrim"
         animate={{ y: shown >= 6 ? "-100%" : 0 }}
         transition={{ duration: 1.2, ease: EASE }}
       />
-      <motion.div
+      <m.div
         className="absolute inset-x-0 bottom-0 z-30 h-[8vh] bg-scrim"
         animate={{ y: shown >= 6 ? "100%" : 0 }}
         transition={{ duration: 1.2, ease: EASE }}
       />
 
       {/* projector glow */}
-      <motion.div
+      <m.div
         aria-hidden
         className="absolute inset-0"
         style={{ background: "radial-gradient(55% 45% at 50% 55%, rgb(var(--color-accent) / 0.2), transparent 70%)" }}
@@ -68,7 +69,7 @@ export default function Opening({ onDone }) {
       />
 
       {/* portrait fading up behind the title */}
-      <motion.div
+      <m.div
         aria-hidden
         className="absolute inset-0"
         initial={{ opacity: 0, scale: 1.15 }}
@@ -84,12 +85,12 @@ export default function Opening({ onDone }) {
           className="object-cover object-[50%_25%] grayscale"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-scrim via-scrim/40 to-scrim/70" />
-      </motion.div>
+      </m.div>
 
       {/* intro card */}
       <AnimatePresence>
         {shown === 1 && (
-          <motion.div
+          <m.div
             key="intro-card"
             className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-4"
             initial={{ opacity: 0 }}
@@ -97,14 +98,14 @@ export default function Opening({ onDone }) {
             exit={{ opacity: 0, filter: "blur(6px)" }}
             transition={{ duration: 0.8 }}
           >
-            <motion.span
+            <m.span
               className="h-px bg-gradient-to-r from-transparent via-accent to-transparent"
               initial={{ width: 0 }}
               animate={{ width: 220 }}
               transition={{ duration: 1.2, ease: EASE }}
             />
             <span className="text-xs font-medium tracking-[0.6em] text-fg/80 md:text-sm">{profile.introCard}</span>
-          </motion.div>
+          </m.div>
         )}
       </AnimatePresence>
 
@@ -115,23 +116,23 @@ export default function Opening({ onDone }) {
             <LetterReveal text={profile.firstName} stagger={reduced ? 0 : 0.06} />
           </h1>
         )}
-        <motion.p
+        <m.p
           className="mt-3 font-display text-2xl tracking-[0.5em] text-accent md:text-4xl"
           initial={{ opacity: 0, letterSpacing: "1.2em" }}
           animate={shown >= 3 ? { opacity: 1, letterSpacing: "0.5em" } : {}}
           transition={{ duration: 1.1, ease: EASE }}
         >
           {profile.lastName}
-        </motion.p>
-        <motion.p
+        </m.p>
+        <m.p
           className="mt-6 text-sm uppercase tracking-[0.3em] text-fg/70 md:text-base"
           initial={{ opacity: 0, y: 10 }}
           animate={shown >= 5 ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.8, ease: EASE }}
         >
           {profile.role}
-        </motion.p>
-        <motion.div
+        </m.p>
+        <m.div
           className="mt-10"
           initial={{ opacity: 0, scale: 0.85 }}
           animate={shown >= 6 ? { opacity: 1, scale: 1 } : {}}
@@ -148,7 +149,7 @@ export default function Opening({ onDone }) {
               ENTER
             </button>
           </Magnetic>
-        </motion.div>
+        </m.div>
       </div>
 
       <button
@@ -158,7 +159,7 @@ export default function Opening({ onDone }) {
       >
         Skip
       </button>
-    </motion.div>
+    </m.div>
   );
 }
 

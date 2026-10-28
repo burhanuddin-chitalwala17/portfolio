@@ -2,9 +2,9 @@
 
 import { useCallback, useEffect, useState } from "react";
 import Image from "next/image";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, m } from "framer-motion";
 import { useContent } from "../content";
-import { EASE } from "../fx";
+import { EASE } from "../motion";
 
 const SLIDE_MS = 4500;
 
@@ -43,7 +43,7 @@ export default function QuickIntro({ onClose }) {
   const slide = introSlides[index];
 
   return (
-    <motion.div
+    <m.div
       className="fixed inset-0 z-[130] overflow-hidden bg-scrim"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
@@ -53,7 +53,7 @@ export default function QuickIntro({ onClose }) {
       aria-modal="true"
       aria-label="Quick intro"
     >
-      <motion.div
+      <m.div
         aria-hidden
         className="absolute inset-0"
         initial={{ scale: 1.6, opacity: 0 }}
@@ -62,13 +62,13 @@ export default function QuickIntro({ onClose }) {
       >
         <Image src={profile.portrait.src} alt="" fill sizes="100vw" className="object-cover object-[50%_25%]" />
         <div className="absolute inset-0 bg-gradient-to-t from-scrim via-scrim/50 to-scrim/80" />
-      </motion.div>
+      </m.div>
 
       {/* progress bars */}
       <div className="absolute inset-x-0 top-0 z-20 flex gap-1.5 px-gutter pt-4 md:pt-6">
         {introSlides.map((item, slideIndex) => (
           <div key={item.title} className="h-1 flex-1 overflow-hidden rounded-full bg-fg/25">
-            <motion.div
+            <m.div
               key={slideIndex === index ? `active-${index}-${paused}` : slideIndex}
               className="h-full origin-left bg-fg"
               initial={{ scaleX: slideIndex < index ? 1 : 0 }}
@@ -85,7 +85,7 @@ export default function QuickIntro({ onClose }) {
 
       <div className="pointer-events-none relative z-10 flex h-full flex-col items-center justify-center px-6 text-center">
         <AnimatePresence mode="wait">
-          <motion.div
+          <m.div
             key={index}
             initial={{ opacity: 0, y: 30, filter: "blur(8px)" }}
             animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
@@ -96,7 +96,7 @@ export default function QuickIntro({ onClose }) {
             <p className="text-xs font-semibold uppercase tracking-[0.4em] text-accent md:text-sm">{slide.eyebrow}</p>
             <h2 className="mt-3 font-display text-display-section text-fg">{slide.title}</h2>
             <p className="mx-auto mt-5 max-w-xl text-lg text-fg/80 md:text-xl">{slide.text}</p>
-          </motion.div>
+          </m.div>
         </AnimatePresence>
       </div>
 
@@ -116,6 +116,6 @@ export default function QuickIntro({ onClose }) {
           Close
         </button>
       </div>
-    </motion.div>
+    </m.div>
   );
 }

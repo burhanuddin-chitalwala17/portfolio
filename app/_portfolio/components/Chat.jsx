@@ -2,9 +2,9 @@
 
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import Image from "next/image";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, m } from "framer-motion";
 import { useContent } from "../content";
-import { EASE } from "../fx";
+import { EASE } from "../motion";
 import { useScrollLock } from "../smoothScroll";
 
 const STORAGE_KEY = "burhanuddin-portfolio-chat";
@@ -167,7 +167,7 @@ export default function Chat({ open, onOpenChange, hidden }) {
     <>
       <AnimatePresence>
         {!open && !hidden && (
-          <motion.button
+          <m.button
             key="chat-launcher"
             type="button"
             onClick={() => onOpenChange(true)}
@@ -182,13 +182,13 @@ export default function Chat({ open, onOpenChange, hidden }) {
               <Image src={profile.portrait.src} alt="" fill sizes="32px" className="object-cover object-[50%_20%]" />
             </span>
             Ask me anything
-          </motion.button>
+          </m.button>
         )}
       </AnimatePresence>
 
       <AnimatePresence>
         {open && (
-          <motion.section
+          <m.section
             key="chat-panel"
             role="dialog"
             aria-modal={isPhone}
@@ -268,7 +268,7 @@ export default function Chat({ open, onOpenChange, hidden }) {
                       )}
                       {pending && index === chat.messages.length - 1 && message.status && (
                         <p className="flex items-center gap-2 px-2 text-xs text-fg/60">
-                          <motion.span
+                          <m.span
                             className="h-1.5 w-1.5 rounded-full bg-accent"
                             animate={{ opacity: [0.3, 1, 0.3] }}
                             transition={{ duration: 1, repeat: Infinity }}
@@ -287,7 +287,7 @@ export default function Chat({ open, onOpenChange, hidden }) {
                   {waitingForFirstWord && (
                     <li className="flex gap-1 px-2 py-3" aria-label="Typing">
                       {[0, 1, 2].map((dot) => (
-                        <motion.span
+                        <m.span
                           key={dot}
                           className="h-2 w-2 rounded-full bg-fg/50"
                           animate={{ opacity: [0.3, 1, 0.3] }}
@@ -347,7 +347,7 @@ export default function Chat({ open, onOpenChange, hidden }) {
                 {draft.length}/{MAX_CHARACTERS}
               </p>
             )}
-          </motion.section>
+          </m.section>
         )}
       </AnimatePresence>
     </>

@@ -90,6 +90,12 @@
     --radius-xl: 0.75rem;
     --radius-2xl: 1rem;
     --radius-3xl: 1.5rem;
+
+    /* Motion */
+    --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+    --duration-entrance: 0.8s;
+    --duration-reveal: 0.9s;
+    --duration-reveal-slow: 1.4s;
   }
 
   /* Light theme for the admin panel: same token names, different values. */
@@ -107,6 +113,39 @@
   }
 }
 
+
+/*
+ * Scroll reveals, as progressive enhancement. Server HTML is always visible. After hydration,
+ * RevealObserver marks only content that is still below the fold as "pending" (hidden, so nothing
+ * on screen flashes) and switches it to "shown" as it scrolls into view. Without JavaScript,
+ * nothing is ever hidden.
+ */
+[data-reveal] {
+  transition:
+    opacity var(--duration-reveal) var(--ease-out),
+    transform var(--duration-reveal) var(--ease-out),
+    letter-spacing var(--duration-reveal-slow) var(--ease-out);
+  transition-delay: var(--reveal-delay, 0s);
+}
+[data-reveal="pending"] {
+  opacity: 0;
+  transform: translateY(28px);
+}
+[data-reveal="pending"][data-reveal-variant="tracking"] {
+  transform: none;
+  letter-spacing: 0.3em;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-reveal] {
+    transition: none;
+  }
+  [data-reveal="pending"] {
+    opacity: 1;
+    transform: none;
+    letter-spacing: inherit;
+  }
+}
 
 @layer utilities {
   .scrollbar-hide {

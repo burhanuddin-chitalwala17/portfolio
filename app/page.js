@@ -1,4 +1,4 @@
-import Portfolio from "./_portfolio/Portfolio";
+import HomePage from "./_portfolio/HomePage";
 import { getPublishedContent } from "./services/content/siteContent";
 import { isChatConfigured } from "./services/chat/config";
 import { buildStructuredData, personName, serializeJsonLd } from "./services/seo/structuredData";
@@ -31,11 +31,11 @@ export async function generateMetadata() {
 }
 
 export default async function Home() {
-  const { content } = await getPublishedContent();
+  const [{ content }, chatEnabled] = await Promise.all([getPublishedContent(), isChatConfigured()]);
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(buildStructuredData(content)) }} />
-      <Portfolio content={content} chatEnabled={await isChatConfigured()} />
+      <HomePage content={content} chatEnabled={chatEnabled} />
     </>
   );
 }

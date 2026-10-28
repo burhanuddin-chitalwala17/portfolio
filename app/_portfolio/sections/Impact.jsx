@@ -1,18 +1,15 @@
-"use client";
+import Rail from "../islands/Rail";
+import Reveal from "./Reveal";
+import SectionHeading from "./SectionHeading";
 
-import { useContent } from "../content";
-import { Reveal } from "../fx";
-import { Rail, SectionHeading } from "./Rail";
-
-export default function Impact() {
-  const { impactNumbers } = useContent();
+export default function Impact({ content }) {
   return (
     <section id="impact" className="py-section" aria-labelledby="impact-title">
-      <SectionHeading eyebrow="Impact" title={<span id="impact-title">By the Numbers</span>}>
+      <SectionHeading id="impact-title" eyebrow="Impact" title="By the Numbers">
         A few results I&apos;m proud of.
       </SectionHeading>
       <Rail label="Impact numbers">
-        {impactNumbers.map((item, index) => (
+        {content.impactNumbers.map((item, index) => (
           <li key={item.label} className="flex shrink-0 snap-start items-end">
             <Reveal delay={index * 0.05} className="flex items-end">
               <span

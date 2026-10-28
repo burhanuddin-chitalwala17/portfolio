@@ -1,37 +1,28 @@
 "use client";
 
-import { useCallback, useEffect, useState, useSyncExternalStore } from "react";
-import { AnimatePresence, MotionConfig, motion } from "framer-motion";
+import { Fragment, useCallback, useEffect, useMemo, useState, useSyncExternalStore } from "react";
+import dynamic from "next/dynamic";
+import { AnimatePresence, LazyMotion, MotionConfig, m } from "framer-motion";
 import { visitorTypes } from "../data/siteData";
 import { SmoothScrollProvider, useScrollLock, useSmoothScroll } from "./smoothScroll";
 import { CursorRing } from "./fx";
 import { ContentProvider } from "./content";
+import { PortfolioActionsProvider } from "./actions";
+import RevealObserver from "./islands/RevealObserver";
 import Opening from "./components/Opening";
 import VisitorSelect from "./components/VisitorSelect";
 import Navbar from "./components/Navbar";
 import Hero from "./components/Hero";
-import About from "./components/About";
-import Experience from "./components/Experience";
-import Projects from "./components/Projects";
-import Impact from "./components/Impact";
-import Skills from "./components/Skills";
-import BeyondWork from "./components/BeyondWork";
-import Contact from "./components/Contact";
-import QuickIntro from "./components/QuickIntro";
-import Chat from "./components/Chat";
-import ProjectModal from "./components/ProjectModal";
-import ResumeModal from "./components/ResumeModal";
+
+// Shown only on demand, so their code loads when first needed instead of with the page.
+const QuickIntro = dynamic(() => import("./components/QuickIntro"));
+const ProjectModal = dynamic(() => import("./components/ProjectModal"));
+const ResumeModal = dynamic(() => import("./components/ResumeModal"));
+const Chat = dynamic(() => import("./components/Chat"));
 
 const STORAGE_KEY = "burhanuddin-portfolio-visitor";
 
-const SECTIONS = {
-  about: About,
-  experience: Experience,
-  projects: Projects,
-  impact: Impact,
-  skills: Skills,
-  beyond: BeyondWork,
-};
+const loadMotionFeatures = () => import("./motionFeatures").then((module) => module.default);
 
 // The chosen visitor type lives in sessionStorage (with an in-memory fallback) so a reload skips the intro.
 let memoryVisitor = null;
@@ -66,19 +57,28 @@ function useStoredVisitor() {
   return useSyncExternalStore(subscribeToVisitor, readStoredVisitor, () => null);
 }
 
-export default function Portfolio({ content, chatEnabled = false }) {
+/**
+ * The interactive frame of the homepage: navigation, hero, intro and overlays, chat, and the order
+ * of sections for the chosen kind of visitor. The sections themselves are Server Components
+ * rendered by app/page.js and passed in as `sections` (keyed by id) and `footer`.
+ */
+export default function PortfolioShell({ content, chatEnabled = false, sections, footer }) {
   return (
     <ContentProvider content={content}>
-      <MotionConfig reducedMotion="user">
-        <SmoothScrollProvider>
-          <Home chatEnabled={chatEnabled} />
-        </SmoothScrollProvider>
-      </MotionConfig>
+      {/* `m` components with lazily loaded features keep most of Framer Motion out of the first load;
+          `strict` makes accidental use of the full `motion` component an error. */}
+      <LazyMotion features={loadMotionFeatures} strict>
+        <MotionConfig reducedMotion="user">
+          <SmoothScrollProvider>
+            <Home content={content} chatEnabled={chatEnabled} sections={sections} footer={footer} />
+          </SmoothScrollProvider>
+        </MotionConfig>
+      </LazyMotion>
     </ContentProvider>
   );
 }
 
-function Home({ chatEnabled }) {
+function Home({ content, chatEnabled, sections, footer }) {
   const storedVisitor = useStoredVisitor();
   const visitorId = storedVisitor ?? visitorTypes[0].id;
   // "auto" plays the intro for first-time visitors and skips them for returning ones.
@@ -119,32 +119,38 @@ function Home({ chatEnabled }) {
     scrollTo(0);
   };
 
-  const replayOpening = () => {
-    window.scrollTo(0, 0);
-    setStage("opening");
-  };
+  const actions = useMemo(
+    () => ({
+      openIntro: () => setIntroOpen(true),
+      openResume,
+      openProject: (id) => setProject(content.projects.find((item) => item.id === id) ?? null),
+      openChat: chatEnabled ? () => setChatOpen(true) : undefined,
+      replayIntro: () => {
+        window.scrollTo(0, 0);
+        setStage("opening");
+      },
+      scrollTo,
+    }),
+    [chatEnabled, content.projects, openResume, scrollTo]
+  );
 
   const order = visitorTypes.find((visitor) => visitor.id === visitorId).order;
 
   return (
-    <>
+    <PortfolioActionsProvider value={actions}>
       <CursorRing />
+      <RevealObserver />
 
       <div className="relative min-h-screen overflow-x-clip bg-canvas text-fg" inert={overlayOpen}>
         <Navbar visitorId={visitorId} onSwitchVisitor={switchVisitor} onOpenResume={openResume} />
         <main>
-          <Hero onPlayIntro={() => setIntroOpen(true)} onMoreInfo={() => scrollTo("about")} />
+          <Hero />
           <div className="relative z-10 -mt-[8vh] mx-auto max-w-[1600px]">
-            {order.map((id) => {
-              const Section = SECTIONS[id];
-              return <Section key={id} onOpen={setProject} />;
-            })}
+            {order.map((id) => (
+              <Fragment key={id}>{sections[id]}</Fragment>
+            ))}
           </div>
-          <Contact
-            onOpenResume={openResume}
-            onReplay={replayOpening}
-            onOpenChat={chatEnabled ? () => setChatOpen(true) : undefined}
-          />
+          {footer}
         </main>
       </div>
 
@@ -160,7 +166,7 @@ function Home({ chatEnabled }) {
 
       <AnimatePresence>
         {toast && (
-          <motion.div
+          <m.div
             role="status"
             className="fixed bottom-6 left-1/2 z-[160] -translate-x-1/2 rounded-md bg-fg px-5 py-3 text-sm font-medium text-inverse shadow-2xl"
             initial={{ opacity: 0, y: 20 }}
@@ -168,9 +174,9 @@ function Home({ chatEnabled }) {
             exit={{ opacity: 0, y: 20 }}
           >
             {toast}
-          </motion.div>
+          </m.div>
         )}
       </AnimatePresence>
-    </>
+    </PortfolioActionsProvider>
   );
 }

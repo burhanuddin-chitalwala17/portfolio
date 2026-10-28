@@ -1,9 +1,9 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { motion } from "framer-motion";
-import { EASE } from "../fx";
-import { PosterArt } from "./Projects";
+import { m } from "framer-motion";
+import { EASE } from "../motion";
+import PosterArt from "../sections/PosterArt";
 
 export default function ProjectModal({ project, onClose }) {
   const closeRef = useRef(null);
@@ -18,7 +18,7 @@ export default function ProjectModal({ project, onClose }) {
   }, [onClose]);
 
   return (
-    <motion.div
+    <m.div
       className="fixed inset-0 z-[120] flex items-start justify-center overflow-y-auto bg-scrim/80 px-3 py-6 backdrop-blur-sm md:py-12"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
@@ -34,7 +34,7 @@ export default function ProjectModal({ project, onClose }) {
         className="relative w-full max-w-3xl"
         onClick={(event) => event.stopPropagation()}
       >
-        <motion.div layoutId={`poster-${project.id}`} className="overflow-hidden rounded-t-lg">
+        <m.div layoutId={`poster-${project.id}`} className="overflow-hidden rounded-t-lg">
           <PosterArt project={project} className="aspect-[16/9] md:aspect-[21/9]">
             <div className="absolute inset-0 bg-gradient-to-t from-surface via-transparent to-transparent" />
             <div className="absolute bottom-0 left-0 p-5 md:p-8">
@@ -45,9 +45,9 @@ export default function ProjectModal({ project, onClose }) {
               <p className="mt-1 text-sm uppercase tracking-[0.2em] text-fg/75">{project.subtitle}</p>
             </div>
           </PosterArt>
-        </motion.div>
+        </m.div>
 
-        <motion.div
+        <m.div
           className="rounded-b-lg bg-surface p-5 md:p-8"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -93,7 +93,7 @@ export default function ProjectModal({ project, onClose }) {
               ))}
             </div>
           )}
-        </motion.div>
+        </m.div>
 
         <button
           ref={closeRef}
@@ -107,6 +107,6 @@ export default function ProjectModal({ project, onClose }) {
           </svg>
         </button>
       </div>
-    </motion.div>
+    </m.div>
   );
 }

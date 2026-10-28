@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import Portfolio from "../../_portfolio/Portfolio";
+import HomePage from "../../_portfolio/HomePage";
 import { isAdminRequest } from "../../services/auth/requireAdmin";
 import { getContentVersion, validateContent } from "../../services/content/siteContent";
 
@@ -20,7 +20,7 @@ export default async function PreviewPage({ params }) {
       <p className="fixed inset-x-0 top-0 z-[400] bg-accent px-4 py-1.5 text-center text-xs font-semibold text-on-accent">
         Preview of a {version.status === "published" ? "live" : version.status} version. Visitors can&apos;t see this page.
       </p>
-      <Portfolio content={validated.content} />
+      <HomePage content={validated.content} />
     </>
   );
 }

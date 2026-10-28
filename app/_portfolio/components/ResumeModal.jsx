@@ -1,9 +1,9 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { motion } from "framer-motion";
+import { m } from "framer-motion";
 import { useContent } from "../content";
-import { EASE } from "../fx";
+import { EASE } from "../motion";
 
 export default function ResumeModal({ onClose }) {
   const { profile } = useContent();
@@ -21,7 +21,7 @@ export default function ResumeModal({ onClose }) {
   }, [onClose]);
 
   return (
-    <motion.div
+    <m.div
       className="fixed inset-0 z-[120] flex items-center justify-center bg-scrim/85 p-3 backdrop-blur-sm md:p-8"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
@@ -29,7 +29,7 @@ export default function ResumeModal({ onClose }) {
       onClick={onClose}
       data-lenis-prevent
     >
-      <motion.div
+      <m.div
         role="dialog"
         aria-modal="true"
         aria-labelledby="resume-title"
@@ -98,7 +98,7 @@ export default function ResumeModal({ onClose }) {
             </a>
           </div>
         )}
-      </motion.div>
-    </motion.div>
+      </m.div>
+    </m.div>
   );
 }

@@ -1,10 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { AnimatePresence, motion, useMotionValueEvent, useScroll } from "framer-motion";
+import { AnimatePresence, m, useMotionValueEvent, useScroll } from "framer-motion";
 import { navSections, visitorTypes } from "../../data/siteData";
 import { useSmoothScroll } from "../smoothScroll";
-import { EASE } from "../fx";
+import { EASE } from "../motion";
 import { VisitorAvatar } from "./VisitorSelect";
 
 export default function Navbar({ visitorId, onSwitchVisitor, onOpenResume }) {
@@ -28,7 +28,7 @@ export default function Navbar({ visitorId, onSwitchVisitor, onOpenResume }) {
   };
 
   return (
-    <motion.header
+    <m.header
       className={`fixed inset-x-0 top-0 z-50 transition-colors duration-500 ${
         solid ? "bg-canvas/90 backdrop-blur-md" : "bg-gradient-to-b from-scrim/80 to-transparent"
       }`}
@@ -80,7 +80,7 @@ export default function Navbar({ visitorId, onSwitchVisitor, onOpenResume }) {
             </button>
             <AnimatePresence>
               {viewsOpen && (
-                <motion.ul
+                <m.ul
                   role="menu"
                   className="absolute right-0 mt-3 w-56 overflow-hidden rounded-md border border-fg/10 bg-scrim/95 py-2 shadow-2xl"
                   initial={{ opacity: 0, y: -8 }}
@@ -105,7 +105,7 @@ export default function Navbar({ visitorId, onSwitchVisitor, onOpenResume }) {
                       </button>
                     </li>
                   ))}
-                </motion.ul>
+                </m.ul>
               )}
             </AnimatePresence>
           </div>
@@ -132,7 +132,7 @@ export default function Navbar({ visitorId, onSwitchVisitor, onOpenResume }) {
 
       <AnimatePresence>
         {menuOpen && (
-          <motion.ul
+          <m.ul
             id="mobile-menu"
             className="overflow-hidden border-t border-fg/10 bg-canvas/95 px-gutter md:hidden"
             initial={{ height: 0 }}
@@ -151,9 +151,9 @@ export default function Navbar({ visitorId, onSwitchVisitor, onOpenResume }) {
                 </button>
               </li>
             ))}
-          </motion.ul>
+          </m.ul>
         )}
       </AnimatePresence>
-    </motion.header>
+    </m.header>
   );
 }

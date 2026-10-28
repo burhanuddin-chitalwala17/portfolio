@@ -18,7 +18,8 @@ Without a database the site runs on the built-in content in `app/data/siteData.j
 
 ## How it fits together
 
-- **Homepage** (`app/page.js`) renders the latest *published* content version, falling back to `defaultContent` in `app/data/siteData.js`. Publishing a version rebuilds the page.
+- **Homepage** (`app/page.js`) renders the latest *published* content version, falling back to `defaultContent` in `app/data/siteData.js`. Publishing a version rebuilds the page. It's server-first: every section is a Server Component (`app/_portfolio/sections`), so the whole page is in the HTML and visible without JavaScript. A client shell (`PortfolioShell`) adds the navigation, hero, intro, overlays and chat; small client islands (`app/_portfolio/islands`) handle tabs, rails and buttons. Scroll reveals are progressive enhancement, modals and the chat load on demand, and Framer Motion's features load after first paint.
+- **SEO**: content-driven title, description, canonical URL and social previews, schema.org JSON-LD (person, website, projects), `sitemap.xml` and `robots.txt`.
 - **Chat** (`app/api/chat/route.js`) streams answers speaking as me, grounded in the published content plus the documents I allow. When it can't answer, it calls a `raise_query` tool that files the question in the admin inbox.
 - **Sources** (`app/services/github`, `app/services/leetcode`, `app/admin/_lib/linkedinExport.js`): the chat explores selected GitHub repositories live through read-only tools (`app/services/chat/tools.js`), uses live public LeetCode stats, and can read an imported LinkedIn profile. All three are configured in Admin → Sources.
 - **Knowledge, not vectors**: the chat gets the whole knowledge base (site content plus allowed documents, redacted) in its prompt, cached by the provider, rather than retrieving chunks through embeddings. For a portfolio-sized corpus this is cheaper to run, has nothing to keep in sync, and answers from full context. Retrieval with embeddings would only pay off once the documents outgrow the model's context window.
@@ -47,7 +48,12 @@ Components use only these tokens (for example `bg-canvas text-fg/70 border-dange
 app/
   page.js                    ← homepage (published content + chat switch)
   preview/[id]/              ← admin-only preview of any content version
-  _portfolio/                ← public site: sections, chat panel, motion helpers, content context
+  _portfolio/                ← public site
+    HomePage.jsx             ← composes the server sections into the client shell
+    sections/                ← Server Components, one per homepage section
+    islands/                 ← small client components used inside sections
+    components/              ← client-only UI: hero, navigation, intro, modals, chat
+  ui/                        ← shared design-system primitives, hooks and patterns
   admin/                     ← dashboard: documents, content, inbox, chats
   api/                       ← chat, resume link, admin APIs, keep-alive cron
   services/

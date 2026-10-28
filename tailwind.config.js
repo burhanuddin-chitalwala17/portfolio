@@ -75,6 +75,26 @@ module.exports = {
         "2xl": "var(--radius-2xl)",
         "3xl": "var(--radius-3xl)",
       },
+      transitionTimingFunction: {
+        // The site's signature ease-out, also used by Framer Motion (app/_portfolio/motion.js).
+        out: "var(--ease-out)",
+      },
+      // Entrance animations that run in CSS, so server-rendered content animates without waiting
+      // for JavaScript. Delay with an inline style, e.g. style={{ animationDelay: "0.3s" }}.
+      keyframes: {
+        rise: { from: { opacity: "0", transform: "translateY(var(--rise-distance, 20px))" }, to: { opacity: "1", transform: "none" } },
+        "rise-soft": { from: { transform: "translateY(var(--rise-distance, 40px))" }, to: { transform: "none" } },
+        fade: { from: { opacity: "0" }, to: { opacity: "1" } },
+        blink: { "0%, 100%": { opacity: "1" }, "50%": { opacity: "0.2" } },
+        float: { "0%, 100%": { transform: "translateY(0)" }, "50%": { transform: "translateY(-12px)" } },
+      },
+      animation: {
+        rise: "rise var(--duration-entrance) var(--ease-out) both",
+        "rise-soft": "rise-soft var(--duration-entrance) var(--ease-out) both",
+        fade: "fade var(--duration-entrance) ease both",
+        blink: "blink 1.6s ease-in-out infinite",
+        float: "float 6s ease-in-out infinite",
+      },
     },
   },
   plugins: [],

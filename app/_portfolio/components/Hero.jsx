@@ -2,9 +2,11 @@
 
 import { useRef } from "react";
 import Image from "next/image";
-import { motion, useScroll, useTransform } from "framer-motion";
+import { m, useScroll, useTransform } from "framer-motion";
+import { usePortfolioActions } from "../actions";
 import { useContent } from "../content";
-import { EASE, Magnetic, Particles } from "../fx";
+import { delay } from "../motion";
+import { Magnetic, Particles } from "../fx";
 import { PlayIcon } from "./Opening";
 
 // Where the floating tags sit, in order; profile.heroTags allows up to three.
@@ -14,8 +16,13 @@ const CHIP_SLOTS = [
   { className: "right-[8%] top-[70%]", delay: 2.4 },
 ];
 
-export default function Hero({ onPlayIntro, onMoreInfo }) {
+/**
+ * The first screen. Its entrance runs in CSS (animate-rise), so the server-rendered hero is
+ * visible and animating before JavaScript loads; only the scroll parallax and the effects need it.
+ */
+export default function Hero() {
   const { experience, profile, projects } = useContent();
+  const { openIntro, scrollTo } = usePortfolioActions();
   const current = experience.find((job) => job.current) ?? experience[experience.length - 1];
   const ref = useRef(null);
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
@@ -42,7 +49,7 @@ export default function Hero({ onPlayIntro, onMoreInfo }) {
       {/* Background-removed portrait. On phones and tablets it sits above the copy and fades out
           downwards; on laptops and up it stands on the bottom edge to the right of the copy. */}
       <div className="absolute left-1/2 top-[8%] aspect-[947/921] h-[44%] -translate-x-1/2 [-webkit-mask-image:linear-gradient(to_bottom,black_55%,transparent)] [mask-image:linear-gradient(to_bottom,black_55%,transparent)] lg:bottom-0 lg:left-auto lg:right-[3%] lg:top-auto lg:h-[66%] lg:translate-x-0 lg:[-webkit-mask-image:none] lg:[mask-image:none] xl:h-[86%]">
-        <motion.div className="relative h-full w-full" style={{ y: portraitY }}>
+        <m.div className="relative h-full w-full" style={{ y: portraitY }}>
           <Image
             src={profile.portrait.cutout ?? profile.portrait.src}
             alt={profile.portrait.alt}
@@ -51,7 +58,7 @@ export default function Hero({ onPlayIntro, onMoreInfo }) {
             sizes="(min-width: 768px) 55vw, 100vw"
             className="object-contain object-bottom drop-shadow-[0_24px_60px_rgb(var(--color-scrim)/0.6)]"
           />
-        </motion.div>
+        </m.div>
       </div>
 
       {/* blend the waist-level crop into the page, and keep the copy readable on phones */}
@@ -59,69 +66,48 @@ export default function Hero({ onPlayIntro, onMoreInfo }) {
       <div className="absolute inset-0 hidden bg-gradient-to-r from-canvas/80 via-transparent to-transparent lg:block" />
 
       {/* light streaks */}
-      <motion.div
+      <m.div
         aria-hidden
         className="pointer-events-none absolute -left-1/4 top-1/3 h-px w-[150%] rotate-[-8deg] bg-gradient-to-r from-transparent via-accent/50 to-transparent"
         animate={{ x: ["-30%", "30%"] }}
         transition={{ duration: 9, repeat: Infinity, repeatType: "mirror", ease: "easeInOut" }}
       />
 
-      <motion.div
+      <m.div
         className="relative z-10 mx-auto flex h-full max-w-[1600px] flex-col justify-end px-gutter pb-[12vh] lg:justify-center lg:pb-0"
         style={{ y: copyY, opacity: fade }}
       >
-        <motion.div
-          className="flex items-center gap-3"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, ease: EASE, delay: 0.2 }}
-        >
+        <div className="flex items-center gap-3 motion-safe:animate-rise" style={delay(0.2)}>
           <span className="font-display text-3xl leading-none text-accent">B</span>
           <span className="text-xs font-semibold uppercase tracking-[0.35em] text-fg/80">Portfolio</span>
-        </motion.div>
+        </div>
 
-        <motion.h1
-          className="mt-3 font-display text-display-hero text-fg"
-          initial={{ opacity: 0, y: 40 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1, ease: EASE, delay: 0.3 }}
-        >
+        {/* The name is the largest paint, so it only slides (never starts invisible). */}
+        <h1 className="mt-3 font-display text-display-hero text-fg motion-safe:animate-rise-soft" style={delay(0.3)}>
           {profile.firstName}
           <span className="block text-[0.55em] tracking-wide text-fg/85">{profile.lastName}</span>
-        </motion.h1>
+        </h1>
 
-        <motion.div
-          className="mt-5 flex flex-wrap items-center gap-x-3 gap-y-2 text-sm text-fg/80 md:text-base"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.8, delay: 0.6 }}
+        <div
+          className="mt-5 flex flex-wrap items-center gap-x-3 gap-y-2 text-sm text-fg/80 motion-safe:animate-fade md:text-base"
+          style={delay(0.6)}
         >
           <span className="font-semibold text-success">Currently at {current.company}</span>
           <span>Since 2023</span>
           <span className="rounded border border-fg/40 px-1.5 text-xs">{experience.length} roles</span>
           <span className="rounded border border-fg/40 px-1.5 text-xs">{projects.length} projects</span>
           <span className="rounded border border-fg/40 px-1.5 text-xs">{profile.yearsExperience} yrs</span>
-        </motion.div>
+        </div>
 
-        <motion.p
-          className="mt-4 max-w-xl text-base leading-relaxed text-fg/85 md:text-lg"
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, ease: EASE, delay: 0.7 }}
-        >
+        <p className="mt-4 max-w-xl text-base leading-relaxed text-fg/85 motion-safe:animate-rise md:text-lg" style={delay(0.7)}>
           {profile.logline}
-        </motion.p>
+        </p>
 
-        <motion.div
-          className="mt-7 flex flex-wrap gap-3"
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, ease: EASE, delay: 0.85 }}
-        >
+        <div className="mt-7 flex flex-wrap gap-3 motion-safe:animate-rise" style={delay(0.85)}>
           <Magnetic strength={0.2}>
             <button
               type="button"
-              onClick={onPlayIntro}
+              onClick={openIntro}
               className="flex items-center gap-2 rounded-md bg-fg px-6 py-3 text-base font-semibold text-inverse transition hover:bg-fg/80 md:px-8 md:text-lg"
             >
               <PlayIcon className="h-5 w-5" />
@@ -131,7 +117,7 @@ export default function Hero({ onPlayIntro, onMoreInfo }) {
           <Magnetic strength={0.2}>
             <button
               type="button"
-              onClick={onMoreInfo}
+              onClick={() => scrollTo("about")}
               className="flex items-center gap-2 rounded-md bg-fg/20 px-6 py-3 text-base font-semibold text-fg backdrop-blur transition hover:bg-fg/30 md:px-8 md:text-lg"
             >
               <svg viewBox="0 0 24 24" className="h-5 w-5" aria-hidden>
@@ -141,39 +127,33 @@ export default function Hero({ onPlayIntro, onMoreInfo }) {
               About Me
             </button>
           </Magnetic>
-        </motion.div>
+        </div>
 
-        <motion.ul
-          className="mt-6 flex flex-wrap gap-2 text-xs text-fg/70 md:text-sm"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.8, delay: 1 }}
-          aria-label="Focus areas"
-        >
+        <ul className="mt-6 flex flex-wrap gap-2 text-xs text-fg/70 motion-safe:animate-fade md:text-sm" style={delay(1)} aria-label="Focus areas">
           {profile.focusAreas.map((area, index) => (
             <li key={area} className="flex items-center gap-2">
               {index > 0 && <span className="h-1 w-1 rounded-full bg-fg/40" aria-hidden />}
               {area}
             </li>
           ))}
-        </motion.ul>
-      </motion.div>
+        </ul>
+      </m.div>
 
       {/* floating chips, desktop only */}
       <div className="pointer-events-none absolute inset-0 z-10 hidden xl:block" aria-hidden>
         {profile.heroTags.slice(0, CHIP_SLOTS.length).map((tag, index) => (
-          <motion.span
+          <span
             key={tag}
-            className={`absolute rounded-full border border-fg/15 bg-scrim/40 px-4 py-2 text-sm text-fg/80 backdrop-blur-md ${CHIP_SLOTS[index].className}`}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1, y: [0, -12, 0] }}
-            transition={{
-              opacity: { duration: 1, delay: 1.2 + CHIP_SLOTS[index].delay / 3 },
-              y: { duration: 6, repeat: Infinity, ease: "easeInOut", delay: CHIP_SLOTS[index].delay },
-            }}
+            className={`absolute motion-safe:animate-fade ${CHIP_SLOTS[index].className}`}
+            style={delay(1.2 + CHIP_SLOTS[index].delay / 3)}
           >
-            {tag}
-          </motion.span>
+            <span
+              className="block rounded-full border border-fg/15 bg-scrim/40 px-4 py-2 text-sm text-fg/80 backdrop-blur-md motion-safe:animate-float"
+              style={delay(CHIP_SLOTS[index].delay)}
+            >
+              {tag}
+            </span>
+          </span>
         ))}
       </div>
     </section>

@@ -1,12 +1,12 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { m } from "framer-motion";
 import { visitorTypes } from "../../data/siteData";
-import { EASE } from "../fx";
+import { EASE } from "../motion";
 
 export default function VisitorSelect({ onPick }) {
   return (
-    <motion.div
+    <m.div
       className="fixed inset-0 z-[140] flex flex-col items-center justify-center bg-canvas px-6"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
@@ -16,7 +16,7 @@ export default function VisitorSelect({ onPick }) {
       aria-modal="true"
       aria-labelledby="visitor-title"
     >
-      <motion.h2
+      <m.h2
         id="visitor-title"
         className="text-center text-3xl font-medium text-fg md:text-5xl"
         initial={{ opacity: 0, y: 16 }}
@@ -24,14 +24,14 @@ export default function VisitorSelect({ onPick }) {
         transition={{ duration: 0.7, ease: EASE, delay: 0.1 }}
       >
         What brings you here?
-      </motion.h2>
+      </m.h2>
       <p className="mt-3 text-center text-sm text-fg/50 md:text-base">
         Pick one and I&apos;ll show you the most relevant parts first.
       </p>
 
       <ul className="mt-10 flex flex-wrap justify-center gap-3 sm:gap-6 md:mt-14 md:gap-10">
         {visitorTypes.map((visitor, index) => (
-          <motion.li
+          <m.li
             key={visitor.id}
             initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
@@ -49,10 +49,10 @@ export default function VisitorSelect({ onPick }) {
               <span className="text-base text-fg/60 transition group-hover:text-fg md:text-lg">{visitor.name}</span>
               <span className="-mt-2 text-center text-xs text-fg/40">{visitor.blurb}</span>
             </button>
-          </motion.li>
+          </m.li>
         ))}
       </ul>
-    </motion.div>
+    </m.div>
   );
 }
 

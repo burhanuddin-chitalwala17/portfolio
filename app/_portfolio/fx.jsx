@@ -1,24 +1,8 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { motion, useMotionValue, useReducedMotion, useSpring } from "framer-motion";
-
-export const EASE = [0.22, 1, 0.36, 1];
-
-/** Fades and lifts its children in the first time they scroll into view. */
-export function Reveal({ children, className, delay = 0, y = 28 }) {
-  return (
-    <motion.div
-      className={className}
-      initial={{ opacity: 0, y }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "0px 0px -12% 0px" }}
-      transition={{ duration: 0.9, ease: EASE, delay }}
-    >
-      {children}
-    </motion.div>
-  );
-}
+import { m, useMotionValue, useReducedMotion, useSpring } from "framer-motion";
+import { EASE } from "./motion";
 
 /** Animates a word in letter by letter, keeping the whole word readable for screen readers. */
 export function LetterReveal({ text, className, delay = 0, stagger = 0.05 }) {
@@ -26,7 +10,7 @@ export function LetterReveal({ text, className, delay = 0, stagger = 0.05 }) {
     <span className={className}>
       <span className="sr-only">{text}</span>
       {text.split("").map((char, index) => (
-        <motion.span
+        <m.span
           key={index}
           aria-hidden
           className="inline-block"
@@ -35,7 +19,7 @@ export function LetterReveal({ text, className, delay = 0, stagger = 0.05 }) {
           transition={{ duration: 0.8, ease: EASE, delay: delay + index * stagger }}
         >
           {char === " " ? " " : char}
-        </motion.span>
+        </m.span>
       ))}
     </span>
   );
@@ -60,7 +44,7 @@ export function Magnetic({ children, className = "", strength = 0.3 }) {
   };
 
   return (
-    <motion.div
+    <m.div
       ref={ref}
       className={`inline-block ${className}`}
       style={{ x, y }}
@@ -68,7 +52,7 @@ export function Magnetic({ children, className = "", strength = 0.3 }) {
       onPointerLeave={reset}
     >
       {children}
-    </motion.div>
+    </m.div>
   );
 }
 
@@ -93,7 +77,7 @@ export function Tilt({ children, className = "", max = 10 }) {
   };
 
   return (
-    <motion.div
+    <m.div
       ref={ref}
       className={className}
       style={{ rotateX, rotateY, transformPerspective: 900 }}
@@ -101,7 +85,7 @@ export function Tilt({ children, className = "", max = 10 }) {
       onPointerLeave={reset}
     >
       {children}
-    </motion.div>
+    </m.div>
   );
 }
 
@@ -194,7 +178,7 @@ export function CursorRing() {
   }, [x, y]);
 
   return (
-    <motion.div
+    <m.div
       aria-hidden
       className="pointer-events-none fixed left-0 top-0 z-[300] -ml-4 -mt-4 h-8 w-8 rounded-full border border-accent mix-blend-difference"
       style={{ x: springX, y: springY }}

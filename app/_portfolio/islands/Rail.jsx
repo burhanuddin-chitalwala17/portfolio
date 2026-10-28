@@ -1,20 +1,12 @@
 "use client";
 
 import { useRef } from "react";
-import { Reveal } from "../fx";
 
-export function SectionHeading({ eyebrow, title, children }) {
-  return (
-    <Reveal className="mb-6 px-gutter md:mb-8">
-      <p className="text-xs font-semibold uppercase tracking-[0.35em] text-accent">{eyebrow}</p>
-      <h2 className="mt-2 font-display text-4xl tracking-wide text-fg md:text-6xl">{title}</h2>
-      {children && <p className="mt-2 max-w-2xl text-sm text-fg/60 md:text-base">{children}</p>}
-    </Reveal>
-  );
-}
-
-/** A horizontally scrolling row with arrow buttons on wider screens. */
-export function Rail({ children, label }) {
+/**
+ * A horizontally scrolling row with arrow buttons on wider screens. The items (`children`, <li>s)
+ * can be server-rendered; only the scrolling needs the client.
+ */
+export default function Rail({ children, label }) {
   const ref = useRef(null);
 
   const page = (direction) => {
