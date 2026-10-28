@@ -12,6 +12,8 @@ export const profile = {
   focusAreas: ["Next.js", "Java · Python", "AI / LLM systems"],
   logline:
     "A full-stack engineer with 3+ years shipping AI-powered products at InMobi and Stellantis, from an LLM voice assistant live in a car to an AI layer that plans ad campaigns.",
+  /** Shown in About as "Open to" when set. Left empty on purpose. */
+  openTo: "",
   summary: [
     "Full-stack engineer with 3+ years building and shipping AI-powered products at global companies. I own features end to end, across Java and Python backends and Next.js and React frontends.",
     "I've shipped production LLM systems in a live vehicle, and I'm strongest in AI integration, scalable server-rendered web platforms and design systems, always with an eye on measurable business impact.",
