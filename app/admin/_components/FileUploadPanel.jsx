@@ -4,6 +4,11 @@ import { useRef, useState } from "react";
 import UploadMessages from "./UploadMessages";
 import UploadReview from "./UploadReview";
 import { useDocumentUpload } from "./useDocumentUpload";
+import Button from "../../ui/Button";
+import SegmentedControl from "../../ui/SegmentedControl";
+import { Field, TextArea, TextInput } from "../../ui/fields";
+import Card from "../../ui/Card";
+import Notice from "../../ui/Notice";
 
 const ACCEPTED_TYPES = [
   "application/pdf",
@@ -45,32 +50,22 @@ export default function FileUploadPanel({ enabled = false }) {
   };
 
   return (
-    <section className="rounded-2xl border border-fg/10 bg-surface px-5 py-4 shadow-sm">
-      <div className="flex flex-col gap-1">
-        <h2 className="text-lg font-semibold text-fg">
-          Add documents
-        </h2>
-        <p className="text-sm text-fg/60">
-          Upload PDF, Word (.docx), text or images up to 4 MB each, or write
-          and paste text directly. What you allow is what the portfolio chat
-          answers from.
+    <Card
+      headingLevel={2}
+      title="Add documents"
+      description="Upload PDF, Word (.docx), text or images up to 4 MB each, or write and paste text directly. What you allow is what the portfolio chat answers from."
+    >
+      <Notice tone="warning" title="Before you upload">
+        <p>
+          Anything the chat can read, a visitor can get it to repeat, so treat chat documents as public. Don&apos;t
+          include ID numbers (Aadhaar, PAN, passport), bank or card details, passwords or keys, your home address, date
+          of birth, salary, or other people&apos;s private details.
         </p>
-      </div>
-
-      <div className="mt-4 rounded-xl border border-warning/20 bg-warning/5 px-4 py-3 text-sm text-warning">
-        <p className="font-semibold">Before you upload</p>
         <p className="mt-1">
-          Anything the chat can read, a visitor can get it to repeat, so treat
-          chat documents as public. Don&apos;t include ID numbers (Aadhaar, PAN,
-          passport), bank or card details, passwords or keys, your home address,
-          date of birth, salary, or other people&apos;s private details.
+          Files and notes themselves stay private to this panel. Everything is scanned first, and anything detected as
+          sensitive is removed from what the chat sees.
         </p>
-        <p className="mt-1 text-warning">
-          Files and notes themselves stay private to this panel. Everything is
-          scanned first, and anything detected as sensitive is removed from
-          what the chat sees.
-        </p>
-      </div>
+      </Notice>
 
       {stage === "review" || stage === "uploading" ? (
         <UploadReview
@@ -84,68 +79,52 @@ export default function FileUploadPanel({ enabled = false }) {
         />
       ) : (
         <>
-          <div role="tablist" aria-label="How to add" className="mt-4 inline-flex rounded-full border border-fg/15 p-1 text-sm">
-            {[
+          <SegmentedControl
+            label="How to add"
+            options={[
               ["file", "Upload files"],
               ["text", "Write or paste text"],
-            ].map(([value, label]) => (
-              <button
-                key={value}
-                type="button"
-                role="tab"
-                aria-selected={mode === value}
-                onClick={() => setMode(value)}
-                className={`rounded-full px-4 py-1.5 font-medium transition ${
-                  mode === value ? "bg-fg text-surface" : "text-fg/70 hover:text-fg"
-                }`}
-              >
-                {label}
-              </button>
-            ))}
-          </div>
+            ]}
+            value={mode}
+            onChange={setMode}
+          />
 
           {mode === "text" ? (
-            <form onSubmit={checkNote} className="mt-4 flex flex-col gap-3">
-              <label className="flex flex-col gap-1 text-sm text-fg/80">
-                Title
-                <input
+            <form onSubmit={checkNote} className="flex flex-col gap-3">
+              <Field label="Title">
+                <TextInput
                   value={note.title}
                   onChange={(event) => setNote((current) => ({ ...current, title: event.target.value }))}
                   maxLength={80}
                   placeholder="e.g. About me FAQ"
                   disabled={!enabled || stage === "checking"}
-                  className="rounded-lg border border-fg/20 bg-surface px-3 py-2 text-input disabled:opacity-50"
                 />
-              </label>
-              <label className="flex flex-col gap-1 text-sm text-fg/80">
-                Text
-                <textarea
+              </Field>
+              <Field label="Text" hint={`${note.text.length.toLocaleString("en")} / ${MAX_NOTE_CHARACTERS.toLocaleString("en")} characters`}>
+                <TextArea
                   value={note.text}
                   onChange={(event) => setNote((current) => ({ ...current, text: event.target.value }))}
                   maxLength={MAX_NOTE_CHARACTERS}
                   rows={10}
                   placeholder="Write in the first person, the way you'd answer a recruiter. Plain text or Markdown."
                   disabled={!enabled || stage === "checking"}
-                  className="min-h-[200px] rounded-lg border border-fg/20 bg-surface px-3 py-2 text-input leading-relaxed disabled:opacity-50"
+                  className="min-h-[200px]"
                 />
-                <span className="self-end text-xs text-fg/50">
-                  {note.text.length.toLocaleString("en")} / {MAX_NOTE_CHARACTERS.toLocaleString("en")}
-                </span>
-              </label>
-              <button
+              </Field>
+              <Button
+                size="lg"
                 type="submit"
                 disabled={!enabled || stage === "checking" || !note.title.trim() || !note.text.trim()}
-                className="w-fit rounded-full bg-fg px-5 py-2 text-sm font-semibold text-surface transition hover:bg-fg/80 disabled:cursor-not-allowed disabled:opacity-50"
               >
                 {stage === "checking" ? "Checking for sensitive data…" : "Check and save"}
-              </button>
+              </Button>
               {!enabled && (
                 <p className="text-sm text-fg/60">Saving notes switches on once storage is connected.</p>
               )}
             </form>
           ) : (
             <div
-              className={`mt-4 flex min-h-[150px] flex-col items-center justify-center rounded-xl border border-dashed border-fg/20 bg-canvas text-center transition ${
+              className={`flex min-h-[150px] flex-col items-center justify-center rounded-xl border border-dashed border-fg/20 bg-canvas text-center transition ${
                 isDragging ? "border-fg/40 bg-fg/5" : ""
               } ${enabled ? "cursor-pointer" : "cursor-not-allowed opacity-60"}`}
               onDragOver={(event) => {
@@ -198,6 +177,6 @@ export default function FileUploadPanel({ enabled = false }) {
       />
 
       <UploadMessages messages={messages} />
-    </section>
+    </Card>
   );
 }

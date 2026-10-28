@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Button from "../../ui/Button";
+import { adminRequest } from "../_lib/adminRequest";
 
 const dateFormatter = new Intl.DateTimeFormat("en", { dateStyle: "medium", timeStyle: "short" });
 
@@ -14,12 +16,7 @@ export default function QueryList({ queries }) {
     setPendingId(id);
     setError("");
     try {
-      const response = await fetch(`/api/admin/queries/${id}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ status }),
-      });
-      if (!response.ok) throw new Error();
+      await adminRequest(`/api/admin/queries/${id}`, { method: "PATCH", body: { status } });
       router.refresh();
     } catch {
       setError("Couldn't update that question. Please try again.");
@@ -74,14 +71,14 @@ export default function QueryList({ queries }) {
                   >
                     {open ? "Open" : "Resolved"}
                   </span>
-                  <button
-                    type="button"
+                  <Button
+                    variant="secondary"
+                    size="sm"
                     onClick={() => setStatus(query.id, open ? "resolved" : "open")}
                     disabled={pendingId === query.id}
-                    className="rounded-full border border-fg/20 px-3 py-1.5 text-xs font-semibold text-fg/80 transition hover:border-fg disabled:opacity-50"
                   >
                     {open ? "Mark resolved" : "Reopen"}
-                  </button>
+                  </Button>
                 </div>
               </div>
             </li>

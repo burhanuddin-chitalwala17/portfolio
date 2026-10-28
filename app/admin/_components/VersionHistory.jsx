@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Button from "../../ui/Button";
+import { adminRequest } from "../_lib/adminRequest";
 
 const dateFormatter = new Intl.DateTimeFormat("en", { dateStyle: "medium", timeStyle: "short" });
 
@@ -15,8 +17,7 @@ export default function VersionHistory({ versions }) {
     setBusyId(version.id);
     setError("");
     try {
-      const response = await fetch(`/api/admin/content/${version.id}/publish`, { method: "POST" });
-      if (!response.ok) throw new Error();
+      await adminRequest(`/api/admin/content/${version.id}/publish`);
       router.refresh();
     } catch {
       setError("Couldn't restore that version. Please try again.");
@@ -73,14 +74,13 @@ export default function VersionHistory({ versions }) {
                     Preview ↗
                   </a>
                   {!live && (
-                    <button
-                      type="button"
+                    <Button
+                      size="sm"
                       onClick={() => restore(version)}
                       disabled={busyId !== null}
-                      className="rounded-full bg-fg px-3 py-1.5 text-xs font-semibold text-inverse transition hover:bg-fg/80 disabled:opacity-50"
                     >
                       {busyId === version.id ? "Restoring…" : "Restore"}
-                    </button>
+                    </Button>
                   )}
                 </div>
               </li>

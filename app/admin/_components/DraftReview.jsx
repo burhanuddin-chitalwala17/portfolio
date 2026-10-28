@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Button from "../../ui/Button";
+import { adminRequest } from "../_lib/adminRequest";
 
 const KIND_STYLES = {
   added: "bg-success/10 text-success",
@@ -20,20 +22,16 @@ export default function DraftReview({ draft, changes }) {
   const [busy, setBusy] = useState(null);
   const [showAll, setShowAll] = useState(false);
 
+  // Runs one draft action, refreshing the page on success and listing what went wrong otherwise.
   const call = async (action, request) => {
     setBusy(action);
     setErrors([]);
     try {
-      const response = await request();
-      const data = await response.json().catch(() => ({}));
-      if (!response.ok) {
-        setErrors(data.errors ?? [data.error ?? "Something went wrong. Please try again."]);
-        return false;
-      }
+      await request();
       router.refresh();
       return true;
-    } catch {
-      setErrors(["Network error. Check your connection and try again."]);
+    } catch (error) {
+      setErrors(error.details ?? [error.message]);
       return false;
     } finally {
       setBusy(null);
@@ -48,24 +46,18 @@ export default function DraftReview({ draft, changes }) {
       setErrors([`That isn't valid JSON: ${parseError.message}`]);
       return;
     }
-    const saved = await call("save", () =>
-      fetch(`/api/admin/content/${draft.id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ content }),
-      })
-    );
+    const saved = await call("save", () => adminRequest(`/api/admin/content/${draft.id}`, { method: "PUT", body: { content } }));
     if (saved) setEditing(false);
   };
 
   const publish = () => {
     if (!window.confirm("Publish this draft? The live site updates within a few seconds.")) return;
-    call("publish", () => fetch(`/api/admin/content/${draft.id}/publish`, { method: "POST" }));
+    call("publish", () => adminRequest(`/api/admin/content/${draft.id}/publish`));
   };
 
   const discard = () => {
     if (!window.confirm("Discard this draft?")) return;
-    call("discard", () => fetch(`/api/admin/content/${draft.id}`, { method: "DELETE" }));
+    call("discard", () => adminRequest(`/api/admin/content/${draft.id}`, { method: "DELETE" }));
   };
 
   const visibleChanges = showAll ? changes : changes.slice(0, VISIBLE_CHANGES);
@@ -87,30 +79,27 @@ export default function DraftReview({ draft, changes }) {
           >
             Preview ↗
           </a>
-          <button
-            type="button"
+          <Button
+            variant="secondary"
             onClick={() => setEditing((value) => !value)}
-            className="rounded-full border border-fg/20 px-4 py-2 text-sm font-semibold text-fg/80 transition hover:border-fg"
           >
             {editing ? "Close editor" : "Edit"}
-          </button>
-          <button
-            type="button"
+          </Button>
+          <Button
+            variant="danger"
             onClick={discard}
             disabled={busy !== null}
-            className="rounded-full border border-danger/20 px-4 py-2 text-sm font-semibold text-danger transition hover:border-danger/40 disabled:opacity-50"
           >
             {busy === "discard" ? "Discarding…" : "Discard"}
-          </button>
-          <button
-            type="button"
+          </Button>
+          <Button
+            size="lg"
             onClick={publish}
             disabled={busy !== null || editing}
             title={editing ? "Save or close the editor first" : undefined}
-            className="rounded-full bg-fg px-5 py-2 text-sm font-semibold text-inverse transition hover:bg-fg/80 disabled:cursor-not-allowed disabled:opacity-50"
           >
             {busy === "publish" ? "Publishing…" : "Publish"}
-          </button>
+          </Button>
         </div>
       </div>
 
@@ -140,14 +129,13 @@ export default function DraftReview({ draft, changes }) {
             className="h-[60vh] w-full rounded-xl border border-fg/20 bg-canvas p-4 font-mono text-xs leading-relaxed text-fg focus:border-fg focus:outline-none"
           />
           <div>
-            <button
-              type="button"
+            <Button
+              size="lg"
               onClick={save}
               disabled={busy !== null}
-              className="rounded-full bg-fg px-5 py-2 text-sm font-semibold text-inverse transition hover:bg-fg/80 disabled:opacity-50"
             >
               {busy === "save" ? "Saving…" : "Save draft"}
-            </button>
+            </Button>
           </div>
         </div>
       ) : changes.length === 0 ? (

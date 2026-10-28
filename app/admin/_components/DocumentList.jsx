@@ -3,6 +3,10 @@
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import DocumentTypeBadge from "./DocumentTypeBadge";
+import Button from "../../ui/Button";
+import SearchField from "../../ui/SearchField";
+import { filterByQuery } from "../_lib/search";
+import { adminRequest } from "../_lib/adminRequest";
 
 const dateFormatter = new Intl.DateTimeFormat("en", {
   year: "numeric",
@@ -44,13 +48,10 @@ export default function DocumentList({
     setDeletingId(document.id);
     setError("");
     try {
-      const response = await fetch(`/api/admin/documents/${document.id}`, {
+      await adminRequest(`/api/admin/documents/${document.id}`, {
         method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ useInChat: turningOn, acknowledgedRisks }),
+        body: { useInChat: turningOn, acknowledgedRisks },
       });
-      const data = await response.json().catch(() => ({}));
-      if (!response.ok) throw new Error(data.error);
       router.refresh();
     } catch (toggleError) {
       setError(
@@ -68,10 +69,7 @@ export default function DocumentList({
     setDeletingId(document.id);
     setError("");
     try {
-      const response = await fetch(`/api/admin/documents/${document.id}`, {
-        method: "DELETE",
-      });
-      if (!response.ok) throw new Error();
+      await adminRequest(`/api/admin/documents/${document.id}`, { method: "DELETE" });
       router.refresh();
     } catch {
       setError(`Couldn't delete "${document.name}". Please try again.`);
@@ -80,20 +78,10 @@ export default function DocumentList({
     }
   };
 
-  const filteredDocuments = useMemo(() => {
-    const trimmedQuery = searchTerm.trim().toLowerCase();
-    if (!trimmedQuery) {
-      return documents;
-    }
-
-    return documents.filter((document) => {
-      const haystack = [document.name, document.type, document.id]
-        .join(" ")
-        .toLowerCase();
-
-      return haystack.includes(trimmedQuery);
-    });
-  }, [documents, searchTerm]);
+  const filteredDocuments = useMemo(
+    () => filterByQuery(documents, searchTerm, (document) => [document.name, document.type]),
+    [documents, searchTerm],
+  );
 
   return (
     <section className="rounded-2xl border border-fg/10 bg-surface shadow-sm">
@@ -105,16 +93,13 @@ export default function DocumentList({
           <p className="text-sm text-fg/60">Search by name or type.</p>
         </div>
 
-        <label className="flex w-full max-w-xs items-center gap-2 rounded-full border border-fg/10 bg-surface px-4 py-2 text-sm text-fg/60 focus-within:border-fg/40">
-          <span className="text-fg/40">🔍</span>
-          <input
-            type="search"
-            placeholder="Search documents..."
-            value={searchTerm}
-            onChange={(event) => setSearchTerm(event.target.value)}
-            className="w-full bg-transparent text-fg/80 outline-none"
-          />
-        </label>
+        <SearchField
+          value={searchTerm}
+          onChange={setSearchTerm}
+          label="Search documents"
+          placeholder="Search documents…"
+          className="w-full max-w-xs"
+        />
       </header>
 
       {error && (
@@ -256,14 +241,14 @@ function DocumentActions({ document, deletingId, onDelete, onChatToggle }) {
         </button>
       )}
       {document.source === "upload" && (
-        <button
-          type="button"
+        <Button
+          variant="danger"
+          size="sm"
           onClick={() => onDelete(document)}
           disabled={deletingId === document.id}
-          className="rounded-full border border-danger/20 px-3 py-1 text-xs font-semibold text-danger transition hover:border-danger/40 disabled:opacity-50"
         >
           {deletingId === document.id ? "Deleting…" : "Delete"}
-        </button>
+        </Button>
       )}
     </div>
   );

@@ -1,3 +1,5 @@
+import Notice from "../../ui/Notice";
+
 export default function SetupNotice({ databaseReady, storageReady }) {
   if (databaseReady && storageReady) return null;
 
@@ -7,12 +9,9 @@ export default function SetupNotice({ databaseReady, storageReady }) {
   ].filter(Boolean);
 
   return (
-    <div role="status" className="rounded-2xl border border-warning/20 bg-warning/5 px-5 py-4 text-sm text-warning">
-      <p className="font-semibold">Storage isn&apos;t connected yet</p>
-      <p className="mt-1">
-        Uploads and the inbox switch on once these are set in Vercel → Settings → Environment Variables:{" "}
-        <span className="font-mono text-xs">{missing.join(", ")}</span>. The resume on the site keeps working meanwhile.
-      </p>
-    </div>
+    <Notice tone="warning" title="Storage isn't connected yet">
+      Uploads and the inbox switch on once these are set in Vercel → Settings → Environment Variables:{" "}
+      <span className="font-mono text-xs">{missing.join(", ")}</span>. The resume on the site keeps working meanwhile.
+    </Notice>
   );
 }

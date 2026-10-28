@@ -2,6 +2,10 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { adminRequest } from "../_lib/adminRequest";
+import Button from "../../ui/Button";
+import Notice from "../../ui/Notice";
+import { Field, TextInput } from "../../ui/fields";
 
 export default function AdminLockScreen() {
   const [password, setPassword] = useState("");
@@ -15,27 +19,11 @@ export default function AdminLockScreen() {
     setIsLoading(true);
 
     try {
-      const response = await fetch("/api/admin/auth", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ password }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok || !data.success) {
-        setError(data.error || "Authentication failed. Please try again.");
-        setIsLoading(false);
-        return;
-      }
-
-      // Success - refresh the page to re-run layout auth check
+      await adminRequest("/api/admin/auth", { body: { password } });
+      // Signed in: refresh so the layout re-checks the session. The button stays busy until then.
       router.refresh();
-    } catch (error) {
-      console.error("Login error:", error);
-      setError("Network error. Please check your connection and try again.");
+    } catch (loginError) {
+      setError(loginError.message);
       setIsLoading(false);
     }
   };
@@ -53,40 +41,24 @@ export default function AdminLockScreen() {
             </p>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <label
-                htmlFor="password"
-                className="mb-2 block text-sm font-medium text-fg/80"
-              >
-                Password
-              </label>
-              <input
-                id="password"
+          <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+            <Field label="Password">
+              <TextInput
                 type="password"
+                id="password"
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                onChange={(event) => setPassword(event.target.value)}
                 disabled={isLoading}
-                className="w-full rounded-lg border border-fg/20 bg-surface px-4 py-3 text-fg placeholder-fg/40 transition focus:border-fg focus:outline-none focus:ring-2 focus:ring-fg focus:ring-offset-1 ring-offset-surface disabled:cursor-not-allowed disabled:bg-canvas"
                 placeholder="Enter admin password"
+                autoComplete="current-password"
                 autoFocus
                 required
               />
-            </div>
-
-            {error && (
-              <div className="rounded-lg bg-danger/5 border border-danger/20 px-4 py-3 text-sm text-danger">
-                {error}
-              </div>
-            )}
-
-            <button
-              type="submit"
-              disabled={isLoading || !password.trim()}
-              className="w-full rounded-lg bg-fg px-4 py-3 text-sm font-semibold text-surface transition hover:bg-fg/80 focus:outline-none focus:ring-2 focus:ring-fg focus:ring-offset-2 disabled:cursor-not-allowed disabled:bg-fg/40"
-            >
-              {isLoading ? "Authenticating..." : "Unlock Dashboard"}
-            </button>
+            </Field>
+            {error && <Notice tone="danger">{error}</Notice>}
+            <Button type="submit" size="lg" fullWidth disabled={isLoading || !password.trim()}>
+              {isLoading ? "Signing in…" : "Unlock dashboard"}
+            </Button>
           </form>
         </div>
       </div>

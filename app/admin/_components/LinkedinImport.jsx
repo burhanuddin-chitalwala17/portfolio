@@ -1,6 +1,9 @@
 "use client";
 
 import { useRef, useState } from "react";
+import Button from "../../ui/Button";
+import Card from "../../ui/Card";
+import { TextArea } from "../../ui/fields";
 import UploadMessages from "./UploadMessages";
 import UploadReview from "./UploadReview";
 import { useDocumentUpload } from "./useDocumentUpload";
@@ -46,37 +49,39 @@ export default function LinkedinImport({ enabled, profileUrl }) {
   };
 
   return (
-    <section className="flex flex-col gap-4 rounded-2xl border border-fg/10 bg-surface px-5 py-5 shadow-sm">
-      <div>
-        <h3 className="text-base font-semibold text-fg">LinkedIn</h3>
-        <p className="mt-1 text-sm text-fg/60">
-          LinkedIn doesn&apos;t let apps read profiles, so import your own data export instead. It&apos;s read here in your
-          browser: only your public profile sections (headline, about, experience, education, skills, certifications,
-          projects, public recommendations) are kept, and messages, connections and contact details never leave your
-          device. Re-import whenever your profile changes.
-        </p>
-        <ol className="mt-2 list-decimal space-y-1 pl-5 text-sm text-fg/60">
-          <li>
-            On LinkedIn, open{" "}
-            <a href={EXPORT_URL} target="_blank" rel="noreferrer" className="text-info underline">
-              Get a copy of your data
-            </a>
-            , choose the larger archive or pick Profile, Positions, Education, Skills, Recommendations and Certifications,
-            and request it.
-          </li>
-          <li>When LinkedIn emails you (usually within minutes), download the ZIP and choose it below.</li>
-        </ol>
-        {profileUrl && (
-          <p className="mt-2 text-xs text-fg/50">
-            Quicker alternative: on{" "}
-            <a href={profileUrl} target="_blank" rel="noreferrer" className="underline">
-              your profile
-            </a>{" "}
-            use More → Save to PDF and upload that PDF in Documents.
+    <Card
+      title="LinkedIn"
+      description={
+        <>
+          <p>
+            LinkedIn doesn&apos;t let apps read profiles, so import your own data export instead. It&apos;s read here in your
+            browser: only your public profile sections (headline, about, experience, education, skills, certifications,
+            projects, public recommendations) are kept, and messages, connections and contact details never leave your
+            device. Re-import whenever your profile changes.
           </p>
-        )}
-      </div>
-
+          <ol className="mt-2 list-decimal space-y-1 pl-5 text-sm text-fg/60">
+            <li>
+              On LinkedIn, open{" "}
+              <a href={EXPORT_URL} target="_blank" rel="noreferrer" className="text-info underline">
+                Get a copy of your data
+              </a>
+              , choose the larger archive or pick Profile, Positions, Education, Skills, Recommendations and Certifications,
+              and request it.
+            </li>
+            <li>When LinkedIn emails you (usually within minutes), download the ZIP and choose it below.</li>
+          </ol>
+          {profileUrl && (
+            <p className="mt-2 text-xs text-fg/50">
+              Quicker alternative: on{" "}
+              <a href={profileUrl} target="_blank" rel="noreferrer" className="underline">
+                your profile
+              </a>{" "}
+              use More → Save to PDF and upload that PDF in Documents.
+            </p>
+          )}
+        </>
+      }
+    >
       {stage === "review" || stage === "uploading" ? (
         <UploadReview
           stage={stage}
@@ -94,41 +99,27 @@ export default function LinkedinImport({ enabled, profileUrl }) {
             {imported.skipped.length > 0 && ` Left out ${imported.skipped.length} other files.`} Edit anything you
             don&apos;t want the chat to know before saving.
           </p>
-          <textarea
+          <TextArea
             value={imported.text}
             onChange={(event) => setImported((current) => ({ ...current, text: event.target.value }))}
             rows={12}
             aria-label="Imported LinkedIn profile"
-            className="min-h-[240px] rounded-lg border border-fg/20 bg-surface px-3 py-2 font-mono text-xs leading-relaxed"
+            className="min-h-[240px] font-mono"
           />
           <div className="flex flex-wrap gap-2">
-            <button
-              type="button"
-              onClick={check}
-              disabled={stage === "checking" || !imported.text.trim()}
-              className="rounded-full bg-fg px-5 py-2 text-sm font-semibold text-surface transition hover:bg-fg/80 disabled:cursor-not-allowed disabled:opacity-50"
-            >
+            <Button size="lg" onClick={check} disabled={stage === "checking" || !imported.text.trim()}>
               {stage === "checking" ? "Checking for sensitive data…" : "Check and save"}
-            </button>
-            <button
-              type="button"
-              onClick={() => setImported(null)}
-              className="rounded-full border border-fg/20 px-5 py-2 text-sm font-semibold text-fg/80 transition hover:border-fg"
-            >
+            </Button>
+            <Button variant="secondary" size="lg" onClick={() => setImported(null)}>
               Cancel
-            </button>
+            </Button>
           </div>
         </div>
       ) : (
         <div>
-          <button
-            type="button"
-            onClick={() => inputRef.current?.click()}
-            disabled={!enabled || reading}
-            className="rounded-full border border-fg/20 px-4 py-2 text-sm font-semibold text-fg/80 transition hover:border-fg disabled:cursor-not-allowed disabled:opacity-50"
-          >
+          <Button variant="secondary" onClick={() => inputRef.current?.click()} disabled={!enabled || reading}>
             {reading ? "Reading…" : "Choose the LinkedIn export (ZIP or CSV files)"}
-          </button>
+          </Button>
           {!enabled && <p className="mt-2 text-xs text-fg/50">Importing switches on once storage is connected.</p>}
           <input
             ref={inputRef}
@@ -145,6 +136,6 @@ export default function LinkedinImport({ enabled, profileUrl }) {
       )}
 
       <UploadMessages messages={messages} />
-    </section>
+    </Card>
   );
 }

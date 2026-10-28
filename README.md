@@ -26,6 +26,10 @@ Without a database the site runs on the built-in content in `app/data/siteData.j
 - **CMS** (`app/admin/content`): upload a resume → the model returns updated content as schema-validated JSON → I review a diff, preview it, edit it if needed, and publish. Every version is kept for rollback.
 - **Privacy**: uploads are scanned for ID numbers, bank/card details, secrets, phone numbers, addresses, dates of birth and salary. Risky files stay out of the chat unless I confirm, and detected values are always redacted before any text reaches the model. Chat is rate-limited per visitor and per day, transcripts are kept, and admin logins lock after repeated failures.
 
+## UI architecture
+
+The interface is layered: design tokens → primitives (`app/ui`) → hooks and patterns (`app/ui/hooks`, `app/ui/patterns`) → feature components → pages. Pages are Server Components; `"use client"` goes only on the smallest component that needs interactivity. See [`app/ui/README.md`](app/ui/README.md).
+
 ## Design tokens
 
 All colours, font sizes, radii and layout spacing are CSS variables in `app/globals.css`, exposed through `tailwind.config.js`:

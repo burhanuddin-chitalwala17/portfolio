@@ -2,6 +2,7 @@
 
 import { useCallback, useState } from "react";
 import { useRouter } from "next/navigation";
+import { adminRequest } from "../_lib/adminRequest";
 
 export const MAX_UPLOAD_BYTES = 4 * 1024 * 1024;
 
@@ -33,9 +34,7 @@ export function useDocumentUpload() {
     const formData = new FormData();
     candidates.forEach((file) => formData.append("files", file));
     try {
-      const response = await fetch("/api/admin/documents/scan", { method: "POST", body: formData });
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.error);
+      const data = await adminRequest("/api/admin/documents/scan", { body: formData });
       setReview(
         candidates.map((file, index) => {
           const result = data.results[index];
@@ -72,6 +71,8 @@ export function useDocumentUpload() {
       JSON.stringify(items.map((item) => ({ useInChat: item.useInChat, acknowledgedRisks: item.acknowledgedRisks })))
     );
     try {
+      // Raw fetch on purpose: a partial success comes back as an error status that still lists what
+      // was uploaded, which adminRequest would turn into a plain error.
       const response = await fetch("/api/admin/documents", { method: "POST", body: formData });
       const data = await response.json().catch(() => ({}));
       const errors = [...(data.errors ?? []), ...(data.error ? [data.error] : [])];
