@@ -30,7 +30,7 @@ export default function Contact({ content }) {
           </span>
         </h2>
         <Reveal as="p" delay={0.2} className="mx-auto mt-6 max-w-xl text-lg text-fg/70">
-          I&apos;m always happy to talk about full-stack, mobile and AI products. My inbox is always open.
+          I&apos;m always happy to talk about technology and innovation. My inbox is always open.
         </Reveal>
 
         <Reveal delay={0.3} className="mt-10 flex flex-wrap justify-center gap-3">
