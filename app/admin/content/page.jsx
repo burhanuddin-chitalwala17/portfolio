@@ -1,3 +1,4 @@
+import LoadError from "../_components/LoadError";
 import Link from "next/link";
 import ContentGenerator from "../_components/ContentGenerator";
 import DraftReview from "../_components/DraftReview";
@@ -6,7 +7,7 @@ import SetupNotice from "../_components/SetupNotice";
 import { diffContent } from "../../services/content/diff";
 import { CONTENT_STATUSES, getPublishedContent, listContentVersions } from "../../services/content/siteContent";
 import { getDocuments } from "../../services/documents/getDocuments";
-import { isDatabaseConfigured, withTimeout } from "../../services/db/client";
+import { isDatabaseConfigured, withTimeout, describeDatabaseError } from "../../services/db/client";
 import { isStorageConfigured } from "../../services/storage/storage";
 import { resolveAiTask } from "../../services/ai";
 
@@ -26,7 +27,7 @@ export default async function ContentPage() {
       .map((document) => ({ id: document.id, name: document.name }));
   } catch (error) {
     console.error("Loading content versions failed:", error);
-    loadError = "Content versions couldn't be loaded. Check the database connection.";
+    loadError = { message: "Content versions couldn't be loaded. Check the database connection.", detail: describeDatabaseError(error) };
   }
   const { content: liveContent } = await getPublishedContent();
   const drafts = versions.filter((version) => version.status === CONTENT_STATUSES.DRAFT);
@@ -52,9 +53,7 @@ export default async function ContentPage() {
       />
 
       {loadError && (
-        <p role="alert" className="rounded-2xl border border-danger/20 bg-danger/5 px-5 py-4 text-sm text-danger">
-          {loadError}
-        </p>
+        <LoadError {...loadError} />
       )}
 
       {drafts.map((draft) => (

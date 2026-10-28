@@ -36,3 +36,13 @@ export function withTimeout(promise, ms, label = "Database query") {
   });
   return Promise.race([promise, timeout]).finally(() => clearTimeout(timer));
 }
+
+/**
+ * A short technical description of a database failure for the admin panel, e.g.
+ * "57014: canceling statement due to statement timeout". Shown to the signed-in admin only.
+ */
+export function describeDatabaseError(error) {
+  if (!error) return null;
+  const code = error.code && error.code !== error.message ? `${error.code}: ` : "";
+  return `${code}${error.message ?? String(error)}`.slice(0, 240);
+}

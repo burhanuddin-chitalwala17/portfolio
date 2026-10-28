@@ -1,9 +1,10 @@
+import LoadError from "./_components/LoadError";
 import DocumentList from "./_components/DocumentList";
 import FileUploadPanel from "./_components/FileUploadPanel";
 import SetupNotice from "./_components/SetupNotice";
 import Tile from "../ui/Tile";
 import { getDocuments } from "../services/documents/getDocuments";
-import { isDatabaseConfigured, withTimeout } from "../services/db/client";
+import { isDatabaseConfigured, withTimeout, describeDatabaseError } from "../services/db/client";
 import { isStorageConfigured } from "../services/storage/storage";
 import { countConversationsThisWeek } from "../services/chat/history";
 import { listVisitorQueries, QUERY_STATUSES } from "../services/queries/visitorQueries";
@@ -25,7 +26,7 @@ export default async function AdminPage() {
     openQuestions = queries.filter((query) => query.status === QUERY_STATUSES.OPEN).length;
   } catch (error) {
     console.error("Loading documents failed:", error);
-    loadError = "The document library couldn't be loaded. Check the database connection.";
+    loadError = { message: "The document library couldn't be loaded. Check the database connection.", detail: describeDatabaseError(error) };
   }
 
   const chatDocuments = documents.filter((document) => document.useInChat);
@@ -49,9 +50,7 @@ export default async function AdminPage() {
       <FileUploadPanel enabled={databaseReady && storageReady} />
 
       {loadError ? (
-        <p role="alert" className="rounded-2xl border border-danger/20 bg-danger/5 px-5 py-4 text-sm text-danger">
-          {loadError}
-        </p>
+        <LoadError {...loadError} />
       ) : (
         <DocumentList documents={documents} />
       )}

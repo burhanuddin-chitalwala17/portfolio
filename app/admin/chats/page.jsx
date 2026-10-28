@@ -1,5 +1,6 @@
+import LoadError from "../_components/LoadError";
 import SetupNotice from "../_components/SetupNotice";
-import { isDatabaseConfigured, withTimeout } from "../../services/db/client";
+import { isDatabaseConfigured, withTimeout, describeDatabaseError } from "../../services/db/client";
 import { isStorageConfigured } from "../../services/storage/storage";
 import { getTranscripts, listConversations } from "../../services/chat/history";
 
@@ -19,7 +20,7 @@ export default async function ChatsPage() {
     }
   } catch (error) {
     console.error("Loading chats failed:", error);
-    loadError = "Chats couldn't be loaded. Check the database connection.";
+    loadError = { message: "Chats couldn't be loaded. Check the database connection.", detail: describeDatabaseError(error) };
   }
 
   return (
@@ -32,9 +33,7 @@ export default async function ChatsPage() {
         </p>
       </div>
       {loadError ? (
-        <p role="alert" className="rounded-2xl border border-danger/20 bg-danger/5 px-5 py-4 text-sm text-danger">
-          {loadError}
-        </p>
+        <LoadError {...loadError} />
       ) : conversations.length === 0 ? (
         <div className="rounded-2xl border border-dashed border-fg/20 bg-surface px-5 py-10 text-center text-sm text-fg/60">
           No conversations yet.
