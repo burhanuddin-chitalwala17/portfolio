@@ -318,7 +318,7 @@ export const introSlides = [
   { eyebrow: "2023", title: "2,000+ DAILY USERS", text: "An internship at ITR Consulting: a high-traffic Laravel + Vue.js app." },
   { eyebrow: "2024", title: "AI ON THE ROAD", text: "CARA, an LLM voice assistant live in the Citroën Basalt X, plus Alexa Skills for 14 car brands." },
   { eyebrow: "Today", title: "AI FOR ADVERTISERS", text: "At InMobi, building Accelerate, where AI agents plan, create and launch ad campaigns." },
-  { eyebrow: "What's next", title: "LET'S BUILD", text: "Always up for a conversation about ambitious products and hard problems." },
+  { eyebrow: "What's next", title: "TO BE CONTINUED…", text: "More challenges to take on, more products to build, more to innovate. The best chapter is still being written." },
 ];
 
 /** Visitor types for the welcome screen. Each one only changes the order of sections. */
