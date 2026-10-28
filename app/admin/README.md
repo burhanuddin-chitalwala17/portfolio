@@ -2,7 +2,7 @@
 
 Password-protected panel at `/admin` with six tabs:
 
-- **Documents**: upload, preview, download and delete files (PDF, Word, images, text; up to 4 MB each), and choose which ones the chat may use. Every upload is scanned for sensitive data first.
+- **Documents**: upload, preview, download and delete files (PDF, Word, images, text; up to 4 MB each) or paste text, choose which ones the chat may use, and pick which PDF visitors get as your resume ("Use as site resume"; the Resume buttons only appear once one is chosen). Every upload is scanned for sensitive data first.
 - **Content**: generate a draft of the homepage from a new resume (or edit by hand), review the changes, preview, publish, and roll back.
 - **Inbox**: questions from visitors that the portfolio chat couldn't answer. Mark them resolved or reopen them.
 - **Chats**: transcripts of recent chat conversations.
@@ -37,7 +37,7 @@ Set these in Vercel → Settings → Environment Variables (or `.env.local` for 
 | `CHAT_HOURLY_LIMIT_PER_VISITOR`, `CHAT_DAILY_LIMIT` | Optional. Default 20 per visitor per hour and 300 per day |
 | `CRON_SECRET` | Optional. Protects the daily keep-alive job |
 
-Without the database and storage variables the panel still works: it shows the resume that ships with the site and explains what to connect.
+Without the database and storage variables the panel still opens and explains what to connect; the site shows its built-in content without a resume link.
 
 ## Database setup
 

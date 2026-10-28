@@ -13,7 +13,7 @@ import Skills from "./sections/Skills";
  * the hero, overlays, the chat and the visitor's choice of section order.
  * Used by the homepage and the admin preview.
  */
-export default function HomePage({ content, chatEnabled = false }) {
+export default function HomePage({ content, chatEnabled = false, hasResume = false }) {
   const sections = {
     about: <About content={content} />,
     experience: <Experience content={content} />,
@@ -22,5 +22,13 @@ export default function HomePage({ content, chatEnabled = false }) {
     skills: <Skills content={content} />,
     beyond: <BeyondWork />,
   };
-  return <PortfolioShell content={content} chatEnabled={chatEnabled} sections={sections} footer={<Contact content={content} />} />;
+  return (
+    <PortfolioShell
+      content={content}
+      chatEnabled={chatEnabled}
+      hasResume={hasResume}
+      sections={sections}
+      footer={<Contact content={content} />}
+    />
+  );
 }

@@ -8,6 +8,7 @@ import { DOCUMENT_TYPES } from "./getDocuments";
 import { extractText } from "./extractText";
 import { scanSensitiveData } from "../privacy/sensitiveData";
 import { profile } from "../../data/siteData";
+import { clearSiteResume } from "./siteResume";
 
 // Vercel rejects request bodies over 4.5 MB, so keep each upload under that.
 export const MAX_UPLOAD_BYTES = 4 * 1024 * 1024;
@@ -96,13 +97,18 @@ export async function uploadDocument(file, { useInChat = false, acknowledgedRisk
   }
 }
 
+/**
+ * Deletes a document's file and record. Returns null if it doesn't exist; otherwise whether it was
+ * the site resume (which is then no longer offered to visitors).
+ * @returns {Promise<null | { wasSiteResume: boolean }>}
+ */
 export async function deleteDocument(id) {
   const db = getDb();
   const [row] = await db.select().from(documents).where(eq(documents.id, id));
-  if (!row) return false;
+  if (!row) return null;
   await deleteObject(row.storageKey);
   await db.delete(documents).where(eq(documents.id, id));
-  return true;
+  return { wasSiteResume: await clearSiteResume({ onlyIf: id }) };
 }
 
 export async function getDocumentFileUrl(id, { download = false } = {}) {

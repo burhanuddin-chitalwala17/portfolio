@@ -1,27 +1,21 @@
 import { NextResponse } from "next/server";
-import { eq } from "drizzle-orm";
-import { getDb } from "../../services/db/client";
-import { documents } from "../../services/db/schema";
-import { getPublishedContent } from "../../services/content/siteContent";
+import { getSiteResume } from "../../services/documents/siteResume";
 import { getObjectUrl } from "../../services/storage/storage";
-
-const BUNDLED_RESUME = "/docs/resume.pdf";
 
 /**
  * GET /api/resume
- * Sends visitors to the resume behind the published content: the uploaded PDF it was
- * generated from, or the resume bundled with the site.
+ * Sends visitors to the resume chosen in Admin → Documents, through a short-lived link to the
+ * private file. Never cached, since each link expires.
  */
-export async function GET(request) {
-  const fallback = NextResponse.redirect(new URL(BUNDLED_RESUME, request.url));
+export async function GET() {
   try {
-    const { sourceDocumentId } = await getPublishedContent();
-    if (!sourceDocumentId) return fallback;
-    const [row] = await getDb().select().from(documents).where(eq(documents.id, sourceDocumentId));
-    if (!row || row.contentType !== "application/pdf") return fallback;
-    return NextResponse.redirect(await getObjectUrl(row.storageKey));
+    const resume = await getSiteResume();
+    if (!resume) return new NextResponse("No resume is published yet.", { status: 404 });
+    const response = NextResponse.redirect(await getObjectUrl(resume.storageKey));
+    response.headers.set("Cache-Control", "no-store");
+    return response;
   } catch (error) {
-    console.error("Resume link failed, using the bundled resume:", error);
-    return fallback;
+    console.error("Serving the resume failed:", error);
+    return new NextResponse("The resume isn't available right now. Please try again shortly.", { status: 503 });
   }
 }

@@ -56,13 +56,15 @@ export default function Navbar({ visitorId, onSwitchVisitor, onOpenResume }) {
         </ul>
 
         <div className="ml-auto flex items-center gap-3">
-          <button
-            type="button"
-            onClick={onOpenResume}
-            className="rounded border border-fg/25 px-3 py-1.5 text-sm text-fg/90 transition hover:border-accent hover:text-accent"
-          >
-            Resume
-          </button>
+          {onOpenResume && (
+            <button
+              type="button"
+              onClick={onOpenResume}
+              className="rounded border border-fg/25 px-3 py-1.5 text-sm text-fg/90 transition hover:border-accent hover:text-accent"
+            >
+              Resume
+            </button>
+          )}
 
           <div className="relative">
             <button

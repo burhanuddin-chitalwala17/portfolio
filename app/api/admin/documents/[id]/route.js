@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import { isAdminRequest } from "../../../../services/auth/requireAdmin";
 import { deleteDocument, setDocumentChatUse, UploadError } from "../../../../services/documents/manageDocuments";
 
@@ -16,6 +17,8 @@ export async function DELETE(_request, { params }) {
     if (!deleted) {
       return NextResponse.json({ success: false, error: "Document not found" }, { status: 404 });
     }
+    // The homepage hides its Resume buttons once the resume is gone.
+    if (deleted.wasSiteResume) revalidatePath("/");
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error("Delete failed:", error);

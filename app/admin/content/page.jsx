@@ -25,7 +25,7 @@ export default async function ContentPage() {
     });
     versions = loadedVersions;
     resumeOptions = documents
-      .filter((document) => document.source === "upload" && document.hasText)
+      .filter((document) => document.hasText)
       .map((document) => ({ id: document.id, name: document.name }));
   } catch (error) {
     console.error("Loading content versions failed:", error);

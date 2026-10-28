@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import DocumentTypeBadge from "./DocumentTypeBadge";
+import Badge from "../../ui/Badge";
 import Button from "../../ui/Button";
 import SearchField from "../../ui/SearchField";
 import { filterByQuery } from "../_lib/search";
@@ -29,7 +30,8 @@ export default function DocumentList({
   emptyStateMessage = "No documents uploaded yet.",
 }) {
   const [searchTerm, setSearchTerm] = useState("");
-  const [deletingId, setDeletingId] = useState(null);
+  // The document an action is running on, and which action: { id, action } or null.
+  const [busy, setBusy] = useState(null);
   const [error, setError] = useState("");
   const router = useRouter();
 
@@ -45,7 +47,7 @@ export default function DocumentList({
       );
       if (!acknowledgedRisks) return;
     }
-    setDeletingId(document.id);
+    setBusy({ id: document.id, action: "chat" });
     setError("");
     try {
       await adminRequest(`/api/admin/documents/${document.id}`, {
@@ -59,14 +61,31 @@ export default function DocumentList({
           `Couldn't update "${document.name}". Please try again.`,
       );
     } finally {
-      setDeletingId(null);
+      setBusy(null);
+    }
+  };
+
+  const handleResumeToggle = async (document) => {
+    setBusy({ id: document.id, action: "resume" });
+    setError("");
+    try {
+      await adminRequest(`/api/admin/documents/${document.id}/site-resume`, {
+        method: document.isSiteResume ? "DELETE" : "PUT",
+      });
+      router.refresh();
+    } catch (resumeError) {
+      setError(resumeError.message);
+    } finally {
+      setBusy(null);
     }
   };
 
   const handleDelete = async (document) => {
-    if (!window.confirm(`Delete "${document.name}"? This can't be undone.`))
-      return;
-    setDeletingId(document.id);
+    const warning = document.isSiteResume
+      ? `"${document.name}" is the resume visitors see. Deleting it removes the Resume buttons from the site until you choose another. Delete it?`
+      : `Delete "${document.name}"? This can't be undone.`;
+    if (!window.confirm(warning)) return;
+    setBusy({ id: document.id, action: "delete" });
     setError("");
     try {
       await adminRequest(`/api/admin/documents/${document.id}`, { method: "DELETE" });
@@ -74,7 +93,7 @@ export default function DocumentList({
     } catch {
       setError(`Couldn't delete "${document.name}". Please try again.`);
     } finally {
-      setDeletingId(null);
+      setBusy(null);
     }
   };
 
@@ -121,6 +140,7 @@ export default function DocumentList({
                     <p className="break-words font-medium text-fg">
                       {document.name}
                     </p>
+                    {document.isSiteResume && <Badge tone="success" className="mt-1">Site resume</Badge>}
                     <SensitiveBadge findings={document.sensitiveFindings} />
                     <p className="mt-0.5 text-xs text-fg/60">
                       {formatFileSize(document.sizeInBytes)} ·{" "}
@@ -131,9 +151,10 @@ export default function DocumentList({
                 </div>
                 <DocumentActions
                   document={document}
-                  deletingId={deletingId}
+                  busy={busy}
                   onDelete={handleDelete}
                   onChatToggle={handleChatToggle}
+                  onResumeToggle={handleResumeToggle}
                 />
               </li>
             ))}
@@ -167,11 +188,7 @@ export default function DocumentList({
                         <span className="font-medium text-fg">
                           {document.name}
                         </span>
-                        <span className="text-xs uppercase tracking-widest text-fg/40">
-                          {document.source === "upload"
-                            ? "Uploaded"
-                            : "Ships with the site"}
-                        </span>
+                        {document.isSiteResume && <Badge tone="success" className="mt-1">Site resume</Badge>}
                         <SensitiveBadge findings={document.sensitiveFindings} />
                       </div>
                     </td>
@@ -187,9 +204,10 @@ export default function DocumentList({
                     <td className="px-3 py-3">
                       <DocumentActions
                         document={document}
-                        deletingId={deletingId}
+                        busy={busy}
                         onDelete={handleDelete}
                         onChatToggle={handleChatToggle}
+                        onResumeToggle={handleResumeToggle}
                       />
                     </td>
                   </tr>
@@ -207,7 +225,7 @@ export default function DocumentList({
   );
 }
 
-function DocumentActions({ document, deletingId, onDelete, onChatToggle }) {
+function DocumentActions({ document, busy, onDelete, onChatToggle, onResumeToggle }) {
   return (
     <div className="flex flex-wrap items-center gap-2">
       <a
@@ -225,11 +243,11 @@ function DocumentActions({ document, deletingId, onDelete, onChatToggle }) {
       >
         Download
       </a>
-      {document.source === "upload" && document.hasText && (
+      {document.hasText && (
         <button
           type="button"
           onClick={() => onChatToggle(document)}
-          disabled={deletingId === document.id}
+          disabled={busy?.id === document.id}
           aria-pressed={document.useInChat}
           className={`rounded-full px-3 py-1 text-xs font-semibold transition disabled:opacity-50 ${
             document.useInChat
@@ -240,16 +258,25 @@ function DocumentActions({ document, deletingId, onDelete, onChatToggle }) {
           {document.useInChat ? "Used by chat ✓" : "Not in chat"}
         </button>
       )}
-      {document.source === "upload" && (
-        <Button
-          variant="danger"
-          size="sm"
-          onClick={() => onDelete(document)}
-          disabled={deletingId === document.id}
+      {document.canBeSiteResume && (
+        <button
+          type="button"
+          onClick={() => onResumeToggle(document)}
+          disabled={busy?.id === document.id}
+          aria-pressed={document.isSiteResume}
+          title={document.isSiteResume ? "Visitors see this PDF when they open your resume" : "Show this PDF to visitors as your resume"}
+          className={`rounded-full px-3 py-1 text-xs font-semibold transition disabled:opacity-50 ${
+            document.isSiteResume
+              ? "bg-success/10 text-success hover:bg-success/20"
+              : "border border-fg/10 text-fg/60 hover:border-fg/40"
+          }`}
         >
-          {deletingId === document.id ? "Deleting…" : "Delete"}
-        </Button>
+          {document.isSiteResume ? "Site resume ✓" : "Use as site resume"}
+        </button>
       )}
+      <Button variant="danger" size="sm" onClick={() => onDelete(document)} disabled={busy?.id === document.id}>
+        {busy?.id === document.id && busy.action === "delete" ? "Deleting…" : "Delete"}
+      </Button>
     </div>
   );
 }

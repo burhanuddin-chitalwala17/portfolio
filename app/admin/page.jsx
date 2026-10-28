@@ -37,7 +37,7 @@ export default async function AdminPage() {
       <SetupNotice databaseReady={databaseReady} storageReady={storageReady} />
 
       <section className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <Tile label="Documents" value={documents.length} helper="Including the resume on the site" />
+        <Tile label="Documents" value={documents.length} helper="Uploaded files and notes" />
         <Tile
           label="Used by chat"
           value={chatDocuments.length}

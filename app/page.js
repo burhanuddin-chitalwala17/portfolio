@@ -1,6 +1,7 @@
 import HomePage from "./_portfolio/HomePage";
 import { getPublishedContent } from "./services/content/siteContent";
 import { isChatConfigured } from "./services/chat/config";
+import { hasSiteResume } from "./services/documents/siteResume";
 import { buildStructuredData, personName, serializeJsonLd } from "./services/seo/structuredData";
 
 // Rebuilt whenever a new version is published (see revalidatePath in the publish route),
@@ -31,11 +32,15 @@ export async function generateMetadata() {
 }
 
 export default async function Home() {
-  const [{ content }, chatEnabled] = await Promise.all([getPublishedContent(), isChatConfigured()]);
+  const [{ content }, chatEnabled, hasResume] = await Promise.all([
+    getPublishedContent(),
+    isChatConfigured(),
+    hasSiteResume(),
+  ]);
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(buildStructuredData(content)) }} />
-      <HomePage content={content} chatEnabled={chatEnabled} />
+      <HomePage content={content} chatEnabled={chatEnabled} hasResume={hasResume} />
     </>
   );
 }

@@ -1,6 +1,6 @@
 /**
- * All portfolio content lives here, taken from public/docs/resume.pdf.
- * Every section of the homepage reads from this file, so update facts here.
+ * The built-in portfolio content: what the homepage shows until a version is published from
+ * Admin → Content. The resume file itself is uploaded in Admin → Documents, not kept in the code.
  */
 
 export const profile = {
@@ -28,7 +28,7 @@ export const profile = {
   },
   location: "Bengaluru, India",
   email: "burhanuddinchital25151@gmail.com",
-  // Serves the resume from the latest published version, or the bundled /docs/resume.pdf.
+  // Serves the PDF chosen as the site resume in Admin → Documents.
   resumePdf: "/api/resume",
   portrait: {
     src: "/img/burhanuddin-portrait.jpg",

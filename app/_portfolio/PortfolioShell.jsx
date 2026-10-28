@@ -62,7 +62,7 @@ function useStoredVisitor() {
  * of sections for the chosen kind of visitor. The sections themselves are Server Components
  * rendered by app/page.js and passed in as `sections` (keyed by id) and `footer`.
  */
-export default function PortfolioShell({ content, chatEnabled = false, sections, footer }) {
+export default function PortfolioShell({ content, chatEnabled = false, hasResume = false, sections, footer }) {
   return (
     <ContentProvider content={content}>
       {/* `m` components with lazily loaded features keep most of Framer Motion out of the first load;
@@ -70,7 +70,7 @@ export default function PortfolioShell({ content, chatEnabled = false, sections,
       <LazyMotion features={loadMotionFeatures} strict>
         <MotionConfig reducedMotion="user">
           <SmoothScrollProvider>
-            <Home content={content} chatEnabled={chatEnabled} sections={sections} footer={footer} />
+            <Home content={content} chatEnabled={chatEnabled} hasResume={hasResume} sections={sections} footer={footer} />
           </SmoothScrollProvider>
         </MotionConfig>
       </LazyMotion>
@@ -78,7 +78,7 @@ export default function PortfolioShell({ content, chatEnabled = false, sections,
   );
 }
 
-function Home({ content, chatEnabled, sections, footer }) {
+function Home({ content, chatEnabled, hasResume, sections, footer }) {
   const storedVisitor = useStoredVisitor();
   const visitorId = storedVisitor ?? visitorTypes[0].id;
   // "auto" plays the intro for first-time visitors and skips them for returning ones.
@@ -122,7 +122,8 @@ function Home({ content, chatEnabled, sections, footer }) {
   const actions = useMemo(
     () => ({
       openIntro: () => setIntroOpen(true),
-      openResume,
+      // Resume buttons only appear when a resume is chosen in Admin → Documents.
+      openResume: hasResume ? openResume : undefined,
       openProject: (id) => setProject(content.projects.find((item) => item.id === id) ?? null),
       openChat: chatEnabled ? () => setChatOpen(true) : undefined,
       replayIntro: () => {
@@ -131,7 +132,7 @@ function Home({ content, chatEnabled, sections, footer }) {
       },
       scrollTo,
     }),
-    [chatEnabled, content.projects, openResume, scrollTo]
+    [chatEnabled, hasResume, content.projects, openResume, scrollTo]
   );
 
   const order = visitorTypes.find((visitor) => visitor.id === visitorId).order;
@@ -142,7 +143,7 @@ function Home({ content, chatEnabled, sections, footer }) {
       <RevealObserver />
 
       <div className="relative min-h-screen overflow-x-clip bg-canvas text-fg" inert={overlayOpen}>
-        <Navbar visitorId={visitorId} onSwitchVisitor={switchVisitor} onOpenResume={openResume} />
+        <Navbar visitorId={visitorId} onSwitchVisitor={switchVisitor} onOpenResume={actions.openResume} />
         <main>
           <Hero />
           <div className="relative z-10 -mt-[8vh] mx-auto max-w-[1600px]">
