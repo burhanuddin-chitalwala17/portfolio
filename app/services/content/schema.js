@@ -81,7 +81,16 @@ export const ContentSchema = z.object({
     lastName: text(30),
     introCard: text(40),
     resumePdf: text(200),
-    portrait: z.object({ src: text(200), alt: text(120), cutout: text(200).optional() }),
+    // Kept for older versions; the site shows the photo from Admin → Content (services/sitePhoto).
+    portrait: z
+      .object({
+        src: text(200),
+        alt: text(120),
+        cutout: text(200).nullish(),
+        cutoutWidth: z.number().int().positive().optional(),
+        cutoutHeight: z.number().int().positive().optional(),
+      })
+      .optional(),
     // Short tags that float beside the portrait on large screens.
     heroTags: z.array(text(32)).max(3).default([]),
   }),

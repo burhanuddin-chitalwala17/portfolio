@@ -10,6 +10,8 @@ import { getDocuments } from "../../services/documents/getDocuments";
 import { isDatabaseConfigured, readWithRetry, describeDatabaseError } from "../../services/db/client";
 import { isStorageConfigured } from "../../services/storage/storage";
 import { resolveAiTask } from "../../services/ai";
+import SitePhotoCard from "../_components/SitePhotoCard";
+import { getSitePhotoSlots } from "../../services/sitePhoto/sitePhoto";
 
 export default async function ContentPage() {
   const databaseReady = isDatabaseConfigured();
@@ -18,12 +20,15 @@ export default async function ContentPage() {
 
   let versions = [];
   let resumeOptions = [];
+  let photoSlots = null;
   let loadError = null;
   try {
-    const [loadedVersions, documents] = await readWithRetry(() => Promise.all([listContentVersions(), getDocuments()]), {
-      label: "Loading content versions",
-    });
+    const [loadedVersions, documents, slots] = await readWithRetry(
+      () => Promise.all([listContentVersions(), getDocuments(), getSitePhotoSlots()]),
+      { label: "Loading content versions" }
+    );
     versions = loadedVersions;
+    photoSlots = slots;
     resumeOptions = documents
       .filter((document) => document.hasText)
       .map((document) => ({ id: document.id, name: document.name }));
@@ -47,6 +52,8 @@ export default async function ContentPage() {
           to generate drafts from a resume. Editing by hand works without it.
         </p>
       )}
+
+      {photoSlots && <SitePhotoCard images={photoSlots} enabled={databaseReady && storageReady} />}
 
       <ContentGenerator
         enabled={databaseReady && storageReady && aiReady}

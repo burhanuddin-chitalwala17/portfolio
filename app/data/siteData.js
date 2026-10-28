@@ -30,11 +30,14 @@ export const profile = {
   email: "burhanuddinchital25151@gmail.com",
   // Serves the PDF chosen as the site resume in Admin → Documents.
   resumePdf: "/api/resume",
+  // The built-in profile photo, used until another is uploaded in Admin → Content.
   portrait: {
-    src: "/img/burhanuddin-portrait.jpg",
+    src: "/img/portrait.jpg",
     alt: "Portrait of Burhanuddin Chitalwala",
-    // Background-removed version for the hero.
-    cutout: "/img/burhanuddin-cutout.webp",
+    // Background-removed version for the hero, and its size (for the layout's aspect ratio).
+    cutout: "/img/portrait-cutout.webp",
+    cutoutWidth: 632,
+    cutoutHeight: 1016,
   },
   heroTags: ["LLM-powered", "Next.js · Java · Python"],
   links: {

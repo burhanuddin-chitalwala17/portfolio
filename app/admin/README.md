@@ -3,7 +3,7 @@
 Password-protected panel at `/admin` with six tabs:
 
 - **Documents**: upload, preview, download and delete files (PDF, Word, images, text; up to 4 MB each) or paste text, choose which ones the chat may use, and pick which PDF visitors get as your resume ("Use as site resume"; the Resume buttons only appear once one is chosen). Every upload is scanned for sensitive data first.
-- **Content**: generate a draft of the homepage from a new resume (or edit by hand), review the changes, preview, publish, and roll back.
+- **Content**: change the profile photo and the hero cut-out (uploads are resized and stripped of location and camera details; "Use built-in" returns to the images in `public/img`), generate a draft of the homepage from a new resume (or edit by hand), review the changes, preview, publish, and roll back.
 - **Inbox**: questions from visitors that the portfolio chat couldn't answer. Mark them resolved or reopen them.
 - **Chats**: transcripts of recent chat conversations.
 - **Sources**: what the chat can look at beyond the site and documents. **GitHub**: pick repositories (public, or private with a token) that the chat explores live with read-only tools (overview and README, file listing, reading files, code search). **LeetCode**: live public stats. **LinkedIn**: import your LinkedIn data export; it's read in the browser and only public profile sections are kept, then saved as a scanned document.

@@ -3,6 +3,7 @@ import HomePage from "../../_portfolio/HomePage";
 import { isAdminRequest } from "../../services/auth/requireAdmin";
 import { getContentVersion, validateContent } from "../../services/content/siteContent";
 import { hasSiteResume } from "../../services/documents/siteResume";
+import { getSitePortrait, withSitePortrait } from "../../services/sitePhoto/sitePhoto";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Preview", robots: { index: false, follow: false } };
@@ -21,7 +22,10 @@ export default async function PreviewPage({ params }) {
       <p className="fixed inset-x-0 top-0 z-[400] bg-accent px-4 py-1.5 text-center text-xs font-semibold text-on-accent">
         Preview of a {version.status === "published" ? "live" : version.status} version. Visitors can&apos;t see this page.
       </p>
-      <HomePage content={validated.content} hasResume={await hasSiteResume()} />
+      <HomePage
+        content={withSitePortrait(validated.content, await getSitePortrait())}
+        hasResume={await hasSiteResume()}
+      />
     </>
   );
 }

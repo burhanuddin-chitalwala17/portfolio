@@ -20,8 +20,13 @@ const CHIP_SLOTS = [
  * The first screen. Its entrance runs in CSS (animate-rise), so the server-rendered hero is
  * visible and animating before JavaScript loads; only the scroll parallax and the effects need it.
  */
+// Fades a rectangular photo's edges into the page so it doesn't read as a box.
+const PHOTO_EDGE_FADE =
+  "[-webkit-mask-image:radial-gradient(75%_70%_at_50%_40%,black_55%,transparent)] [mask-image:radial-gradient(75%_70%_at_50%_40%,black_55%,transparent)]";
+
 export default function Hero() {
   const { experience, profile, projects } = useContent();
+  const cutout = profile.portrait.cutout;
   const { openIntro, scrollTo } = usePortfolioActions();
   const current = experience.find((job) => job.current) ?? experience[experience.length - 1];
   const ref = useRef(null);
@@ -46,17 +51,29 @@ export default function Hero() {
 
       <Particles className="pointer-events-none absolute inset-0 h-full w-full" />
 
-      {/* Background-removed portrait. On phones and tablets it sits above the copy and fades out
-          downwards; on laptops and up it stands on the bottom edge to the right of the copy. */}
-      <div className="absolute left-1/2 top-[8%] aspect-[947/921] h-[44%] -translate-x-1/2 [-webkit-mask-image:linear-gradient(to_bottom,black_55%,transparent)] [mask-image:linear-gradient(to_bottom,black_55%,transparent)] lg:bottom-0 lg:left-auto lg:right-[3%] lg:top-auto lg:h-[66%] lg:translate-x-0 lg:[-webkit-mask-image:none] lg:[mask-image:none] xl:h-[86%]">
-        <m.div className="relative h-full w-full" style={{ y: portraitY }}>
+      {/* The portrait. A background-removed cut-out stands in the scene; a plain photo (uploaded
+          without a cut-out) is shown with its edges faded into the page instead. On phones and
+          tablets it sits above the copy and fades out downwards; on laptops and up it stands on
+          the bottom edge to the right of the copy. */}
+      <div
+        className="absolute left-1/2 top-[8%] h-[44%] -translate-x-1/2 [-webkit-mask-image:linear-gradient(to_bottom,black_55%,transparent)] [mask-image:linear-gradient(to_bottom,black_55%,transparent)] lg:bottom-0 lg:left-auto lg:right-[3%] lg:top-auto lg:h-[66%] lg:translate-x-0 lg:[-webkit-mask-image:none] lg:[mask-image:none] xl:h-[86%]"
+        style={{ aspectRatio: cutout ? `${profile.portrait.cutoutWidth} / ${profile.portrait.cutoutHeight}` : "4 / 5" }}
+      >
+        <m.div
+          className={`relative h-full w-full ${cutout ? "" : PHOTO_EDGE_FADE}`}
+          style={{ y: portraitY }}
+        >
           <Image
-            src={profile.portrait.cutout ?? profile.portrait.src}
+            src={cutout ?? profile.portrait.src}
             alt={profile.portrait.alt}
             fill
             priority
-            sizes="(min-width: 768px) 55vw, 100vw"
-            className="object-contain object-bottom drop-shadow-[0_24px_60px_rgb(var(--color-scrim)/0.6)]"
+            sizes="(min-width: 1024px) 45vw, 80vw"
+            className={
+              cutout
+                ? "object-contain object-bottom drop-shadow-[0_24px_60px_rgb(var(--color-scrim)/0.6)]"
+                : "object-cover object-top"
+            }
           />
         </m.div>
       </div>

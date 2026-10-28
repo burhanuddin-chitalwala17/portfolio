@@ -78,6 +78,12 @@ export async function deleteObject(key) {
   await send(new DeleteObjectCommand({ Bucket: process.env.S3_BUCKET, Key: key }));
 }
 
+/** Reads a stored file. Returns its bytes as a web stream, with its content type and size. */
+export async function getObject(key) {
+  const result = await send(new GetObjectCommand({ Bucket: process.env.S3_BUCKET, Key: key }));
+  return { body: result.Body.transformToWebStream(), contentType: result.ContentType, size: result.ContentLength };
+}
+
 /** A short-lived link to a stored file. `downloadName` makes the browser save it instead of showing it. */
 export async function getObjectUrl(key, { downloadName } = {}) {
   const command = new GetObjectCommand({
