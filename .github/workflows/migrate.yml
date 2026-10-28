@@ -1,0 +1,47 @@
+name: Database migrations
+
+# Applies new migrations in drizzle/ to the production database whenever they reach main.
+# Needs the repository secret MIGRATION_DATABASE_URL (Settings → Secrets and variables → Actions):
+# Supabase's *Session pooler* connection string (port 5432 on the pooler host). GitHub's runners
+# have no IPv6, so the direct db.<ref>.supabase.co address won't connect.
+on:
+  push:
+    branches: [main]
+    paths: ["drizzle/**"]
+  workflow_dispatch:
+
+# Never run two migrations against the database at once.
+concurrency:
+  group: database-migrations
+  cancel-in-progress: false
+
+jobs:
+  migrate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check for the database secret
+        id: secret
+        env:
+          MIGRATION_DATABASE_URL: ${{ secrets.MIGRATION_DATABASE_URL }}
+        run: |
+          if [ -z "$MIGRATION_DATABASE_URL" ]; then
+            echo "::warning::MIGRATION_DATABASE_URL isn't set, so no migrations were applied. Run the new files in supabase/migrations/ by hand instead."
+            echo "present=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "present=true" >> "$GITHUB_OUTPUT"
+          fi
+      - uses: actions/checkout@v4
+        if: steps.secret.outputs.present == 'true'
+      - uses: actions/setup-node@v4
+        if: steps.secret.outputs.present == 'true'
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+        if: steps.secret.outputs.present == 'true'
+      - name: Apply migrations
+        if: steps.secret.outputs.present == 'true'
+        env:
+          DATABASE_URL: ${{ secrets.MIGRATION_DATABASE_URL }}
+        run: npm run db:migrate

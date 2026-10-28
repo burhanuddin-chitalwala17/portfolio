@@ -1,6 +1,6 @@
 import LoadError from "../_components/LoadError";
 import SetupNotice from "../_components/SetupNotice";
-import { isDatabaseConfigured, withTimeout, describeDatabaseError } from "../../services/db/client";
+import { isDatabaseConfigured, readWithRetry, describeDatabaseError } from "../../services/db/client";
 import { isStorageConfigured } from "../../services/storage/storage";
 import { getTranscripts, listConversations } from "../../services/chat/history";
 
@@ -11,8 +11,9 @@ export default async function ChatsPage() {
   let messagesByConversation = new Map();
   let loadError = null;
   try {
-    conversations = await withTimeout(listConversations(50), 8000);
-    const messages = await withTimeout(getTranscripts(conversations.map((conversation) => conversation.id)), 8000);
+    conversations = await readWithRetry(() => listConversations(50), { label: "Loading chats" });
+    const ids = conversations.map((conversation) => conversation.id);
+    const messages = await readWithRetry(() => getTranscripts(ids), { label: "Loading transcripts" });
     for (const message of messages) {
       const list = messagesByConversation.get(message.conversationId) ?? [];
       list.push(message);

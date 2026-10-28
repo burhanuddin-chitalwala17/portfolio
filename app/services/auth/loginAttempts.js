@@ -1,11 +1,11 @@
 import "server-only";
 import { and, count, eq, gte } from "drizzle-orm";
-import { getDb, withTimeout } from "../db/client";
+import { getDb, readWithRetry, withTimeout } from "../db/client";
 import { adminLoginAttempts } from "../db/schema";
 
 const WINDOW_MS = 15 * 60 * 1000;
 const MAX_FAILURES = 5;
-const QUERY_TIMEOUT_MS = 4000;
+const QUERY_TIMEOUT_MS = 3000;
 
 /**
  * True when this visitor has failed to sign in too many times recently. Without a database
@@ -13,22 +13,21 @@ const QUERY_TIMEOUT_MS = 4000;
  * still works (the password is checked either way) rather than locking the owner out.
  */
 export async function isLockedOut(ipHash) {
-  const db = getDb();
-  if (!db) return false;
+  if (!getDb()) return false;
   try {
-    const [row] = await withTimeout(
-      db
-        .select({ value: count() })
-        .from(adminLoginAttempts)
-        .where(
-          and(
-            eq(adminLoginAttempts.ipHash, ipHash),
-            eq(adminLoginAttempts.succeeded, false),
-            gte(adminLoginAttempts.attemptedAt, new Date(Date.now() - WINDOW_MS))
-          )
-        ),
-      QUERY_TIMEOUT_MS,
-      "Login lockout check"
+    const [row] = await readWithRetry(
+      () =>
+        getDb()
+          .select({ value: count() })
+          .from(adminLoginAttempts)
+          .where(
+            and(
+              eq(adminLoginAttempts.ipHash, ipHash),
+              eq(adminLoginAttempts.succeeded, false),
+              gte(adminLoginAttempts.attemptedAt, new Date(Date.now() - WINDOW_MS))
+            )
+          ),
+      { timeoutMs: QUERY_TIMEOUT_MS, label: "Login lockout check" }
     );
     return row.value >= MAX_FAILURES;
   } catch (error) {

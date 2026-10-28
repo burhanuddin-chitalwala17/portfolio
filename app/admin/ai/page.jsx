@@ -2,7 +2,7 @@ import LoadError from "../_components/LoadError";
 import ModelSettings from "../_components/ModelSettings";
 import ProviderKeys from "../_components/ProviderKeys";
 import SetupNotice from "../_components/SetupNotice";
-import { isDatabaseConfigured, withTimeout, describeDatabaseError } from "../../services/db/client";
+import { isDatabaseConfigured, readWithRetry, describeDatabaseError } from "../../services/db/client";
 import { isStorageConfigured } from "../../services/storage/storage";
 import { getAiSettings, getKeyStatuses } from "../../services/ai/settings";
 import { canStoreSecrets } from "../../services/ai/secrets";
@@ -13,7 +13,9 @@ export default async function AiSettingsPage() {
   let keyStatuses = null;
   let loadError = null;
   try {
-    [settings, keyStatuses] = await withTimeout(Promise.all([getAiSettings(), getKeyStatuses()]), 8000);
+    [settings, keyStatuses] = await readWithRetry(() => Promise.all([getAiSettings(), getKeyStatuses()]), {
+      label: "Loading AI settings",
+    });
   } catch (error) {
     console.error("Loading AI settings failed:", error);
     loadError = { message: "AI settings couldn't be loaded. Check the database connection.", detail: describeDatabaseError(error) };

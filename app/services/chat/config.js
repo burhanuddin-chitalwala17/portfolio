@@ -1,5 +1,5 @@
 import "server-only";
-import { isDatabaseConfigured, withTimeout } from "../db/client";
+import { isDatabaseConfigured, readWithRetry } from "../db/client";
 import { resolveAiTask } from "../ai/settings";
 
 /**
@@ -9,7 +9,7 @@ import { resolveAiTask } from "../ai/settings";
 export async function isChatConfigured() {
   if (!isDatabaseConfigured()) return false;
   try {
-    return Boolean(await withTimeout(resolveAiTask("chat"), 5000, "Loading AI settings"));
+    return Boolean(await readWithRetry(() => resolveAiTask("chat"), { timeoutMs: 4000, label: "Loading AI settings" }));
   } catch (error) {
     console.error("Checking the chat configuration failed:", error);
     return false;

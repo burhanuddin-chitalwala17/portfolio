@@ -4,7 +4,7 @@ import FileUploadPanel from "./_components/FileUploadPanel";
 import SetupNotice from "./_components/SetupNotice";
 import Tile from "../ui/Tile";
 import { getDocuments } from "../services/documents/getDocuments";
-import { isDatabaseConfigured, withTimeout, describeDatabaseError } from "../services/db/client";
+import { isDatabaseConfigured, readWithRetry, describeDatabaseError } from "../services/db/client";
 import { isStorageConfigured } from "../services/storage/storage";
 import { countConversationsThisWeek } from "../services/chat/history";
 import { listVisitorQueries, QUERY_STATUSES } from "../services/queries/visitorQueries";
@@ -17,9 +17,9 @@ export default async function AdminPage() {
   let openQuestions = 0;
   let loadError = null;
   try {
-    const [loadedDocuments, conversations, queries] = await withTimeout(
-      Promise.all([getDocuments(), countConversationsThisWeek(), listVisitorQueries()]),
-      8000
+    const [loadedDocuments, conversations, queries] = await readWithRetry(
+      () => Promise.all([getDocuments(), countConversationsThisWeek(), listVisitorQueries()]),
+      { label: "Loading documents" }
     );
     documents = loadedDocuments;
     chatsThisWeek = conversations;

@@ -1,7 +1,7 @@
 import LoadError from "../_components/LoadError";
 import QueryList from "../_components/QueryList";
 import SetupNotice from "../_components/SetupNotice";
-import { isDatabaseConfigured, withTimeout, describeDatabaseError } from "../../services/db/client";
+import { isDatabaseConfigured, readWithRetry, describeDatabaseError } from "../../services/db/client";
 import { isStorageConfigured } from "../../services/storage/storage";
 import { listVisitorQueries } from "../../services/queries/visitorQueries";
 
@@ -9,7 +9,7 @@ export default async function InboxPage() {
   let queries = [];
   let loadError = null;
   try {
-    queries = await withTimeout(listVisitorQueries(), 8000);
+    queries = await readWithRetry(() => listVisitorQueries(), { label: "Loading the inbox" });
   } catch (error) {
     console.error("Loading the inbox failed:", error);
     loadError = { message: "The inbox couldn't be loaded. Check the database connection.", detail: describeDatabaseError(error) };

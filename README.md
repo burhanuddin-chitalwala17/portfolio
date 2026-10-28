@@ -54,4 +54,6 @@ app/
     privacy/                 ← sensitive-data scan and redaction
     db/, storage/            ← Drizzle schema + client, S3 client
 drizzle/                     ← SQL migrations
+supabase/                    ← the same migrations as paste-ready SQL (npm run db:setup-sql)
+.github/workflows/           ← CI (lint, generated SQL check, build) and migrations on main
 ```

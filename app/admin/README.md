@@ -41,7 +41,9 @@ The schema lives in `app/services/db/schema.js` and the SQL migrations in `drizz
 
 On a new Supabase project, paste `supabase/setup.sql` into the SQL Editor and run it once. It creates every table, turns on row-level security, and records the migrations as applied.
 
-When a later version adds migrations, run only the new files from `supabase/migrations/`, in number order, the same way. Alternatively, from a terminal:
+New migrations are applied automatically by the **Database migrations** GitHub Action when they reach `main`, once the repository secret `MIGRATION_DATABASE_URL` is set (GitHub → Settings → Secrets and variables → Actions). Use Supabase's **Session pooler** connection string (port 5432 on the pooler host): GitHub's runners have no IPv6, so the direct `db.<ref>.supabase.co` address won't connect. The action can also be run by hand from the Actions tab.
+
+Without that secret, run only the new files from `supabase/migrations/`, in number order, in the SQL Editor. Or, from a terminal:
 
 ```bash
 DATABASE_URL="postgres://…" npm run db:migrate

@@ -7,7 +7,7 @@ import SetupNotice from "../_components/SetupNotice";
 import { diffContent } from "../../services/content/diff";
 import { CONTENT_STATUSES, getPublishedContent, listContentVersions } from "../../services/content/siteContent";
 import { getDocuments } from "../../services/documents/getDocuments";
-import { isDatabaseConfigured, withTimeout, describeDatabaseError } from "../../services/db/client";
+import { isDatabaseConfigured, readWithRetry, describeDatabaseError } from "../../services/db/client";
 import { isStorageConfigured } from "../../services/storage/storage";
 import { resolveAiTask } from "../../services/ai";
 
@@ -20,7 +20,9 @@ export default async function ContentPage() {
   let resumeOptions = [];
   let loadError = null;
   try {
-    const [loadedVersions, documents] = await withTimeout(Promise.all([listContentVersions(), getDocuments()]), 8000);
+    const [loadedVersions, documents] = await readWithRetry(() => Promise.all([listContentVersions(), getDocuments()]), {
+      label: "Loading content versions",
+    });
     versions = loadedVersions;
     resumeOptions = documents
       .filter((document) => document.source === "upload" && document.hasText)

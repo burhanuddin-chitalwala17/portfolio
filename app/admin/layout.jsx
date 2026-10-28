@@ -4,7 +4,7 @@ import AdminLockScreen from "./_components/AdminLockScreen";
 import LogoutButton from "./_components/LogoutButton";
 import AdminNav from "./_components/AdminNav";
 import { listVisitorQueries, QUERY_STATUSES } from "../services/queries/visitorQueries";
-import { withTimeout } from "../services/db/client";
+import { readWithRetry } from "../services/db/client";
 
 const COOKIE_NAME = ADMIN_COOKIE_NAME;
 
@@ -20,7 +20,7 @@ export default async function AdminLayout({ children }) {
     return <AdminLockScreen />;
   }
 
-  const openQueries = (await withTimeout(listVisitorQueries(), 5000).catch(() => [])).filter(
+  const openQueries = (await readWithRetry(() => listVisitorQueries(), { timeoutMs: 4000 }).catch(() => [])).filter(
     (query) => query.status === QUERY_STATUSES.OPEN
   ).length;
 
