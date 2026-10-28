@@ -69,7 +69,7 @@ export async function generateContentFromResume({ resumeText, currentContent }) 
 
   const client = new Anthropic();
   const { profile, ...sections } = currentContent;
-  const { firstName, lastName, introCard, resumePdf, portrait, ...editableProfile } = profile;
+  const { firstName, lastName, introCard, resumePdf, portrait, heroTags, ...editableProfile } = profile;
   const editable = {
     profile: editableProfile,
     ...sections,
@@ -103,7 +103,7 @@ export async function generateContentFromResume({ resumeText, currentContent }) 
       const content = withProjectArt(
         {
           ...generatedSections,
-          profile: { ...generatedProfile, firstName, lastName, introCard, resumePdf, portrait },
+          profile: { ...generatedProfile, firstName, lastName, introCard, resumePdf, portrait, heroTags },
         },
         currentContent
       );

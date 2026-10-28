@@ -7,6 +7,13 @@ import { useContent } from "../content";
 import { EASE, Magnetic, Particles } from "../fx";
 import { PlayIcon } from "./Opening";
 
+// Where the floating tags sit, in order; profile.heroTags allows up to three.
+const CHIP_SLOTS = [
+  { className: "right-[12%] top-[24%]", delay: 0 },
+  { className: "right-[30%] top-[58%]", delay: 1.2 },
+  { className: "right-[8%] top-[70%]", delay: 2.4 },
+];
+
 export default function Hero({ onPlayIntro, onMoreInfo }) {
   const { experience, profile, projects } = useContent();
   const current = experience.find((job) => job.current) ?? experience[experience.length - 1];
@@ -154,22 +161,18 @@ export default function Hero({ onPlayIntro, onMoreInfo }) {
 
       {/* floating chips, desktop only */}
       <div className="pointer-events-none absolute inset-0 z-10 hidden xl:block" aria-hidden>
-        {[
-          { text: "$786M+ projected", className: "right-[12%] top-[24%]", delay: 0 },
-          { text: "LLM-powered", className: "right-[30%] top-[58%]", delay: 1.2 },
-          { text: "Next.js · Java · Python", className: "right-[8%] top-[70%]", delay: 2.4 },
-        ].map((chip) => (
+        {profile.heroTags.slice(0, CHIP_SLOTS.length).map((tag, index) => (
           <motion.span
-            key={chip.text}
-            className={`absolute rounded-full border border-fg/15 bg-scrim/40 px-4 py-2 text-sm text-fg/80 backdrop-blur-md ${chip.className}`}
+            key={tag}
+            className={`absolute rounded-full border border-fg/15 bg-scrim/40 px-4 py-2 text-sm text-fg/80 backdrop-blur-md ${CHIP_SLOTS[index].className}`}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1, y: [0, -12, 0] }}
             transition={{
-              opacity: { duration: 1, delay: 1.2 + chip.delay / 3 },
-              y: { duration: 6, repeat: Infinity, ease: "easeInOut", delay: chip.delay },
+              opacity: { duration: 1, delay: 1.2 + CHIP_SLOTS[index].delay / 3 },
+              y: { duration: 6, repeat: Infinity, ease: "easeInOut", delay: CHIP_SLOTS[index].delay },
             }}
           >
-            {chip.text}
+            {tag}
           </motion.span>
         ))}
       </div>

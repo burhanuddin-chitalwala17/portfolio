@@ -3,7 +3,7 @@ import FileUploadPanel from "./_components/FileUploadPanel";
 import SetupNotice from "./_components/SetupNotice";
 import Tile from "../ui/Tile";
 import { getDocuments } from "../services/documents/getDocuments";
-import { isDatabaseConfigured } from "../services/db/client";
+import { isDatabaseConfigured, withTimeout } from "../services/db/client";
 import { isStorageConfigured } from "../services/storage/storage";
 import { countConversationsThisWeek } from "../services/chat/history";
 import { listVisitorQueries, QUERY_STATUSES } from "../services/queries/visitorQueries";
@@ -16,11 +16,10 @@ export default async function AdminPage() {
   let openQuestions = 0;
   let loadError = null;
   try {
-    const [loadedDocuments, conversations, queries] = await Promise.all([
-      getDocuments(),
-      countConversationsThisWeek(),
-      listVisitorQueries(),
-    ]);
+    const [loadedDocuments, conversations, queries] = await withTimeout(
+      Promise.all([getDocuments(), countConversationsThisWeek(), listVisitorQueries()]),
+      8000
+    );
     documents = loadedDocuments;
     chatsThisWeek = conversations;
     openQuestions = queries.filter((query) => query.status === QUERY_STATUSES.OPEN).length;

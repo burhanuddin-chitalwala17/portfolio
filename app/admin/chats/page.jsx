@@ -1,5 +1,5 @@
 import SetupNotice from "../_components/SetupNotice";
-import { isDatabaseConfigured } from "../../services/db/client";
+import { isDatabaseConfigured, withTimeout } from "../../services/db/client";
 import { isStorageConfigured } from "../../services/storage/storage";
 import { getTranscripts, listConversations } from "../../services/chat/history";
 
@@ -10,8 +10,8 @@ export default async function ChatsPage() {
   let messagesByConversation = new Map();
   let loadError = null;
   try {
-    conversations = await listConversations(50);
-    const messages = await getTranscripts(conversations.map((conversation) => conversation.id));
+    conversations = await withTimeout(listConversations(50), 8000);
+    const messages = await withTimeout(getTranscripts(conversations.map((conversation) => conversation.id)), 8000);
     for (const message of messages) {
       const list = messagesByConversation.get(message.conversationId) ?? [];
       list.push(message);

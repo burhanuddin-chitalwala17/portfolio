@@ -5,7 +5,7 @@ import SetupNotice from "../_components/SetupNotice";
 import { diffContent } from "../../services/content/diff";
 import { CONTENT_STATUSES, getPublishedContent, listContentVersions } from "../../services/content/siteContent";
 import { getDocuments } from "../../services/documents/getDocuments";
-import { isDatabaseConfigured } from "../../services/db/client";
+import { isDatabaseConfigured, withTimeout } from "../../services/db/client";
 import { isStorageConfigured } from "../../services/storage/storage";
 
 export default async function ContentPage() {
@@ -17,8 +17,9 @@ export default async function ContentPage() {
   let resumeOptions = [];
   let loadError = null;
   try {
-    versions = await listContentVersions();
-    resumeOptions = (await getDocuments())
+    const [loadedVersions, documents] = await withTimeout(Promise.all([listContentVersions(), getDocuments()]), 8000);
+    versions = loadedVersions;
+    resumeOptions = documents
       .filter((document) => document.source === "upload" && document.hasText)
       .map((document) => ({ id: document.id, name: document.name }));
   } catch (error) {

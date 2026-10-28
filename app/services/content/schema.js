@@ -82,6 +82,8 @@ export const ContentSchema = z.object({
     introCard: text(40),
     resumePdf: text(200),
     portrait: z.object({ src: text(200), alt: text(120), cutout: text(200).optional() }),
+    // Short tags that float beside the portrait on large screens.
+    heroTags: z.array(text(32)).max(3).default([]),
   }),
   projects: z.array(z.object({ ...projectFields, art: artSchema.optional() })).min(1).max(12),
   ...sharedSections,

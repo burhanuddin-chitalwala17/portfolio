@@ -1,6 +1,6 @@
 import "server-only";
 import { and, desc, eq, ne } from "drizzle-orm";
-import { getDb } from "../db/client";
+import { getDb, withTimeout } from "../db/client";
 import { siteContent } from "../db/schema";
 import { defaultContent } from "../../data/siteData";
 import { ContentSchema, describeIssues } from "./schema";
@@ -53,12 +53,15 @@ export async function getPublishedContent() {
   const db = getDb();
   if (!db) return { content: fallbackContent, versionId: null };
   try {
-    const [row] = await db
-      .select()
-      .from(siteContent)
-      .where(eq(siteContent.status, CONTENT_STATUSES.PUBLISHED))
-      .orderBy(desc(siteContent.publishedAt))
-      .limit(1);
+    const [row] = await withTimeout(
+      db
+        .select()
+        .from(siteContent)
+        .where(eq(siteContent.status, CONTENT_STATUSES.PUBLISHED))
+        .orderBy(desc(siteContent.publishedAt))
+        .limit(1),
+      5000
+    );
     if (!row) return { content: fallbackContent, versionId: null };
     const validated = validateContent(row.content);
     if (!validated.ok) {

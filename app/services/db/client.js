@@ -14,7 +14,8 @@ export function getDb() {
   if (!url) return null;
   if (!database) {
     // prepare: false keeps it compatible with transaction-mode poolers such as Supabase's on port 6543.
-    const client = postgres(url, { prepare: false, max: 1 });
+    // The timeouts stop a slow or unreachable database from holding a request open.
+    const client = postgres(url, { prepare: false, max: 1, connect_timeout: 10, idle_timeout: 20 });
     database = drizzle(client, { schema });
   }
   return database;
@@ -22,4 +23,16 @@ export function getDb() {
 
 export function isDatabaseConfigured() {
   return Boolean(process.env.DATABASE_URL);
+}
+
+/**
+ * Rejects if `promise` hasn't settled within `ms`, so a stuck query fails fast instead of
+ * leaving a page loading until the database cancels it.
+ */
+export function withTimeout(promise, ms, label = "Database query") {
+  let timer;
+  const timeout = new Promise((_, reject) => {
+    timer = setTimeout(() => reject(new Error(`${label} timed out after ${ms} ms`)), ms);
+  });
+  return Promise.race([promise, timeout]).finally(() => clearTimeout(timer));
 }

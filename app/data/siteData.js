@@ -36,6 +36,7 @@ export const profile = {
     // Background-removed version for the hero.
     cutout: "/img/burhanuddin-cutout.webp",
   },
+  heroTags: ["LLM-powered", "Next.js · Java · Python"],
   links: {
     linkedin: "https://www.linkedin.com/in/cburhanuddin/",
     github: "https://github.com/burhanuddin-chitalwala17",
