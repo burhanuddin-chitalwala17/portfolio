@@ -268,8 +268,6 @@ export const impactNumbers = [
   { value: "$786M+", label: "projected subscription revenue for the in-car AI assistant", source: "Stellantis" },
   { value: "14", label: "car brands with voice-controlled Alexa Skills", source: "Stellantis" },
   { value: "27%", label: "more engagement on Echo Show interfaces", source: "Stellantis" },
-  { value: "20h", label: "of engineering time saved every sprint", source: "Stellantis" },
-  { value: "15+", label: "developer platforms aggregated into AI reports", source: "CredDev" },
   { value: "2,000+", label: "daily users on a high-traffic web app", source: "ITR Consulting" },
   { value: "555", label: "LeetCode problems solved, including 296 medium and 54 hard", source: "LeetCode" },
   { value: "3+", label: "years shipping AI-powered products", source: "Career" },
