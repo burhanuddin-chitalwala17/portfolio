@@ -90,7 +90,7 @@ export const experience = [
       },
       {
         title: "Refactoring for scale",
-        text: "Refactored core systems for MVVM compliance and reusability, saving 20 engineering hours per sprint.",
+        text: "Refactored core systems for MVVM compliance and reusability.",
       },
     ],
   },
@@ -148,10 +148,10 @@ export const projects = [
     subtitle: "AI credibility reports",
     kind: "Live · Personal",
     art: { from: "#0f172a", via: "#2563eb", to: "#5eead4" },
-    logline: "An AI platform that pulls a developer's data from GitHub, LeetCode, LinkedIn and 15+ other platforms and turns it into credibility reports.",
+    logline: "An AI platform that pulls a developer's data from GitHub, LeetCode, LinkedIn and other platforms and turns it into credibility reports.",
     points: [
       "Full-stack AI platform built with Next.js 16, FastAPI and PostgreSQL.",
-      "Aggregates developer data from GitHub, LeetCode, LinkedIn and 15+ platforms to generate credibility reports with OpenAI GPT.",
+      "Aggregates developer data from GitHub, LeetCode, LinkedIn and other platforms to generate credibility reports with OpenAI GPT.",
       "Backed by a 7-point anti-hallucination guardrail system.",
       "Real-time 12-state chat agent, progressive OAuth authentication and graceful degradation across multi-platform data fetchers, following SOLID principles.",
     ],
@@ -257,7 +257,7 @@ export const projects = [
     points: [
       "Developed Alexa Skills for voice-controlled vehicle operations across 14 brands.",
       "Built responsive multimodal UIs for Echo Show devices, increasing engagement by 27%.",
-      "Refactored for MVVM compliance and reuse, saving 20 engineering hours per sprint.",
+      "Refactored for MVVM compliance and reuse.",
     ],
     tech: ["Alexa Skills", "Echo Show", "Voice UX", "MVVM"],
   },
