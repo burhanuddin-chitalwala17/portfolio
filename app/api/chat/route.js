@@ -3,7 +3,7 @@ import { z } from "zod";
 import { AiProviderError, getAdapter, resolveAiTask } from "../../services/ai";
 import { CHAT_LIMITS } from "../../services/chat/config";
 import { buildKnowledge } from "../../services/chat/knowledge";
-import { personaInstructions } from "../../services/chat/persona";
+import { personaInstructions, scopeReminder } from "../../services/chat/persona";
 import {
   appendMessage,
   countVisitorMessages,
@@ -100,7 +100,8 @@ export async function POST(request) {
   const knowledgeText = `Knowledge you may answer from:\n\n${knowledge.text}`;
   // Provider-neutral conversation: {role: "user" | "assistant", content}, plus, within a reply,
   // assistant turns with toolCalls and {role: "tool", results} turns. Adapters convert it.
-  const messages = [...history, { role: "user", content: parsed.data.message }];
+  // The reminder only goes to the model; the transcript keeps the visitor's own words.
+  const messages = [...history, { role: "user", content: `${parsed.data.message}\n\n${scopeReminder(knowledge.content)}` }];
   const encoder = new TextEncoder();
 
   const body = new ReadableStream({
