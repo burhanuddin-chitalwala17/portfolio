@@ -1,9 +1,10 @@
 # Admin Dashboard
 
-Password-protected panel at `/admin` with six tabs:
+Password-protected panel at `/admin` with seven tabs:
 
 - **Documents**: upload, preview, download and delete files (PDF, Word, images, text; up to 4 MB each) or paste text, choose which ones the chat may use, and pick which PDF visitors get as your resume ("Use as site resume"; the Resume buttons only appear once one is chosen). Every upload is scanned for sensitive data first.
 - **Content**: change the profile photo and the hero cut-out (uploads are resized and stripped of location and camera details; "Use built-in" returns to the images in `public/img`), generate a draft of the homepage from a new resume (or edit by hand), review the changes, preview, publish, and roll back.
+- **Chat profile**: what the portfolio chat knows about you beyond the site's bullets, and its primary source: your pitch and strengths, a case study per project (problem, your role, architecture, key decisions, impact, what you'd do differently), skills with levels and evidence, and your answers to common questions. An AI interview asks what's missing and writes your answers up for review; skills and answers can be drafted from what the chat already knows. Saving makes it live in the chat at once. Below it, **Test the chat** keeps a set of questions with the points a good answer must include, runs them through the real chat (nothing reaches the inbox) and grades each reply with the drafts model, so you can see whether a profile, prompt or model change helped.
 - **Inbox**: questions from visitors that the portfolio chat couldn't answer. Mark them resolved or reopen them.
 - **Chats**: transcripts of recent chat conversations.
 - **Sources**: what the chat can look at beyond the site and documents. **GitHub**: pick repositories (public, or private with a token) that the chat explores live with read-only tools (overview and README, file listing, reading files, code search). **LeetCode**: live public stats. **LinkedIn**: import your LinkedIn data export; it's read in the browser and only public profile sections are kept, then saved as a scanned document.
@@ -11,7 +12,7 @@ Password-protected panel at `/admin` with six tabs:
 
 ## Privacy model
 
-- Anything the chat can read, a visitor can get it to repeat. Treat chat documents as public.
+- Anything the chat can read, a visitor can get it to repeat. Treat chat documents and the chat profile as public. The chat profile refuses to save anything that looks like a phone number, ID, bank detail or secret.
 - Uploads are scanned for ID numbers (Aadhaar, PAN, passport), bank/card details, passwords and API keys, phone numbers, home addresses, dates of birth and salary. A file with findings is stored privately and kept out of the chat unless you explicitly confirm the risk.
 - Even for confirmed files, every detected value is replaced with a placeholder before the text reaches the model. The scan is pattern-based, so review files yourself too.
 - Files are never public: storage is private, links expire after five minutes and require the admin session.

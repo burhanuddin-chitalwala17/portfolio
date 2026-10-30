@@ -61,7 +61,7 @@ async function* readEvents(response) {
   if (buffer.trim()) yield JSON.parse(buffer);
 }
 
-export default function Chat({ open, onOpenChange, hidden }) {
+export default function Chat({ open, onOpenChange, hidden, audience }) {
   const { profile } = useContent();
   // The saved chat only shows once the panel is opened, so reading storage here can't cause a hydration mismatch.
   const [chat, setChat] = useState(() => (typeof window === "undefined" ? { conversationId: null, messages: [] } : readSavedChat()));
@@ -121,7 +121,7 @@ export default function Chat({ open, onOpenChange, hidden }) {
       const response = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ conversationId: chat.conversationId, message }),
+        body: JSON.stringify({ conversationId: chat.conversationId, message, audience }),
       });
       if (!response.ok) {
         const data = await response.json().catch(() => ({}));

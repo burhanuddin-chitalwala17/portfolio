@@ -1,27 +1,25 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
-import { AiProviderError, getAdapter, resolveAiTask } from "../../services/ai";
+import { AiProviderError, resolveAiTask } from "../../services/ai";
 import { CHAT_LIMITS } from "../../services/chat/config";
 import { buildKnowledge } from "../../services/chat/knowledge";
-import { personaInstructions, scopeReminder } from "../../services/chat/persona";
 import {
   appendMessage,
   countVisitorMessages,
   getOrCreateConversation,
   loadHistory,
 } from "../../services/chat/history";
-import { createChatTools } from "../../services/chat/tools";
+import { generateReply } from "../../services/chat/respond";
 import { resolveGithubAccess } from "../../services/github/settings";
 import { clientIpHash } from "../../services/request/clientIp";
 
 export const maxDuration = 60;
 
-// Enough rounds to read a README, list a folder and open a couple of files before answering.
-const MAX_TOOL_ROUNDS = 6;
-
 const RequestSchema = z.object({
   conversationId: z.string().max(64).nullish(),
   message: z.string().trim().min(1).max(CHAT_LIMITS.maxMessageCharacters),
+  // The visitor type picked on the site, so answers lead with what that visitor cares about.
+  audience: z.enum(["recruiter", "engineer", "browsing"]).nullish().catch(null),
 });
 
 function jsonError(message, status) {
@@ -40,7 +38,7 @@ function friendlyError(error) {
 
 /**
  * POST /api/chat
- * Body: { conversationId?: string, message: string }
+ * Body: { conversationId?: string, message: string, audience?: "recruiter" | "engineer" | "browsing" }
  * Streams newline-delimited JSON events: {type: "conversation", id}, {type: "text", text},
  * {type: "status", text} (e.g. while reading GitHub), {type: "query_saved"}, {type: "error", message},
  * {type: "done"}.
@@ -95,60 +93,25 @@ export async function POST(request) {
     return jsonError("The chat isn't available right now.", 503);
   }
 
-  const adapter = getAdapter(provider);
-  const instructions = personaInstructions(knowledge.content);
-  const knowledgeText = `Knowledge you may answer from:\n\n${knowledge.text}`;
-  // Provider-neutral conversation: {role: "user" | "assistant", content}, plus, within a reply,
-  // assistant turns with toolCalls and {role: "tool", results} turns. Adapters convert it.
-  // The reminder only goes to the model; the transcript keeps the visitor's own words.
-  const messages = [...history, { role: "user", content: `${parsed.data.message}\n\n${scopeReminder(knowledge.content)}` }];
   const encoder = new TextEncoder();
 
   const body = new ReadableStream({
     async start(controller) {
       const send = (event) => controller.enqueue(encoder.encode(`${JSON.stringify(event)}\n`));
       send({ type: "conversation", id: conversation.id });
-
-      let reply = "";
-      const tools = createChatTools({
-        github,
-        visitorMessage: parsed.data.message,
-        onStatus: (text) => send({ type: "status", text }),
-        onQuerySaved: () => send({ type: "query_saved" }),
-      });
       try {
-        for (let round = 0; round < MAX_TOOL_ROUNDS; round += 1) {
-          let turnText = "";
-          const turn = await adapter.streamChat({
-            instructions,
-            knowledge: knowledgeText,
-            messages,
-            tools: tools.definitions,
-            onText: (delta) => {
-              turnText += delta;
-              reply += delta;
-              send({ type: "text", text: delta });
-            },
-          });
-
-          if (turn.stopReason === "refusal") {
-            const note = "I can't help with that one. Feel free to ask me about my work, projects or experience.";
-            reply += reply ? `\n\n${note}` : note;
-            send({ type: "text", text: reply === note ? note : `\n\n${note}` });
-            break;
-          }
-          if (turn.stopReason !== "tool_calls" || !turn.toolCalls.length) break;
-
-          messages.push({ role: "assistant", content: turnText, toolCalls: turn.toolCalls, raw: turn.raw });
-          const results = [];
-          for (const toolCall of turn.toolCalls) results.push(await tools.run(toolCall));
-          messages.push({ role: "tool", results });
-          if (reply && !reply.endsWith("\n")) {
-            reply += "\n\n";
-            send({ type: "text", text: "\n\n" });
-          }
-        }
-        if (reply.trim()) await appendMessage(conversation.id, "assistant", reply.trim());
+        const { reply } = await generateReply({
+          provider,
+          knowledge,
+          history,
+          message: parsed.data.message,
+          audience: parsed.data.audience,
+          github,
+          onText: (text) => send({ type: "text", text }),
+          onStatus: (text) => send({ type: "status", text }),
+          onQuerySaved: () => send({ type: "query_saved" }),
+        });
+        if (reply) await appendMessage(conversation.id, "assistant", reply);
         send({ type: "done" });
       } catch (error) {
         console.error("Chat failed:", error);

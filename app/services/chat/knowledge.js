@@ -9,6 +9,7 @@ import { listRepositories } from "../github/api";
 import { getGithubSettings, getGithubToken } from "../github/settings";
 import { getLeetcodeProfile } from "../leetcode/api";
 import { getLeetcodeSettings } from "../leetcode/settings";
+import { chatProfileToText, getChatProfile, isChatProfileEmpty } from "../chatProfile/profile";
 
 /** Renders the published site content as plain text for the model. */
 export function contentToText(content) {
@@ -133,19 +134,22 @@ export async function buildKnowledge() {
         .orderBy(asc(documents.uploadedAt))
     : [];
 
-  const [github, leetcode] = await Promise.all([
+  const [github, leetcode, profile] = await Promise.all([
     optional(() => githubSection(content), "GitHub"),
     optional(leetcodeSection, "LeetCode"),
+    db ? optional(getChatProfile, "The chat profile") : null,
   ]);
 
   const allowed = [content.profile.email];
   const sections = [
     `<portfolio_content>\n${contentToText(content)}\n</portfolio_content>`,
+    profile && !isChatProfileEmpty(profile) &&
+      `<my_profile>\nWritten by me for this chat: the primary source for how I describe my work. Prefer it over the documents below when they differ.\n\n${redactSensitiveData(chatProfileToText(profile, content), { allowed })}\n</my_profile>`,
     github,
     leetcode,
     ...allowedDocuments.map(
       (document) =>
-        `<document name="${document.name.replace(/"/g, "'")}">\n${redactSensitiveData(document.text, { allowed })}\n</document>`
+        `<supporting_document name="${document.name.replace(/"/g, "'")}">\n${redactSensitiveData(document.text, { allowed })}\n</supporting_document>`
     ),
   ];
   const text = sections.filter(Boolean).join("\n\n");

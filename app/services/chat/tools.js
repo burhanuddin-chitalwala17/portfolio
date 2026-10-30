@@ -86,10 +86,11 @@ const shortName = (fullName) => fullName.split("/")[1];
 /**
  * Tools for one chat reply.
  * @param {{ github: {repos: string[], token: string | null} | null, visitorMessage: string,
- *           onStatus: (text: string) => void, onQuerySaved: () => void }} context
+ *           onStatus: (text: string) => void, onQuerySaved: () => void, dryRun?: boolean }} context
+ *        dryRun answers raise_query as if it worked without filing anything (used by the admin test set).
  * @returns {{ definitions: object[], run: (call: {id, name, input}) => Promise<{toolCallId, content, isError?}> }}
  */
-export function createChatTools({ github, visitorMessage, onStatus, onQuerySaved }) {
+export function createChatTools({ github, visitorMessage, onStatus, onQuerySaved, dryRun = false }) {
   let queriesSaved = 0;
   const definitions = [raiseQuery, ...(github ? githubTools(github.repos, { canSearch: Boolean(github.token) }) : [])];
 
@@ -126,7 +127,7 @@ export function createChatTools({ github, visitorMessage, onStatus, onQuerySaved
       return { content: "Invalid input. A question of 3-500 characters is required, and the email must be valid.", isError: true };
     }
     if (queriesSaved >= MAX_QUERIES_PER_REPLY) return { content: "Already passed on." };
-    await createVisitorQuery({
+    if (!dryRun) await createVisitorQuery({
       question: parsed.data.question,
       visitorName: parsed.data.visitor_name || null,
       visitorEmail: parsed.data.visitor_email || null,

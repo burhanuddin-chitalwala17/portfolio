@@ -162,7 +162,7 @@ function Home({ content, chatEnabled, hasResume, sections, footer }) {
       <AnimatePresence>{resumeOpen && <ResumeModal key="resume" onClose={closeResume} />}</AnimatePresence>
 
       {chatEnabled && (
-        <Chat open={chatOpen} onOpenChange={setChatOpen} hidden={overlayOpen} />
+        <Chat open={chatOpen} onOpenChange={setChatOpen} hidden={overlayOpen} audience={storedVisitor} />
       )}
 
       <AnimatePresence>
