@@ -88,13 +88,13 @@ export async function streamChat({ apiKey, model, instructions, knowledge, messa
  * Asks for a JSON object matching `schema`. Returns the raw text; the caller parses and validates.
  * Uses structured output where the model supports it.
  */
-export async function generateJson({ apiKey, model, instructions, messages, schema }) {
+export async function generateJson({ apiKey, model, instructions, messages, schema, effort = "high", maxTokens = 32000 }) {
   try {
-    const extras = requestExtras(model, "high");
+    const extras = requestExtras(model, effort);
     if (extras.output_config) extras.output_config.format = { type: "json_schema", schema };
     const stream = client(apiKey).beta.messages.stream({
       model,
-      max_tokens: 32000,
+      max_tokens: maxTokens,
       ...extras,
       system: extras.output_config
         ? instructions

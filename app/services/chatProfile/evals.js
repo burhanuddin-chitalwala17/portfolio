@@ -4,8 +4,7 @@ import { z } from "zod";
 import { resolveAiTask } from "../ai";
 import { generateStructured } from "../ai/structured";
 import { buildKnowledge } from "../chat/knowledge";
-import { generateReply } from "../chat/respond";
-import { resolveGithubAccess } from "../github/settings";
+import { generateReply, loadChatContext } from "../chat/respond";
 import { readSetting, writeSetting } from "../settings/store";
 import { EvalCaseSchema, EvalSetSchema } from "./schema";
 
@@ -113,14 +112,16 @@ export async function runEvalCase(caseId) {
   if (!chatProvider) throw new EvalError("Choose a provider and model for the chat in Admin → AI first.");
   if (!graderProvider) throw new EvalError("Choose a provider and model for content drafts in Admin → AI; it grades the replies.");
 
-  const [knowledge, github] = await Promise.all([buildKnowledge(), resolveGithubAccess().catch(() => null)]);
-  const { reply, toolsUsed } = await generateReply({
+  // Loaded up front because the grader needs the knowledge even when the chat declines the question.
+  const context = await loadChatContext();
+  const { knowledge } = context;
+  const { reply, toolsUsed, offTopic } = await generateReply({
     provider: chatProvider,
-    knowledge,
+    content: knowledge.content,
     history: [],
     message: testCase.question,
     audience: testCase.audience,
-    github,
+    loadContext: async () => context,
     dryRun: true,
   });
 
@@ -132,6 +133,7 @@ export async function runEvalCase(caseId) {
       `<question>\n${testCase.question}\n</question>`,
       `<expected_points>\n${testCase.mustInclude.map((point) => `- ${point}`).join("\n")}\n</expected_points>`,
       `<reply>\n${reply || "(empty reply)"}\n</reply>`,
+      offTopic && "<note>The chat's first step classified this question as off-topic and declined it without answering.</note>",
       toolsUsed.length && `<tools_used>${[...new Set(toolsUsed)].join(", ")}</tools_used>`,
       `<knowledge>\n${knowledge.text}\n</knowledge>`,
     ]
@@ -143,7 +145,7 @@ export async function runEvalCase(caseId) {
   const result = {
     ...grade,
     reply: reply.slice(0, 8000),
-    toolsUsed: [...new Set(toolsUsed)],
+    toolsUsed: offTopic ? ["declined as off-topic"] : [...new Set(toolsUsed)],
     model: `${chatProvider.provider ?? ""} ${chatProvider.model}`.trim().slice(0, 120),
     ranAt: new Date().toISOString(),
   };

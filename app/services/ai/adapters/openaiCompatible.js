@@ -115,11 +115,11 @@ export async function streamChat({ apiKey, baseURL, model, instructions, knowled
  * Asks for a JSON object matching `schema`. Tries JSON-schema output first, then plain JSON mode
  * for providers or models without it. Returns the raw text; the caller parses and validates.
  */
-export async function generateJson({ apiKey, baseURL, model, instructions, messages, schema }) {
+export async function generateJson({ apiKey, baseURL, model, instructions, messages, schema, maxTokens = 32000 }) {
   const openai = client({ apiKey, baseURL });
   const request = {
     model,
-    ...tokenLimit(baseURL, 32000),
+    ...tokenLimit(baseURL, maxTokens),
     messages: [
       { role: "system", content: `${instructions}\n\nReply with only a JSON object matching this JSON schema:\n${JSON.stringify(schema)}` },
       ...messages,

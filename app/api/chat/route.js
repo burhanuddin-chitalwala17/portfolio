@@ -2,15 +2,14 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { AiProviderError, resolveAiTask } from "../../services/ai";
 import { CHAT_LIMITS } from "../../services/chat/config";
-import { buildKnowledge } from "../../services/chat/knowledge";
 import {
   appendMessage,
-  countVisitorMessages,
+  visitorMessageWindow,
   getOrCreateConversation,
   loadHistory,
 } from "../../services/chat/history";
-import { generateReply } from "../../services/chat/respond";
-import { resolveGithubAccess } from "../../services/github/settings";
+import { generateReply, loadChatContext } from "../../services/chat/respond";
+import { getPublishedContent } from "../../services/content/siteContent";
 import { clientIpHash } from "../../services/request/clientIp";
 
 export const maxDuration = 60;
@@ -36,12 +35,42 @@ function friendlyError(error) {
   return "Something went wrong. Please try again.";
 }
 
+const HOUR = 60 * 60 * 1000;
+const DAY = 24 * HOUR;
+
+/**
+ * The response when this visitor (per hour) or the whole site (per day) has used up its messages,
+ * or null. `limit.retryAt` is when the oldest message leaves the window, so the chat can say when
+ * to come back instead of showing an error.
+ */
+async function checkLimits(ipHash) {
+  const now = Date.now();
+  const [visitor, site] = await Promise.all([
+    visitorMessageWindow({ since: new Date(now - HOUR), ipHash }),
+    visitorMessageWindow({ since: new Date(now - DAY) }),
+  ]);
+  const reached = [
+    visitor.count >= CHAT_LIMITS.messagesPerVisitorPerHour && { scope: "visitor", oldest: visitor.oldest, window: HOUR },
+    site.count >= CHAT_LIMITS.messagesPerDay && { scope: "site", oldest: site.oldest, window: DAY },
+  ]
+    .filter(Boolean)
+    .map(({ scope, oldest, window }) => ({ scope, retryAt: new Date((oldest?.getTime() ?? now) + window + 60_000) }))
+    .sort((a, b) => b.retryAt - a.retryAt);
+  if (!reached.length) return null;
+  const { scope, retryAt } = reached[0];
+  const error =
+    scope === "visitor"
+      ? "You've reached the chat limit for now. Please try again later, or email me directly."
+      : "The chat has reached its daily limit. Please try again later, or email me directly.";
+  return NextResponse.json({ error, limit: { scope, retryAt: retryAt.toISOString() } }, { status: 429 });
+}
+
 /**
  * POST /api/chat
  * Body: { conversationId?: string, message: string, audience?: "recruiter" | "engineer" | "browsing" }
  * Streams newline-delimited JSON events: {type: "conversation", id}, {type: "text", text},
  * {type: "status", text} (e.g. while reading GitHub), {type: "query_saved"}, {type: "error", message},
- * {type: "done"}.
+ * {type: "done"}. A used-up limit answers 429 with { error, limit: { scope: "visitor" | "site", retryAt } }.
  */
 export async function POST(request) {
   let provider;
@@ -56,18 +85,9 @@ export async function POST(request) {
   if (!parsed.success) return jsonError("Please send a message of up to 1,000 characters.", 400);
 
   const ipHash = clientIpHash(request);
-  const now = Date.now();
   try {
-    const [fromVisitor, overall] = await Promise.all([
-      countVisitorMessages({ since: new Date(now - 60 * 60 * 1000), ipHash }),
-      countVisitorMessages({ since: new Date(now - 24 * 60 * 60 * 1000) }),
-    ]);
-    if (fromVisitor >= CHAT_LIMITS.messagesPerVisitorPerHour) {
-      return jsonError("You've reached the chat limit for now. Please try again in an hour, or email me directly.", 429);
-    }
-    if (overall >= CHAT_LIMITS.messagesPerDay) {
-      return jsonError("The chat has reached its daily limit. Please email me directly instead.", 429);
-    }
+    const limited = await checkLimits(ipHash);
+    if (limited) return limited;
   } catch (error) {
     console.error("Chat rate-limit check failed:", error);
     return jsonError("The chat isn't available right now.", 503);
@@ -75,19 +95,14 @@ export async function POST(request) {
 
   let conversation;
   let history;
-  let knowledge;
-  let github;
+  let content;
   try {
     conversation = await getOrCreateConversation(parsed.data.conversationId, ipHash);
-    history = await loadHistory(conversation.id, CHAT_LIMITS.maxHistoryMessages - 1);
-    await appendMessage(conversation.id, "user", parsed.data.message);
-    [knowledge, github] = await Promise.all([
-      buildKnowledge(),
-      resolveGithubAccess().catch((error) => {
-        console.error("Loading GitHub settings failed, chatting without it:", error);
-        return null;
-      }),
+    [history, { content }] = await Promise.all([
+      loadHistory(conversation.id, CHAT_LIMITS.maxHistoryMessages - 1),
+      getPublishedContent(),
     ]);
+    await appendMessage(conversation.id, "user", parsed.data.message);
   } catch (error) {
     console.error("Chat setup failed:", error);
     return jsonError("The chat isn't available right now.", 503);
@@ -102,11 +117,11 @@ export async function POST(request) {
       try {
         const { reply } = await generateReply({
           provider,
-          knowledge,
+          content,
           history,
           message: parsed.data.message,
           audience: parsed.data.audience,
-          github,
+          loadContext: loadChatContext,
           onText: (text) => send({ type: "text", text }),
           onStatus: (text) => send({ type: "status", text }),
           onQuerySaved: () => send({ type: "query_saved" }),

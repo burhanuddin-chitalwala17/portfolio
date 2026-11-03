@@ -61,6 +61,26 @@ async function* readEvents(response) {
   if (buffer.trim()) yield JSON.parse(buffer);
 }
 
+/** "after 4:35 PM", "tomorrow after 9:10 AM" or "after Friday 9:10 AM", in the visitor's own clock. */
+function describeRetry(retryAt) {
+  const date = new Date(retryAt);
+  const now = new Date();
+  const tomorrow = new Date(now);
+  tomorrow.setDate(now.getDate() + 1);
+  const time = new Intl.DateTimeFormat(undefined, { hour: "numeric", minute: "2-digit" }).format(date);
+  if (date.toDateString() === now.toDateString()) return `after ${time}`;
+  if (date.toDateString() === tomorrow.toDateString()) return `tomorrow after ${time}`;
+  return `after ${new Intl.DateTimeFormat(undefined, { weekday: "long" }).format(date)} ${time}`;
+}
+
+function limitMessage({ scope, retryAt }, email) {
+  const when = describeRetry(retryAt);
+  const fallback = email ? ` If it can't wait, email me at ${email}.` : "";
+  return scope === "site"
+    ? `The chat has reached its limit for today, so I'm taking a break. You can ask me again ${when}.${fallback}`
+    : `That's all the questions I can take from you for now. You can ask me again ${when}.${fallback}`;
+}
+
 const URL_PATTERN = /(https?:\/\/[^\s<>"']+[^\s<>"'.,;:!?)\]])/g;
 
 /** Plain reply text with its web addresses (such as web search sources) as links. */
@@ -83,6 +103,8 @@ export default function Chat({ open, onOpenChange, hidden, audience }) {
   const [draft, setDraft] = useState("");
   const [pending, setPending] = useState(false);
   const [error, setError] = useState("");
+  // Re-renders the panel when a limit runs out, so the input unlocks on its own.
+  const [now, setNow] = useState(() => Date.now());
   const listRef = useRef(null);
   const inputRef = useRef(null);
   const isPhone = useSyncExternalStore(
@@ -106,6 +128,14 @@ export default function Chat({ open, onOpenChange, hidden, audience }) {
     listRef.current?.scrollTo({ top: listRef.current.scrollHeight });
   }, [chat.messages, pending]);
 
+  const blockedUntil = chat.blockedUntil ? new Date(chat.blockedUntil.retryAt).getTime() : 0;
+  const blocked = blockedUntil > now;
+  useEffect(() => {
+    if (!blocked) return undefined;
+    const timer = setTimeout(() => setNow(Date.now()), Math.min(blockedUntil - Date.now() + 500, 2 ** 31 - 1));
+    return () => clearTimeout(timer);
+  }, [blocked, blockedUntil]);
+
   const update = (updater) => {
     setChat((current) => {
       const next = updater(current);
@@ -116,7 +146,7 @@ export default function Chat({ open, onOpenChange, hidden, audience }) {
 
   const send = async (text) => {
     const message = text.trim();
-    if (!message || pending) return;
+    if (!message || pending || blocked) return;
     setDraft("");
     setError("");
     setPending(true);
@@ -140,6 +170,16 @@ export default function Chat({ open, onOpenChange, hidden, audience }) {
       });
       if (!response.ok) {
         const data = await response.json().catch(() => ({}));
+        if (response.status === 429 && data.limit?.retryAt) {
+          // Not an error: answer in the chat and lock the input until the limit runs out.
+          setNow(Date.now());
+          update((current) => ({
+            ...current,
+            blockedUntil: data.limit,
+            messages: [...current.messages.slice(0, -1), { role: "assistant", text: limitMessage(data.limit, profile.email) }],
+          }));
+          return;
+        }
         throw new Error(data.error || "The chat isn't available right now.");
       }
       for await (const event of readEvents(response)) {
@@ -169,7 +209,7 @@ export default function Chat({ open, onOpenChange, hidden, audience }) {
   };
 
   const startOver = () => {
-    update(() => ({ conversationId: null, messages: [] }));
+    update((current) => ({ conversationId: null, messages: [], blockedUntil: current.blockedUntil }));
     setError("");
     inputRef.current?.focus();
   };
@@ -258,7 +298,8 @@ export default function Chat({ open, onOpenChange, hidden, audience }) {
                         <button
                           type="button"
                           onClick={() => send(suggestion)}
-                          className="rounded-full border border-fg/15 px-3 py-2 text-left text-sm text-fg/85 transition hover:border-accent hover:text-accent"
+                          disabled={blocked}
+                          className="rounded-full border border-fg/15 px-3 py-2 text-left text-sm text-fg/85 transition hover:border-accent hover:text-accent disabled:pointer-events-none disabled:opacity-50"
                         >
                           {suggestion}
                         </button>
@@ -343,12 +384,13 @@ export default function Chat({ open, onOpenChange, hidden, audience }) {
                   }
                 }}
                 rows={1}
-                placeholder="Ask about my work…"
-                className="max-h-32 min-h-[44px] flex-1 resize-none rounded-xl border border-fg/15 bg-canvas px-3 py-2.5 text-input text-fg placeholder:text-fg/40 focus:border-accent focus:outline-none"
+                disabled={blocked}
+                placeholder={blocked ? `You can ask again ${describeRetry(chat.blockedUntil.retryAt)}` : "Ask about my work…"}
+                className="max-h-32 min-h-[44px] flex-1 resize-none rounded-xl border border-fg/15 bg-canvas px-3 py-2.5 text-input text-fg placeholder:text-fg/40 focus:border-accent focus:outline-none disabled:cursor-not-allowed disabled:placeholder:text-fg/60"
               />
               <button
                 type="submit"
-                disabled={pending || !draft.trim()}
+                disabled={pending || blocked || !draft.trim()}
                 aria-label="Send"
                 className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-accent text-on-accent transition hover:bg-fg disabled:cursor-not-allowed disabled:opacity-40"
               >

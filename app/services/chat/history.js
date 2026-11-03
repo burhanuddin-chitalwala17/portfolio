@@ -1,5 +1,5 @@
 import "server-only";
-import { and, asc, count, desc, eq, gte, sql } from "drizzle-orm";
+import { and, asc, count, desc, eq, gte, min, sql } from "drizzle-orm";
 import { getDb } from "../db/client";
 import { chatConversations, chatMessages } from "../db/schema";
 
@@ -39,16 +39,20 @@ export async function appendMessage(conversationId, role, content) {
     .where(eq(chatConversations.id, conversationId));
 }
 
-/** Visitor messages sent since `since`, optionally only from one visitor. */
-export async function countVisitorMessages({ since, ipHash }) {
+/**
+ * Visitor messages sent since `since` (optionally from one visitor), and when the oldest of them
+ * was sent, which is when the window frees up again.
+ * @returns {Promise<{ count: number, oldest: Date | null }>}
+ */
+export async function visitorMessageWindow({ since, ipHash }) {
   const conditions = [eq(chatMessages.role, "user"), gte(chatMessages.createdAt, since)];
   if (ipHash) conditions.push(eq(chatConversations.ipHash, ipHash));
   const [row] = await getDb()
-    .select({ value: count() })
+    .select({ count: count(), oldest: min(chatMessages.createdAt) })
     .from(chatMessages)
     .innerJoin(chatConversations, eq(chatMessages.conversationId, chatConversations.id))
     .where(and(...conditions));
-  return row.value;
+  return { count: row.count, oldest: row.oldest ? new Date(row.oldest) : null };
 }
 
 export async function listConversations(limit = 50) {

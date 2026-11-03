@@ -12,7 +12,7 @@ const ADAPTER_MODULES = {
  * The adapter for a resolved provider (see resolveAiTask). Every adapter exposes the same
  * functions, all taking the resolved `{apiKey, baseURL, model}` plus their own arguments:
  * - streamChat({instructions, knowledge, messages, tools, onText}) → {stopReason, toolCalls, text?, raw?}
- * - generateJson({instructions, messages, schema}) → {stopReason, text, raw?}
+ * - generateJson({instructions, messages, schema, effort?, maxTokens?}) → {stopReason, text, raw?}
  * - listModels() → string[]
  * stopReason is one of "end", "tool_calls", "refusal", "max_tokens".
  */
