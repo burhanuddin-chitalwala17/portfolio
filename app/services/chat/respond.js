@@ -1,6 +1,7 @@
 import "server-only";
 import { getAdapter } from "../ai";
-import { personaInstructions, turnNote } from "./persona";
+import { searchWeb, supportsWebSearch } from "../ai/webSearch";
+import { personaInstructions, turnNote, webDisclaimer } from "./persona";
 import { createChatTools } from "./tools";
 
 // Enough rounds to read a README, list a folder and open a couple of files before answering.
@@ -37,7 +38,15 @@ export async function generateReply({
   // assistant turns with toolCalls and {role: "tool", results} turns. Adapters convert it.
   // The note only goes to the model; the transcript keeps the visitor's own words.
   const messages = [...history, { role: "user", content: `${message}\n\n${turnNote(knowledge.content, audience)}` }];
-  const tools = createChatTools({ github, visitorMessage: message, onStatus, onQuerySaved, dryRun });
+  const canSearch = provider.webSearch !== false && supportsWebSearch(provider);
+  const tools = createChatTools({
+    github,
+    visitorMessage: message,
+    onStatus,
+    onQuerySaved,
+    dryRun,
+    searchWeb: canSearch ? (query) => searchWeb(provider, query) : null,
+  });
   const toolsUsed = [];
 
   let reply = "";
@@ -73,5 +82,8 @@ export async function generateReply({
     messages.push({ role: "tool", results });
     if (reply && !reply.endsWith("\n")) emit("\n\n");
   }
+  // Added here rather than left to the model, so an answer that used the web is always labelled.
+  const webSources = tools.webSources();
+  if (webSources && reply.trim()) emit(`${reply.endsWith("\n") ? "\n" : "\n\n"}${webDisclaimer(knowledge.content, webSources)}`);
   return { reply: reply.trim(), toolsUsed };
 }

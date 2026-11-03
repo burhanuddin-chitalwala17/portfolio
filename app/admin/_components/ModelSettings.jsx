@@ -5,10 +5,13 @@ import { useRouter } from "next/navigation";
 import Button from "../../ui/Button";
 import Card from "../../ui/Card";
 import StatusMessage from "../../ui/StatusMessage";
-import { Field, Select, TextInput } from "../../ui/fields";
+import { Checkbox, Field, Select, TextInput } from "../../ui/fields";
 import { useAsyncAction } from "../../ui/hooks/useAsyncAction";
 import { AI_PURPOSES, PROVIDERS, PROVIDER_IDS } from "../../services/ai/providers";
 import { adminRequest } from "../_lib/adminRequest";
+
+// Providers whose own API can search the web (see services/ai/webSearch.js).
+const WEB_SEARCH_PROVIDERS = new Set(["openai", "anthropic"]);
 
 function PurposeSettings({ purpose, choice, customBaseUrl, keyStatuses, models, onChange, onModelsLoaded, enabled }) {
   const { label, help } = AI_PURPOSES[purpose];
@@ -143,6 +146,21 @@ export default function ModelSettings({ initialSettings, keyStatuses, enabled })
           />
         </Field>
       )}
+      <div className="flex flex-col gap-1 rounded-xl border border-fg/10 p-4">
+        <Checkbox
+          label="Let the chat search the web when your own information doesn't cover a question"
+          checked={settings.webSearch}
+          onChange={(event) => update({ webSearch: event.target.checked })}
+          disabled={!enabled}
+        />
+        <p className="pl-6 text-xs text-fg/60">
+          Only for questions about you and your work, never general help. Answers that use the web end with a note saying
+          so, plus the sources. Uses the chat&apos;s own provider, and a search costs more than a normal reply.
+        </p>
+        {settings.webSearch && !WEB_SEARCH_PROVIDERS.has(settings.chat.provider) && (
+          <p className="pl-6 text-xs text-warning">Web search works with OpenAI or Anthropic as the chat provider; with this provider the chat won&apos;t search.</p>
+        )}
+      </div>
       <div className="flex flex-wrap items-center gap-3">
         <Button type="submit" size="lg" disabled={!enabled || busy !== null}>
           {busy === "save" ? "Saving…" : "Save"}

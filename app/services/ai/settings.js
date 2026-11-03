@@ -15,6 +15,8 @@ export const AiSettingsSchema = z.object({
   content: modelChoice,
   /** Base URL for the "custom" provider, e.g. https://api.together.xyz/v1 */
   customBaseUrl: z.union([z.literal(""), z.string().trim().url().max(300).startsWith("https://")]).default(""),
+  /** Lets the chat search the web when Burhanuddin's own information doesn't cover a question. */
+  webSearch: z.boolean().default(true),
 });
 
 /** What applies before anything is saved in the admin panel: Claude, with the env model overrides. */
@@ -22,6 +24,7 @@ const DEFAULT_SETTINGS = Object.freeze({
   chat: { provider: "anthropic", model: process.env.ANTHROPIC_CHAT_MODEL || PROVIDERS.anthropic.suggestedModel },
   content: { provider: "anthropic", model: process.env.ANTHROPIC_CONTENT_MODEL || PROVIDERS.anthropic.suggestedModel },
   customBaseUrl: process.env.CUSTOM_LLM_BASE_URL || "",
+  webSearch: true,
 });
 
 export function getAiSettings() {
@@ -66,5 +69,5 @@ export async function resolveAiTask(purpose) {
   const { provider, model } = settings[purpose];
   if (!model) return null;
   const resolved = await resolveProvider(provider, { customBaseUrl: settings.customBaseUrl });
-  return resolved ? { ...resolved, model } : null;
+  return resolved ? { ...resolved, model, webSearch: settings.webSearch } : null;
 }

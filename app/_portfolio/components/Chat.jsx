@@ -61,6 +61,21 @@ async function* readEvents(response) {
   if (buffer.trim()) yield JSON.parse(buffer);
 }
 
+const URL_PATTERN = /(https?:\/\/[^\s<>"']+[^\s<>"'.,;:!?)\]])/g;
+
+/** Plain reply text with its web addresses (such as web search sources) as links. */
+function LinkedText({ text }) {
+  return text.split(URL_PATTERN).map((part, index) =>
+    index % 2 === 1 ? (
+      <a key={index} href={part} target="_blank" rel="noopener noreferrer nofollow" className="break-all underline underline-offset-2">
+        {part}
+      </a>
+    ) : (
+      part
+    )
+  );
+}
+
 export default function Chat({ open, onOpenChange, hidden, audience }) {
   const { profile } = useContent();
   // The saved chat only shows once the panel is opened, so reading storage here can't cause a hydration mismatch.
@@ -263,7 +278,7 @@ export default function Chat({ open, onOpenChange, hidden, audience }) {
                               : "rounded-bl-sm bg-fg/[0.07] text-fg/90"
                           }`}
                         >
-                          {message.text.trim()}
+                          {message.role === "user" ? message.text.trim() : <LinkedText text={message.text.trim()} />}
                         </p>
                       )}
                       {pending && index === chat.messages.length - 1 && message.status && (

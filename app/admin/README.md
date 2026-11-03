@@ -8,7 +8,7 @@ Password-protected panel at `/admin` with seven tabs:
 - **Inbox**: questions from visitors that the portfolio chat couldn't answer. Mark them resolved or reopen them.
 - **Chats**: transcripts of recent chat conversations.
 - **Sources**: what the chat can look at beyond the site and documents. **GitHub**: pick repositories (public, or private with a token) that the chat explores live with read-only tools (overview and README, file listing, reading files, code search). **LeetCode**: live public stats. **LinkedIn**: import your LinkedIn data export; it's read in the browser and only public profile sections are kept, then saved as a scanned document.
-- **AI**: choose the provider and model for the chat and for resume drafts (Anthropic, OpenAI, Google Gemini, OpenRouter, Groq, or any OpenAI-compatible URL), load the models a key can use, test them, and add, replace or remove API keys. Changes apply immediately.
+- **AI**: choose the provider and model for the chat and for resume drafts (Anthropic, OpenAI, Google Gemini, OpenRouter, Groq, or any OpenAI-compatible URL), load the models a key can use, test them, and add, replace or remove API keys. Also turns the chat's web search on or off: when your own information doesn't answer a question about you or your work, the chat can search the web once (with OpenAI or Anthropic as the chat provider) and its answer then ends with a note that it came from the web, plus the sources. Changes apply immediately.
 
 ## Privacy model
 

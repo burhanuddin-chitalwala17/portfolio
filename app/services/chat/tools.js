@@ -2,6 +2,8 @@ import "server-only";
 import { z } from "zod";
 import { GithubError, getRepositoryOverview, listFiles, readFile, searchCode } from "../github/api";
 import { createVisitorQuery } from "../queries/visitorQueries";
+import { AiProviderError } from "../ai/errors";
+import { redactSensitiveData } from "../privacy/sensitiveData";
 
 /*
  * The tools the portfolio chat can call, as provider-neutral definitions (each AI adapter converts
@@ -9,6 +11,21 @@ import { createVisitorQuery } from "../queries/visitorQueries";
  */
 
 const MAX_QUERIES_PER_REPLY = 1;
+// Searches cost more than a normal reply, so one per reply is plenty for a fallback.
+const MAX_SEARCHES_PER_REPLY = 1;
+
+const WebSearchInput = z.object({ query: z.string().trim().min(3).max(300) });
+
+const webSearchTool = {
+  name: "web_search",
+  description:
+    "Search the web. Only for questions that are in scope (about Burhanuddin, his work, or the companies, products and technologies he has worked with) and that the knowledge and other tools don't answer. Check the knowledge first. Include his full name when the question is about him.",
+  parameters: {
+    type: "object",
+    properties: { query: { type: "string", description: "What to search for, as a clear standalone question." } },
+    required: ["query"],
+  },
+};
 
 const RaiseQueryInput = z.object({
   question: z.string().trim().min(3).max(500),
@@ -86,13 +103,42 @@ const shortName = (fullName) => fullName.split("/")[1];
 /**
  * Tools for one chat reply.
  * @param {{ github: {repos: string[], token: string | null} | null, visitorMessage: string,
+ *           searchWeb?: ((query: string) => Promise<{summary: string, sources: {url, title}[]}>) | null,
  *           onStatus: (text: string) => void, onQuerySaved: () => void, dryRun?: boolean }} context
  *        dryRun answers raise_query as if it worked without filing anything (used by the admin test set).
- * @returns {{ definitions: object[], run: (call: {id, name, input}) => Promise<{toolCallId, content, isError?}> }}
+ * @returns {{ definitions: object[], run: (call: {id, name, input}) => Promise<{toolCallId, content, isError?}>,
+ *            webSources: () => {url, title}[] | null }} webSources is null unless a search returned something.
  */
-export function createChatTools({ github, visitorMessage, onStatus, onQuerySaved, dryRun = false }) {
+export function createChatTools({ github, visitorMessage, onStatus, onQuerySaved, searchWeb = null, dryRun = false }) {
   let queriesSaved = 0;
-  const definitions = [raiseQuery, ...(github ? githubTools(github.repos, { canSearch: Boolean(github.token) }) : [])];
+  let searches = 0;
+  let webSources = null;
+  const definitions = [
+    raiseQuery,
+    ...(github ? githubTools(github.repos, { canSearch: Boolean(github.token) }) : []),
+    ...(searchWeb ? [webSearchTool] : []),
+  ];
+
+  async function runWebSearch(input) {
+    const parsed = WebSearchInput.safeParse(input);
+    if (!parsed.success) return { content: "Invalid input. A query of 3-300 characters is required.", isError: true };
+    if (searches >= MAX_SEARCHES_PER_REPLY) return { content: "Already searched once for this reply; answer with what you have." };
+    searches += 1;
+    onStatus("Searching the web…");
+    try {
+      const { summary, sources } = await searchWeb(parsed.data.query);
+      if (!summary.trim()) return { content: "The web search found nothing useful." };
+      webSources = [...(webSources ?? []), ...sources];
+      // Web pages can carry phone numbers and the like; the chat never repeats those.
+      return { content: JSON.stringify({ summary: redactSensitiveData(summary), sources }) };
+    } catch (error) {
+      if (error instanceof AiProviderError) {
+        console.error("Web search failed:", error.message);
+        return { content: "Web search isn't available right now.", isError: true };
+      }
+      throw error;
+    }
+  }
 
   async function runGithub(name, input) {
     const parsed = GITHUB_INPUT[name].safeParse(input);
@@ -141,10 +187,11 @@ export function createChatTools({ github, visitorMessage, onStatus, onQuerySaved
   async function run(call) {
     let result;
     if (call.name === "raise_query") result = await runRaiseQuery(call.input);
+    else if (searchWeb && call.name === "web_search") result = await runWebSearch(call.input);
     else if (github && call.name in GITHUB_INPUT) result = await runGithub(call.name, call.input);
     else result = { content: `Unknown tool: ${call.name}`, isError: true };
     return { toolCallId: call.id, ...result };
   }
 
-  return { definitions, run };
+  return { definitions, run, webSources: () => webSources };
 }
